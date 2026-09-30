@@ -8,8 +8,10 @@
 //   block          raio ocupado no chão pela arte (bloqueia construção de torres; PlacementRules)
 //   glow   {x, y}  (cristais) centro do brilho, em px a partir do pivot
 //
-// Kit escolhido no jogo: DECOR_KIT em src/config/art.js ('atual' = SVGs antigos | 'a' | 'b' | 'c'),
-// ou ?decor=a na URL para testar sem editar arquivo.
+// Kit de cada mapa: `decorKit` em src/data/mapXX.js (padrão DECOR_KIT em src/config/art.js) e, por item, `kit`
+// (ex.: { type: 'arvore2', kit: 'c' }) para transições. ?decor=b na URL força um kit no mapa inteiro (teste).
+// Cada kit = bioma de um mapa (DESIGN.md): A Bosque antigo (mapa 1), B Fronteira de pinheiros (mapa futuro de
+// montanha/fronteira), C Floresta rúnica (contaminação perto do Núcleo Arcano).
 
 export const DECOR_ITEMS = ['arvore1', 'arvore2', 'arvore3', 'arbusto1', 'arbusto2', 'pedraP', 'pedraM', 'pedraG', 'cristal', 'tema'];
 
@@ -64,16 +66,10 @@ export const DECOR_KITS = {
     }
 };
 
-// Qual item do kit ocupa cada decoração de src/data/map01.js (pelo tipo e pela escala que ela tinha nos SVGs).
-// Pixel art não usa escala fracionada: a escala só escolhe o tamanho do item.
-export function decorItemFor (d) {
-    const s = d.scale || 1;
-    switch (d.type) {
-        case 'tree': return s >= 1 ? 'arvore1' : (s >= 0.9 ? 'arvore2' : 'arvore3');
-        case 'rock': return s >= 0.9 ? 'pedraG' : (s >= 0.8 ? 'pedraM' : 'pedraP');
-        case 'crystal-cluster': return 'cristal';
-        case 'bush': return d.variant === 2 ? 'arbusto2' : 'arbusto1';
-        case 'landmark': return 'tema';
-        default: return null;
-    }
+// Resolve uma decoração do mapa: item = `type`; kit = `force` (teste com ?decor=) || `d.kit` (peça de outro kit,
+// ex.: transição) || kit base do mapa. Devolve { kit, item, def, key } ou null se o item não existir.
+export function decorFor (d, baseKit, force = null) {
+    const kit = force || d.kit || baseKit;
+    const def = DECOR_KITS[kit] && DECOR_KITS[kit].items[d.type];
+    return def ? { kit, item: d.type, def, key: `decor-${kit}-${d.type}` } : null;
 }

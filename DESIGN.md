@@ -125,6 +125,18 @@ torre que responde a ele chega no mesmo mapa ou antes.
 | 5 | Ninho do Dragão, Forja de Éter | Xamã Rúnico, Carcaça Divisora; mini-chefe Chefe de Guerra Orc | prioridade de alvo; economia; divisão |
 | 6 — final | Obelisco de Comando | Golem de Sucata; chefe Dragão Ancestral | suporte e combinação de tudo; chefe em fases |
 
+### Biomas: cada kit de decoração = bioma de um mapa
+Os kits de decoração em pixel art (`src/config/decor.js`, `ART_SPEC.md`) funcionam como **biomas**: cada mapa tem um kit
+base (`decorKit`) e pode trocar peças soltas por peças de outro kit (`kit` no item) para contar uma transição.
+- **Kit A — Bosque antigo**: bioma do **mapa 1 (Vale das Runas)**.
+- **Kit C — Floresta rúnica**: a floresta "contaminada" pela energia do Núcleo Arcano. No mapa 1 aparece só no terço
+  final, perto do castelo (cristais grandes, árvores com veias ciano, pedras com fissuras, pilar em ruína); pode ser o
+  bioma inteiro de um mapa mais avançado, próximo de uma fonte rúnica.
+- **Kit B — Fronteira de pinheiros**: guardado para um **mapa futuro de montanha/fronteira** (pinheiros escuros, pedras
+  frias, marcos rúnicos na estrada).
+- Regra dos biomas: a decoração nunca compete com o gameplay — o ciano dela é sempre mais fraco que o de torres,
+  projéteis e runas de construção.
+
 ### Marco intermediário — versão 0.5
 Primeiro jogo completo e jogável de ponta a ponta, em **3 mapas** (1 a 3 acima):
 - **4 torres**: Besta Laser, Catapulta de Plasma, Torre de Estase, Bobina Rúnica.

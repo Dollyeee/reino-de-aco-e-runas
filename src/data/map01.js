@@ -26,36 +26,43 @@ export const MAP01 = {
     // Castelo e Núcleo Arcano (ponto de contato com o chão)
     castle: { x: 1165, y: 522 },
 
-    // Decoração. Também bloqueia a construção de torres.
-    // Com a arte atual (SVG), `type` é o nome do SVG em public/assets/ e `scale` a escala dele.
-    // Com um kit de pixel art (DECOR_KIT em src/config/art.js), `type` + `scale` escolhem o item do kit
-    // (src/config/decor.js, decorItemFor); entradas `kitOnly` (arbustos e elemento temático) só existem nos kits.
+    // Decoração em pixel art (kits em src/config/decor.js; T15/T18). Também bloqueia a construção de torres
+    // (raio `block` de cada item). `type` = item do kit (arvore1-3, arbusto1-2, pedraP/M/G, cristal, tema);
+    // `kit` troca o kit só daquele item (sem `kit` = decorKit do mapa).
+    // Vale das Runas: Bosque antigo (A) na entrada; perto do castelo a floresta fica "contaminada" pela energia do
+    // Núcleo Arcano e peças da Floresta rúnica (C) aparecem — cristais grandes, árvores com veias ciano, pedras com
+    // fissuras e o pilar em ruína. Na entrada, o único ciano são os cristais pequenos do kit A.
+    decorKit: 'a',
     decorations: [
-        { type: 'tree', x: 60, y: 110, scale: 1.0 },
-        { type: 'tree', x: 120, y: 90, scale: 0.8 },
-        { type: 'tree', x: 70, y: 380, scale: 1.1 },
-        { type: 'tree', x: 90, y: 640, scale: 1.0 },
-        { type: 'tree', x: 200, y: 690, scale: 0.85 },
-        { type: 'tree', x: 540, y: 120, scale: 0.9 },
-        { type: 'tree', x: 1060, y: 130, scale: 1.0 },
-        { type: 'tree', x: 1140, y: 170, scale: 0.8 },
-        { type: 'tree', x: 1230, y: 110, scale: 1.1 },
-        { type: 'tree', x: 810, y: 695, scale: 0.9 },
-        { type: 'tree', x: 640, y: 700, scale: 0.8 },
-        { type: 'rock', x: 230, y: 360, scale: 0.9 },
-        { type: 'rock', x: 520, y: 390, scale: 0.7 },
-        { type: 'rock', x: 690, y: 450, scale: 0.8 },
-        { type: 'rock', x: 980, y: 210, scale: 1.0 },
-        { type: 'rock', x: 360, y: 700, scale: 0.8 },
-        { type: 'rock', x: 1245, y: 665, scale: 0.8 },
-        { type: 'crystal-cluster', x: 60, y: 520, scale: 0.9, light: true },
-        { type: 'crystal-cluster', x: 830, y: 440, scale: 0.8, light: true },
-        { type: 'crystal-cluster', x: 540, y: 265, scale: 0.75, light: true },
-        { type: 'crystal-cluster', x: 1010, y: 712, scale: 0.8, light: true },
-        { type: 'bush', x: 250, y: 112, kitOnly: true },
-        { type: 'bush', x: 720, y: 145, variant: 2, kitOnly: true },
-        { type: 'bush', x: 470, y: 655, variant: 2, kitOnly: true },
-        { type: 'bush', x: 150, y: 455, kitOnly: true },
-        { type: 'landmark', x: 200, y: 578, kitOnly: true }
+        // entrada e meio do mapa: Bosque antigo
+        { type: 'arvore1', x: 60, y: 110 },
+        { type: 'arvore3', x: 120, y: 90 },
+        { type: 'arvore1', x: 70, y: 380 },
+        { type: 'arvore1', x: 90, y: 640 },
+        { type: 'arvore3', x: 200, y: 690 },
+        { type: 'arvore2', x: 540, y: 120 },
+        { type: 'arvore3', x: 640, y: 700 },
+        { type: 'arvore2', x: 810, y: 695 },
+        { type: 'pedraG', x: 230, y: 360 },
+        { type: 'pedraP', x: 520, y: 390 },
+        { type: 'pedraM', x: 690, y: 450 },
+        { type: 'pedraM', x: 360, y: 700 },
+        { type: 'cristal', x: 60, y: 520 },
+        { type: 'cristal', x: 540, y: 265 },
+        { type: 'cristal', x: 830, y: 440 },
+        { type: 'arbusto1', x: 250, y: 112 },
+        { type: 'arbusto2', x: 720, y: 145 },
+        { type: 'arbusto2', x: 470, y: 655 },
+        { type: 'arbusto1', x: 150, y: 455 },
+        { type: 'tema', x: 200, y: 578 },                  // toco cortado
+        // terço final (perto do castelo): transição para a Floresta rúnica
+        { type: 'arvore3', x: 1140, y: 170 },
+        { type: 'arvore1', x: 1060, y: 130, kit: 'c' },
+        { type: 'arvore2', x: 1230, y: 110, kit: 'c' },
+        { type: 'pedraG', x: 980, y: 210, kit: 'c' },
+        { type: 'pedraM', x: 1245, y: 665, kit: 'c' },
+        { type: 'cristal', x: 930, y: 130, kit: 'c' },
+        { type: 'cristal', x: 1010, y: 712, kit: 'c' },
+        { type: 'tema', x: 975, y: 320, kit: 'c' }         // ruína de pilar com circuito exposto
     ]
 };

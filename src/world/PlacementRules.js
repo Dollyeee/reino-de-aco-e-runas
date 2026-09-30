@@ -1,7 +1,7 @@
 import { BALANCE } from '../config/balance.js';
 import { HUD, TOWER_BAR, WORLD } from '../config/visual.js';
-import { DECOR } from '../config/art.js';
-import { decorItemFor } from '../config/decor.js';
+import { DECOR_FORCE, mapDecorKit } from '../config/art.js';
+import { decorFor } from '../config/decor.js';
 
 // Retângulo ocupado pela barra de torres (usado pela UI e pelas regras).
 export function towerBarRect () {
@@ -26,16 +26,8 @@ function rectsOverlap (a, b) {
     return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 }
 
-// Raio de bloqueio de uma decoração: kit de pixel art → tamanho real do item (src/config/decor.js);
-// arte atual (SVG) → BALANCE.placement.decorationRadius × escala (entradas `kitOnly` não existem).
-function decorationRadius (d) {
-    if (DECOR) {
-        const item = decorItemFor(d);
-        return item ? DECOR.items[item].block : 0;
-    }
-    if (d.kitOnly) { return 0; }
-    return (BALANCE.placement.decorationRadius[d.type] || 0) * (d.scale || 1);
-}
+// nome da decoração na mensagem de recusa (pelo tipo de item)
+const DECOR_NAMES = { arvore: 'uma árvore', arbusto: 'um arbusto', pedra: 'uma pedra', cristal: 'um cristal' };
 
 // Decide se uma torre pode ser construída num ponto (x, y) do chão.
 // Devolve { ok: true } ou { ok: false, reason: 'texto para o jogador' }.
@@ -82,11 +74,13 @@ export default class PlacementRules {
         }
 
         // sem sobrepor decorações
+        const baseKit = mapDecorKit(this.map);
         for (const d of this.map.decorations) {
-            const dr = decorationRadius(d);
+            const dec = decorFor(d, baseKit, DECOR_FORCE);
+            const dr = dec ? dec.def.block : 0;    // raio real da arte (src/config/decor.js)
             if (dr > 0 && Math.hypot(d.x - x, d.y - y) < r + dr) {
-                const names = { tree: 'uma árvore', rock: 'uma pedra', 'crystal-cluster': 'um cristal', bush: 'um arbusto' };
-                return { ok: false, reason: `Bloqueado por ${names[d.type] || 'decoração'}` };
+                const kind = Object.keys(DECOR_NAMES).find((k) => d.type.startsWith(k));
+                return { ok: false, reason: `Bloqueado por ${DECOR_NAMES[kind] || dec.def.label}` };
             }
         }
 

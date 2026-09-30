@@ -23,23 +23,25 @@
 import { DECOR_ITEMS, DECOR_KITS } from './decor.js';
 
 // ---------------------------------------------------------------------------------------------------------
-// Kit de decoração do mapa (T15): 'atual' (SVGs antigos, padrão até a escolha) | 'a' Bosque antigo |
-// 'b' Fronteira de pinheiros | 'c' Floresta rúnica. Para testar sem editar este arquivo: ?decor=a na URL.
-// Comparação dos kits: tools/pixel-art/escolha-decoracao.html. Itens e encaixes: src/config/decor.js.
-export const DECOR_KIT = 'atual';
+// Kit de decoração (T15/T18): 'a' Bosque antigo (padrão, escolhido na T18) | 'b' Fronteira de pinheiros |
+// 'c' Floresta rúnica. Cada mapa pode ter o seu (`decorKit` no arquivo do mapa) e trocar o kit de itens soltos
+// (`kit` no item). Itens e encaixes: src/config/decor.js. Comparação dos kits: tools/pixel-art/escolha-decoracao.html.
+export const DECOR_KIT = 'a';
 
-function pickDecorKit () {
-    let k = DECOR_KIT;
+// Teste: ?decor=b na URL força um kit no mapa inteiro (ignora `decorKit` e os `kit` dos itens).
+function pickDecorForce () {
     try {
         const q = new URLSearchParams(globalThis.location ? globalThis.location.search : '').get('decor');
-        if (q && (q === 'atual' || DECOR_KITS[q])) { k = q; }
-    } catch (e) { /* fora do navegador (gerador): usa DECOR_KIT */ }
-    return k;
+        if (q && DECOR_KITS[q]) { return q; }
+    } catch (e) { /* fora do navegador (gerador) */ }
+    return null;
 }
+export const DECOR_FORCE = pickDecorForce();
 
-export const DECOR_ACTIVE = pickDecorKit();
-// kit de pixel art ativo (null = arte atual em SVG)
-export const DECOR = DECOR_KITS[DECOR_ACTIVE] || null;
+// kit base de um mapa
+export function mapDecorKit (map) {
+    return map.decorKit || DECOR_KIT;
+}
 
 // ---------------------------------------------------------------------------------------------------------
 // Versão do Orc Cibernético usada no jogo: 'b' (padrão, "Saqueador", escolhida na T09 e ajustada na T10) | 'atual'
@@ -95,10 +97,6 @@ export const ART = {
                               core: { x: 0, y: -178 }, pedestal: { x: 0, y: -122 } },
     'core-crystal':         { file: 'core-crystal.svg', size: [76, 124], pivot: [38, 62] },
 
-    'tree':                 { file: 'tree.svg', size: [100, 122], pivot: [50, 122] },
-    'rock':                 { file: 'rock.svg', size: [76, 56], pivot: [38, 56] },
-    'crystal-cluster':      { file: 'crystal-cluster.svg', size: [84, 86], pivot: [42, 86],
-                              glow: { x: 2, y: -46 } },
 
     'projectile-bolt':      { file: 'projectile-bolt.svg', size: [52, 18], pivot: [26, 9] },
     'projectile-plasma':    { file: 'projectile-plasma.svg', size: [40, 40], pivot: [20, 20] },
@@ -108,11 +106,11 @@ export const ART = {
     'icon-wave':            { file: 'icon-wave.svg', size: [48, 48], pivot: [24, 24] }
 };
 
-// decoração em pixel art do kit ativo: chaves 'decor-<item>' (arvore1, pedraM, cristal...)
-if (DECOR) {
+// decoração em pixel art: todos os itens de todos os kits (mapas misturam kits); chaves 'decor-<kit>-<item>'
+for (const [kit, K] of Object.entries(DECOR_KITS)) {
     for (const item of DECOR_ITEMS) {
-        const d = DECOR.items[item];
-        ART[`decor-${item}`] = { file: `decor-${DECOR_ACTIVE}-${item}.png`, pixel: true, size: d.frame, pivot: d.pivot, glow: d.glow };
+        const d = K.items[item];
+        ART[`decor-${kit}-${item}`] = { file: `decor-${kit}-${item}.png`, pixel: true, size: d.frame, pivot: d.pivot, glow: d.glow };
     }
 }
 
@@ -127,9 +125,6 @@ export const SHADOWS = {
     'tower-catapult': [124, 38],
     'enemy-cyber-orc': ORC.shadow,   // pixel art: elipse de pixels (depende da versão do orc)
     'castle': [270, 60],
-    'tree': [80, 26],
-    'rock': [66, 20],
-    'crystal-cluster': [72, 22],
     'projectile-plasma': [34, 14],
     'projectile-bolt': [26, 9]
 };

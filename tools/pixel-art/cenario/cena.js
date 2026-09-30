@@ -1,5 +1,5 @@
-// Cena de referência (T12): o mapa inteiro no tamanho real 1280×720 — chão novo + orc Saqueador em alguns
-// pontos do caminho + retângulos placeholder no lugar das torres e do castelo (ainda são SVG no jogo).
+// Cena de referência (T12): o mapa inteiro no tamanho real 1280×720 — chão novo + decoração do mapa (T18) +
+// orc Saqueador em alguns pontos do caminho + retângulos placeholder no lugar das torres e do castelo (ainda SVG).
 // Serve para julgar contraste e escala entre personagens e cenário antes de refazer o resto da arte.
 
 // mesmos valores do jogo (src/config/visual.js SHADOW, src/effects/Shadow.js, src/config/art.js SHADOWS)
@@ -109,11 +109,16 @@ export function drawDecorMap (ground, track, map, orc, decor) {
 }
 
 // ground = Raster do chão; orc = { frames: [PixelCanvas], frame: {w,h}, pivot: [x,y], shadow: [w,h] }
-export function drawScene (ground, track, map, orc) {
+// decor = [{ x, y, rgba, def }] (opcional): decoração do mapa como no jogo
+export function drawScene (ground, track, map, orc, decor = []) {
     const w = ground.w, h = ground.h;
     const buf = ground.toRGBA();
 
-    const objs = [];
+    const objs = decor.map((d) => ({
+        y: d.y,
+        shadow: () => shadow(buf, w, h, d.x, d.y, d.def.shadow[0], d.def.shadow[1]),
+        draw: () => sprite(buf, w, h, d.rgba, d.def.frame[0], d.def.frame[1], d.x - d.def.pivot[0], d.y - d.def.pivot[1])
+    }));
     for (const t of TOWERS) {
         const B = TOWER_BOX[t.type];
         objs.push({

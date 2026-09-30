@@ -4,7 +4,7 @@ Direção de arte: **pixel art desenhada em código** (seção "Direção de art
 Os sprites são módulos JS em `tools/pixel-art/sprites/`; `npm run pixel` desenha cada um **em partes** e exporta
 os PNGs para `public/assets/` + `tools/pixel-art/preview.html`. Para mudar a arte, mude o módulo — não o PNG.
 
-Situação: o **Orc Cibernético** e o **chão do mapa 1** já são pixel art. Os demais assets abaixo ainda são SVGs
+Situação: o **Orc Cibernético**, o **chão do mapa 1** e a **decoração** já são pixel art. Os demais assets abaixo ainda são SVGs
 antigos (placeholders) e serão refeitos no gerador seguindo o guia de estilo abaixo; as medidas deles continuam
 valendo como referência.
 
@@ -189,6 +189,7 @@ e texturas de material com semente fixa.
 | Arquivo | Tamanho lógico | Pivot (no quadro) | Olha para | Animação feita pelo código |
 |---|---|---|---|---|
 | `ground-map01` (pixel art 1×, chão) | 1280×720 | 0,0 (canto superior esquerdo) | — | nenhuma |
+| `decor-<kit>-<item>` (pixel art 1×, decoração) | ver `src/config/decor.js` | base, na borda de baixo | frente | nenhuma (cristais: halo fraco) |
 | `enemy-cyber-orc` (pixel art 1×, Saqueador) | 102×83 | 46,83 (entre os pés) | direita (espelhado) | caminhada em 8 quadros, dano, morte |
 | `tower-crossbow-base` | 88×88 | 44,88 (inferior central) | frente (simétrica) | squash |
 | `tower-crossbow-head` | 116×66 | 58,33 (centro = eixo de giro) | direita (gira 360°) | giro, recuo, brilho |
@@ -197,9 +198,6 @@ e texturas de material com semente fixa.
 | `build-slot` | 100×60 | 50,25 (centro da face de cima) | — | surge ao construir, anel pulsando |
 | `castle` | 260×272 | 130,272 (inferior central) | frente | nenhuma (escudo é do código) |
 | `core-crystal` | 76×124 | 38,62 (centro) | frente | flutua, pulsa, reflexo |
-| `tree` | 100×122 | 50,122 (base do tronco) | frente | balança ao vento |
-| `rock` | 76×56 | 38,56 (inferior central) | frente | nenhuma |
-| `crystal-cluster` | 84×86 | 42,86 (inferior central) | frente | pulsa, halo |
 | `projectile-bolt` | 52×18 | 26,9 (centro) | direita (gira) | gira na direção do voo, estica |
 | `projectile-plasma` | 40×40 | 20,20 (centro) | — | estica na direção do voo |
 | `icon-ether` / `icon-core` / `icon-wave` | 48×48 | 24,24 (centro) | — | "respiram" na interface |
@@ -300,39 +298,37 @@ entram quando a fase deles chegar.
 - Emite luz (não é afetado pela iluminação do cenário): cores claras e saturadas de ciano.
 - **Animação procedural**: flutua, pulsa, reflexo (Shine), flash vermelho ao ser atingido.
 
-### Kits de decoração em pixel art (T15) — `decor-<item>`
-Três kits completos para escolha, cada um com os mesmos 10 itens: 3 árvores (`arvore1` grande, `arvore2` média,
-`arvore3` pequena), 2 arbustos, 3 pedras (`pedraP`, `pedraM`, `pedraG`), 1 aglomerado de cristal (`cristal`, com veios
-emissivos ciano) e 1 elemento temático (`tema`). Fonte: `tools/pixel-art/sprites/decoracao/kit-a|b|c.js` (peças comuns em
-`comum.js`); arquivos `public/assets/decor-<kit>-<item>.png`; comparação em `tools/pixel-art/escolha-decoracao.html`.
-- **A — Bosque antigo**: carvalhos retorcidos, copas em tufos verde-musgo (`folhagem`), pedras com musgo, toco cortado com anéis.
-- **B — Fronteira de pinheiros**: pinheiros/abetos em camadas (`pinho`), espinheiros, pedras angulosas com facetas
-  (`pedraFria`), marco de pedra com runa ciano gravada.
-- **C — Floresta rúnica**: casca escura com veias de ciano (`cascaEscura`), copas verde-azuladas (`folhagemRunica`) com
-  brilhos, cristais maiores brotando do chão, pedras com fissuras rúnicas (`pedraRunica`), ruína de pilar com circuito.
+### Decoração em pixel art (T15/T18) — `decor-<kit>-<item>` ✅
+Três kits com os mesmos 10 itens: 3 árvores (`arvore1` grande, `arvore2` média, `arvore3` pequena), 2 arbustos
+(`arbusto1`, `arbusto2`), 3 pedras (`pedraP`, `pedraM`, `pedraG`), 1 aglomerado de cristal (`cristal`) e 1 elemento
+temático (`tema`). Fonte: `tools/pixel-art/sprites/decoracao/kit-a|b|c.js` (peças comuns em `comum.js`); arquivos
+`public/assets/decor-<kit>-<item>.png`; comparação dos kits em `tools/pixel-art/escolha-decoracao.html`.
+**Cada kit = bioma de um mapa** (DESIGN.md):
+- **A — Bosque antigo** (mapa 1, escolhido na T18): carvalhos retorcidos, copas em tufos verde-musgo (`folhagem`), pedras
+  com musgo, toco cortado com anéis.
+- **B — Fronteira de pinheiros** (guardado para um mapa futuro de montanha/fronteira): pinheiros/abetos em camadas
+  (`pinho`), espinheiros, pedras angulosas com facetas (`pedraFria`), marco de pedra com runa ciano gravada.
+- **C — Floresta rúnica** (contaminação rúnica perto do Núcleo Arcano): casca escura com veias de ciano (`cascaEscura`),
+  copas verde-azuladas (`folhagemRunica`), cristais maiores brotando do chão, pedras com fissuras rúnicas (`pedraRunica`),
+  ruína de pilar com circuito exposto.
+
+Regras:
 - **Menos saturada e contrastada** que orcs e torres (rampas próprias da decoração). Nada infantil: copas em tufos
   irregulares, sem frutas, sem copa redonda em tronco fino.
+- **Ciano da decoração sempre mais fraco que o de gameplay** (torres, projéteis, runas de construção): veios de 1 px sem
+  halo, poucos pixels emissivos, a decoração inteira recebe a luz do cenário (escurece com a luz ambiente) e os cristais
+  só ganham um halo fraco — **nenhuma luz dinâmica** (`scene.lights`) na decoração.
 - **Encaixes** (quadro, pivot na borda de baixo, sombra, raio de bloqueio `block`, `glow` dos cristais) em
   `src/config/decor.js`; o gerador falha se o desenho não bater com o quadro ou se um ponto cair fora dele, e avisa se a
   base não encostar no chão ou se a arte encostar na borda.
-- **No mapa**: cada árvore/pedra/cristal de `map01.js` vira o item do tamanho correspondente (`decorItemFor`, pela escala
-  antiga); arbustos e o elemento temático são entradas `kitOnly` (só existem com um kit). Sem balanço nem escala (pixel
-  art); cristais sem iluminação de cena, com halo e luz pulsando.
-- **Seletor**: `DECOR_KIT` em `src/config/art.js` (`'atual'` = SVGs abaixo, padrão até a escolha) ou `?decor=a|b|c` na URL.
-
-### Árvore — `tree` (SVG atual)
-- **Tamanho**: 100×122 · pivot 50,122 (base do tronco).
-- **Animação procedural**: balança ±1,5° girando em torno da base; mantenha a base do tronco no pivot.
-- Sombra: elipse 80×26 (× escala da árvore no mapa).
-
-### Pedra — `rock` (SVG atual)
-- **Tamanho**: 76×56 · pivot 38,56. Estática. Sombra: elipse 66×20.
-
-### Aglomerado de cristais — `crystal-cluster` (SVG atual)
-- **Tamanho**: 84×86 · pivot 42,86.
-- `glow` (+2, −46): centro do halo de luz que o jogo desenha.
-- Emite luz (sem iluminação de cena). **Animação procedural**: pulsa levemente.
-- Sombra: elipse 72×22.
+- **No mapa** (`src/data/mapXX.js`): `decorKit` = kit base do mapa (padrão `DECOR_KIT` em `src/config/art.js`); cada item
+  diz o seu `type` (`arvore2`, `pedraM`...) e pode trocar de kit com `kit` — ex.: `{ type: 'arvore2', kit: 'c', x, y }` —
+  para transições entre biomas. `?decor=b` na URL força um kit no mapa inteiro (só para testar). Sem balanço nem escala
+  (pixel art). Construção bloqueada pelo `block` de cada item.
+- **Mapa 1 (Vale das Runas)**: kit A na entrada e no meio; no terço final (perto do castelo) a floresta fica "contaminada"
+  — 2 cristais grandes, 2 árvores com veias, pedras com fissuras e o pilar em ruína do kit C. Na entrada, o único ciano são
+  os cristais pequenos do kit A.
+- Os SVGs antigos de árvore, pedra e cristal foram removidos na T18 (continuam no histórico do git).
 
 ### Virote laser — `projectile-bolt`
 - **Tamanho**: 52×18 · pivot 26,9 (centro) · **aponta para a direita**.

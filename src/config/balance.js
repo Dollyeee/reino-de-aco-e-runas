@@ -59,11 +59,7 @@ export const BALANCE = {
         worldMargin: 16,             // distância mínima das bordas do mundo
         uiPadding: 10,               // folga em volta do HUD e da barra de torres
         towerHeight: 95,             // altura aproximada da torre acima do centro (não pode invadir o HUD)
-        decorationRadius: {          // raio de bloqueio por tipo de decoração (× escala da decoração)
-            tree: 26,
-            rock: 24,
-            'crystal-cluster': 28
-        },
+        // decorações bloqueiam pelo raio `block` de cada item (tamanho real da arte, src/config/decor.js)
         castle: { halfWidth: 140, above: 250, below: 26 }   // retângulo bloqueado em volta do castelo
     },
 

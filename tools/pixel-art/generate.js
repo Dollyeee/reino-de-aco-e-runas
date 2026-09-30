@@ -21,7 +21,8 @@ import { MATERIALS, SINGLE, OUTLINE } from './palette.js';
 import { MAP01 } from '../../src/data/map01.js';
 import { drawGround, TILE } from './cenario/chao.js';
 import { drawScene, drawDecorMap } from './cenario/cena.js';
-import { DECOR_KITS, DECOR_ITEMS, decorItemFor } from '../../src/config/decor.js';
+import { DECOR_KITS, DECOR_ITEMS, decorFor } from '../../src/config/decor.js';
+import { DECOR_KIT } from '../../src/config/art.js';
 import { escolhaDecoracaoHtml } from './escolha-decoracao.js';
 import kitA from './sprites/decoracao/kit-a.js';
 import kitB from './sprites/decoracao/kit-b.js';
@@ -324,17 +325,20 @@ console.log(`✓ public/assets/chao-map01.png  (${ground.w}×${ground.h}, chão 
 
 const orcV = ORC_VARIANTS.b;
 const orcRef = { frames: orcB.sheets[0].frames, frame: orcB.frame, pivot: orcV.pivot, shadow: orcV.shadow };
-const scene = drawScene(ground, track, MAP01, orcRef);
+// decoração como no jogo: kit base do mapa + `kit` por item (transição A → C perto do castelo)
+const placeDecor = (force = null) => MAP01.decorations.map((d) => {
+    const dec = decorFor(d, MAP01.decorKit || DECOR_KIT, force);
+    if (!dec) { throw new Error(`[pixel] decoração desconhecida em map01.js: ${JSON.stringify(d)}`); }
+    return { x: d.x, y: d.y, rgba: decor[dec.kit][dec.item].rgba, def: dec.def };
+});
+const scene = drawScene(ground, track, MAP01, orcRef, placeDecor());
 fs.writeFileSync(path.join(HERE, 'cena-referencia.png'), encodeRGBA(scene, ground.w, ground.h));
 console.log('✓ tools/pixel-art/cena-referencia.png  (1280×720)');
 
-// escolha-decoracao.html: cada kit aplicado no mapa inteiro (mesmas posições de map01.js) + itens soltos
+// escolha-decoracao.html: cada kit aplicado no mapa inteiro (mesmas posições de map01.js, kit forçado) + itens soltos
 fs.mkdirSync(path.join(HERE, 'decoracao'), { recursive: true });
 for (const kit of Object.keys(KIT_DRAW)) {
-    const placed = MAP01.decorations.map((d) => {
-        const item = decorItemFor(d);
-        return { x: d.x, y: d.y, rgba: decor[kit][item].rgba, def: decor[kit][item].def };
-    });
+    const placed = placeDecor(kit);
     fs.writeFileSync(path.join(HERE, 'decoracao', `mapa-${kit}.png`), encodeRGBA(drawDecorMap(ground, track, MAP01, orcRef, placed), ground.w, ground.h));
 }
 fs.writeFileSync(path.join(HERE, 'escolha-decoracao.html'), escolhaDecoracaoHtml({

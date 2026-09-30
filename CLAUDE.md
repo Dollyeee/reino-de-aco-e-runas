@@ -25,9 +25,10 @@ Os sprites são gerados por `npm run pixel` a partir de módulos JS em `tools/pi
 cada personagem **em partes** numa grade pequena. Não se edita PNG à mão: muda-se o módulo e roda o gerador.
 
 > Transição em andamento: o **Orc Cibernético** (com caminhada) e o **chão do mapa 1** (T12) já são pixel art 1×.
-> A **decoração** tem 3 kits em pixel art aguardando escolha (T15: `DECOR_KIT` em `src/config/art.js`, padrão `'atual'` =
-> SVGs; comparação em `tools/pixel-art/escolha-decoracao.html`). Torres, castelo, projéteis e ícones ainda são os SVGs
-> antigos (placeholders) e serão refeitos no mesmo gerador.
+> A **decoração** é pixel art em 3 kits = biomas (T15/T18): mapa 1 = kit A (Bosque antigo) com transição para o kit C
+> (Floresta rúnica) perto do castelo; kit B (Fronteira de pinheiros) guardado para um mapa futuro. Kit base do mapa em
+> `decorKit` (padrão `DECOR_KIT` em `src/config/art.js`), troca por item com `kit`. Torres, castelo, projéteis e ícones
+> ainda são os SVGs antigos (placeholders) e serão refeitos no mesmo gerador.
 > **Guia de estilo ("bíblia") em `ART_SPEC.md`**: paleta completa, luz, contorno, densidade de detalhe, tamanhos de
 > referência e sombras. Toda arte nova segue esse guia.
 > O orc padrão é o **"Saqueador"** (`sprites/orc-b.js`, `ORC_VARIANT = 'b'` em `src/config/art.js`); o orc da T08
@@ -119,7 +120,7 @@ tools/pixel-art/          gerador de pixel art (`npm run pixel`): palette.js, li
 public/assets/            SVGs substituíveis (torres, inimigos, castelo, cristais, cenário, ícones)
 src/
   main.js                 configuração do Phaser.Game
-  config/decor.js         kits de decoração (itens, quadros, sombras, raio de bloqueio) e decorItemFor
+  config/decor.js         kits de decoração (itens, quadros, sombras, raio de bloqueio) e decorFor (kit por item)
   config/balance.js       TODOS os valores de balanceamento (dano, alcance, custo, vida, velocidade, ondas, economia)
   config/visual.js        cores, profundidades, luzes, bloom, escala de renderização
   data/map01.js           caminho, castelo e decoração do mapa 1 (decorações também bloqueiam construção)
@@ -171,7 +172,7 @@ Tudo em **pixel art 1×**, seguindo o guia de estilo do `ART_SPEC.md`:
 - [x] Chão e caminho do mapa 1 + guia de estilo (T12)
 - [ ] Torres (Besta Laser, Catapulta de Plasma) e plataforma rúnica
 - [ ] Castelo + Núcleo Arcano
-- [ ] Decoração (árvores, pedras, cristais) — 3 kits gerados (T15), aguardando a escolha do usuário
+- [x] Decoração (árvores, pedras, cristais): kit A no mapa 1 com transição para o C perto do castelo (T15/T18)
 - [ ] Projéteis e efeitos
 - [ ] UI com fonte pixel
 

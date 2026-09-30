@@ -381,7 +381,14 @@ Conteúdo:
 
 ---
 
-## [ ] T18 — Decoração do mapa 1: kit A com transição para C
+## [x] T18 — Decoração do mapa 1: kit A com transição para C
+
+**Concluída em 2026-09-30.** Resultado:
+- `DECOR_KIT = 'a'` (padrão) e `decorKit: 'a'` no `map01.js`; cada decoração agora diz o item (`type: 'arvore2'`...) e pode trocar de kit com `kit: 'c'` (`decorFor` em `src/config/decor.js`). `?decor=a|b|c` força um kit no mapa inteiro só para teste. O jogo carrega os 30 itens (mapas misturam kits).
+- Transição no terço final: 2 cristais grandes do C (um novo em 930,130), 2 árvores com veias (1060,130 e 1230,110), pedras com fissuras (980,210 e 1245,665) e o pilar em ruína (975,320); entrada só com peças do A (único ciano: cristais pequenos). Toco cortado continua na entrada.
+- Ciano da decoração mais fraco que o de gameplay: toda a decoração recebe a luz do cenário, cristais só com halo fraco (0,04–0,09) e **sem luz dinâmica** (antes tinham `scene.lights`). Regra registrada no ART_SPEC.
+- SVGs `tree`, `rock`, `crystal-cluster` removidos (arquivos, manifesto, sombras, `BALANCE.placement.decorationRadius` e o ramo SVG do MapRenderer); bloqueio de construção só pelo `block` de cada item, com o nome da peça na mensagem.
+- DESIGN.md: "cada kit = bioma de um mapa" (A = mapa 1, C = contaminação rúnica, B = mapa futuro de montanha/fronteira). Cena de referência agora com a decoração; simulação: mesmos resultados finais (mista perde, só Bestas 20/20, só Catapultas perde; mista 5 de vida na onda 4 em vez de 6, por causa dos raios de bloqueio novos). `npm run pixel` e `npm run build` OK.
 
 Escolha da decoração: kit A (Bosque antigo) como base do mapa 1, com transição para o kit C (Floresta rúnica) perto do castelo.
 
