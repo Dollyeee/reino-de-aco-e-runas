@@ -58,6 +58,7 @@ Cada material é uma **rampa de 5 tons com hue shift**: 0 = mais escuro … 4 = 
 | `pedraFria` | decoração: pedras angulosas (kit B) | `#1b1d28` | `#2e323d` | `#474c57` | `#646b73` | `#8e949a` |
 | `pedraRunica` | decoração: pedras com fissuras (kit C) | `#15151d` | `#25242d` | `#37363f` | `#4d4b52` | `#6e6b6c` |
 | `cristal` | decoração: corpo dos cristais (o brilho é o ciano) | `#152238` | `#1c3c55` | `#2a6878` | `#4a9aa2` | `#9fdcd6` |
+| `azul` | azul do reino: estandartes e tecidos do castelo (T22) | `#161a33` | `#232f5c` | `#304a86` | `#4a6aa8` | `#7f9ccc` |
 | `terra` | chão (caminho) | `#35272a` | `#58443a` | `#7a6049` | `#977b5b` | `#b59c76` |
 | `ciano` ⚡ | energia rúnica, plasma, runas | `#0c3252` | `#14788c` | `#3ff5ff` | `#a8fcf0` | `#f2fff0` |
 | `vermelho` ⚡ | olhos, perigo, núcleo ferido | `#3a0a26` | `#78101c` | `#ff3b4e` | `#ff9a78` | `#fff0d8` |
@@ -167,6 +168,42 @@ e texturas de material com semente fixa.
 - Caminho de terra com **borda irregular** (nunca linha reta), barranco escuro em cima/esquerda e claro embaixo/direita,
   capim avançando sobre a terra, sulcos, pegadas e pedrinhas.
 - Mudou o caminho do mapa? Rode `npm run pixel`; o jogo avisa no console se o chão estiver desatualizado.
+
+## 10. Processo de trabalho (padrão desde a T22 — vale para TODA a arte nova)
+
+Toda arte nova (torres, castelo, inimigos, ícones) passa por **conceito + 4 etapas**, com **autocrítica** a cada rodada.
+Piloto: Besta Laser nova (`tools/pixel-art/sprites/torres/besta-nova.js`, rodadas em `tools/pixel-art/rodadas/`).
+
+**0. Conceito** — 3 miniaturas de silhueta (só massas, 2–3 tons) com proporções diferentes, no tamanho real ao lado do
+orc; escolher a mais legível e robusta e registrar o porquê.
+
+**1. Blocagem** — silhueta, proporções e perspectiva 3/4 com formas grandes: caixas com frente, topo visível e lateral
+(`Grade.box3q`: o topo recua para cima e meio pixel para a direita por pixel de profundidade).
+
+**2. Luz e volume** — topo claro (tom 3), frente média (tom 2), lateral escura (tom 1); sombra de oclusão (tom 0) onde as
+peças se encontram (pé da parede na pedra, sob o piso); sombra de contato e sombra projetada para baixo/direita no chão;
+rim light de 1 px na borda direita.
+
+**3. Materiais e detalhes pixel a pixel** — compor com peças da biblioteca `tools/pixel-art/lib/materiais/` (grades de
+caracteres mapeadas para a paleta: blocos de pedra com rejunte e variações, tábuas com veio vertical/horizontal, piso,
+poste, pontas de tábua, ameia, cinta e rebite, cantoneira, corda, estandarte, janela com brilho, runas). Peça nova que
+possa se repetir (castelo, outras torres) entra na biblioteca, não no sprite.
+
+**4. Limpeza pixel a pixel**, olhando a imagem ampliada — checklist:
+- [ ] nenhum pixel órfão (1 px isolado sem par da mesma cor) — `Grade.cleanup()` remove os que não são protegidos;
+- [ ] diagonais e curvas sem "jaggies": degraus regulares (1-1, 2-2, 1-2-1…), sem degrau solto quebrando o ritmo;
+- [ ] sem **pillow shading**: a sombra segue a luz (embaixo/à direita), não contorna todas as bordas;
+- [ ] sem **banding**: faixas paralelas de tons em degrau (rejuntes e frestas todos no tom 0 viram listras) — alternar tons;
+- [ ] detalhe que vira ruído no tamanho real sai (ou vira uma forma maior);
+- [ ] ciano só em runas/energia e sempre discreto (tons 1–3; o 4 só no pulso forte).
+
+**Autocrítica** — ao fim de cada rodada: renderizar no tamanho real sobre o chão ao lado do orc e de uma árvore do kit A,
+e ampliado 4× (`node tools/pixel-art/rodadas/render.mjs rN <estágio>`); **olhar** a imagem; listar os 5 maiores problemas
+(legibilidade, volume, ruído, proporção, consistência com o orc); corrigir. **Mínimo de 3 rodadas**, salvas como
+`<nome>-r1.png`, `r2`, `r3` em `tools/pixel-art/rodadas/`, com a lista em `<nome>-autocritica.md`.
+
+**Peças e animação** — base + peça que gira separada (ângulos redesenhados pela grade, nunca rotação de imagem); idle leve
+(runas/janela pulsando, tecido balançando 1 px); recuo e materialização rúnica funcionando.
 
 ## Como registrar um sprite no jogo
 
@@ -282,6 +319,9 @@ animada em `tools/pixel-art/escolha-torres.html`; no jogo: `TOWER_VARIANT` em `s
    (`groundDecal` em `tools/pixel-art/sprites/torres/comum.js`); o pivot sobe alguns px no quadro para caber o chão da frente.
 7. **Idle**: base com quadros em loop (`base.frames`/`fps`: bandeira 3 poses, runa pulsando) e peça de cima com fases
    (`head.phases`: brilho correndo pela corda); quadro da cabeça = fase × nº de ângulos + ângulo.
+
+- **Versão N (T22, nova técnica)**: Besta composta com a biblioteca de materiais em 4 etapas (seção 10) — base 112×104 com
+  4 quadros de idle (runas e janela pulsando, estandarte balançando 1 px), arma 72×72 com 3 fases; `?besta=n` no jogo.
 
 | Versão | Besta Laser | Catapulta de Plasma |
 |---|---|---|

@@ -63,6 +63,18 @@ export const TOWER_ART = {
                 3: 'cano duplo (Rajada) / trilho alongado com bobinas (Perfurante) / antena e luneta sobre o visor (Sentinela)',
                 4: 'placas extras na base e escudo frontal; torre dupla com dois trilhos (Rajada) ou radar giratório (Sentinela)'
             }
+        },
+        n: {
+            name: 'Torre de vigia — nova técnica',
+            note: 'T22: composta com peças desenhadas à mão (lib/materiais) em 4 etapas; pedra com rejunte, musgo e runas, corpo de tábuas com postes e cintas, piso com ameias, estandarte azul, janela ciano, suporte com anel rúnico.',
+            base: { frame: [112, 104], pivot: [56, 96], frames: 4, fps: 5 },
+            head: { frame: [72, 72], pivot: [36, 36], angles: HEAD_ANGLES, phases: 3 },
+            headMount: { x: 4, y: -86 }, muzzle: { x: 31, y: 0 }, crystal: { x: -9, y: 0 },
+            shadow: [60, 16],
+            upgrades: {
+                3: 'Rajada: segundo arco sobre o suporte; Perfurante: ponta de arpão e cinta dupla na coronha; Sentinela: luneta e bandeirola no suporte',
+                4: 'telhado de ardósia sobre as ameias; besta dupla (Rajada) / balestra de ferro (Perfurante) / farol rúnico na ameia de trás (Sentinela)'
+            }
         }
     },
     plasmaCatapult: {

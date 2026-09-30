@@ -58,6 +58,17 @@ export function escolhaTorresHtml ({ towerArt, bestaAntes, headAngles, armAngles
     towers['besta-a0'] = entry(bestaAntes, 'besta', 'torres/besta-a-antes-base.png', 'torres/besta-a-antes-cabeca.png', 'head');
     const antesDepois = cell('besta-a0', 'Antes (T19)', bestaAntes, 'besta') +
         cell('besta-a', 'Depois (T20) — passada de acabamento', towerArt.laserCrossbow.a, 'besta');
+    // "Besta A atual × Besta nova" (T22): mesmas animações; ids próprios para não repetir as células de cima
+    towers['besta-a-t22'] = entry(towerArt.laserCrossbow.a, 'besta', `${A}torre-besta-a-base.png`, `${A}torre-besta-a-cabeca.png`, 'head');
+    towers['besta-n-t22'] = entry(towerArt.laserCrossbow.n, 'besta', `${A}torre-besta-n-base.png`, `${A}torre-besta-n-cabeca.png`, 'head');
+    const novaTecnica = cell('besta-a-t22', 'Besta A atual (T20)', towerArt.laserCrossbow.a, 'besta') +
+        cell('besta-n-t22', 'Besta nova (T22) — nova técnica', towerArt.laserCrossbow.n, 'besta');
+    const rodadas = [
+        ['besta-conceitos.png', '0 · conceito: 3 silhuetas (baixa e larga · robusta, escolhida · alta e estreita)'],
+        ['besta-r1.png', 'R1 · blocagem + luz e volume (etapas 1–2)'],
+        ['besta-r2.png', 'R2 · materiais e detalhes (etapa 3) + correções da R1'],
+        ['besta-r3.png', 'R3 · limpeza (etapa 4) + correções da R2 — final']
+    ].map(([f, cap]) => `<figure><img class="rod" src="rodadas/${f}" alt="${cap}"><figcaption>${cap}</figcaption></figure>`).join('');
     for (const [tower, file, pieceName, pieceFile, kind] of kinds) {
         for (const [v, d] of Object.entries(towerArt[tower])) {
             const id = `${file}-${v}`;
@@ -86,6 +97,7 @@ export function escolhaTorresHtml ({ towerArt, bestaAntes, headAngles, armAngles
   .cols { display: flex; gap: 22px; align-items: flex-start; flex-wrap: wrap; } .col { flex: 0 0 auto; max-width: 1240px; }
   .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; } figure { margin: 0 0 10px; } figcaption { font-size: 12px; color: #b8a8a0; margin-top: 3px; }
   canvas { image-rendering: pixelated; display: block; border: 1px solid #2a1f18; }
+  .rodadas { display: flex; flex-direction: column; gap: 6px; } .rod { image-rendering: pixelated; display: block; border: 1px solid #2a1f18; max-width: 100%; }
 </style>
 </head>
 <body>
@@ -93,6 +105,12 @@ export function escolhaTorresHtml ({ towerArt, bestaAntes, headAngles, armAngles
 <p>Gerado por <code>npm run pixel</code>. Cenário real do mapa 1 (chão, kit A, orc Saqueador). A animação repete a cada 9 s: materialização rúnica,
 depois combate. A peça de cima é redesenhada em cada ângulo (sem rotação de imagem) e o recuo é em pixels inteiros.
 Para testar no jogo: <code>TOWER_VARIANT</code> em <code>src/config/art.js</code> ou <code>?besta=a&amp;catapulta=c</code> na URL (padrão <code>'atual'</code> = SVGs).</p>
+<h2>Besta A atual × Besta nova (T22, nova técnica: peças desenhadas à mão, 4 etapas)</h2>
+<div class="cols">${novaTecnica}
+</div>
+<h2>Rodadas da Besta nova (autocrítica em <code>tools/pixel-art/rodadas/besta-autocritica.md</code>)</h2>
+<div class="rodadas">${rodadas}
+</div>
 <h2>Besta A — antes × depois (T20, passada de acabamento)</h2>
 <div class="cols">${antesDepois}
 </div>

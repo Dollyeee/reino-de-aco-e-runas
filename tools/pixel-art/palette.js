@@ -42,7 +42,10 @@ export const MATERIALS = {
     cerne: ['#3a2a26', '#5c4535', '#7d6247', '#9c7f5c', '#bba07a'],           // madeira cortada (toco)
     pedraFria: ['#1b1d28', '#2e323d', '#474c57', '#646b73', '#8e949a'],       // pedras angulosas cinza-frias
     pedraRunica: ['#15151d', '#25242d', '#37363f', '#4d4b52', '#6e6b6c'],     // pedras escuras com fissuras
-    cristal: ['#152238', '#1c3c55', '#2a6878', '#4a9aa2', '#9fdcd6']          // corpo dos cristais (o brilho é o ciano)
+    cristal: ['#152238', '#1c3c55', '#2a6878', '#4a9aa2', '#9fdcd6'],         // corpo dos cristais (o brilho é o ciano)
+
+    // T22: azul do reino (estandartes, tecidos do castelo) — fosco, para não competir com o ciano
+    azul: ['#161a33', '#232f5c', '#304a86', '#4a6aa8', '#7f9ccc']
 };
 
 // Cores avulsas

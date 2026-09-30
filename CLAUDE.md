@@ -32,6 +32,9 @@ cada personagem **em partes** numa grade pequena. Não se edita PNG à mão: mud
 > (placeholders) e serão refeitos no mesmo gerador.
 > **Guia de estilo ("bíblia") em `ART_SPEC.md`**: paleta completa, luz, contorno, densidade de detalhe, tamanhos de
 > referência e sombras. Toda arte nova segue esse guia.
+> **Processo padrão desde a T22** (`ART_SPEC.md`, seção 10): conceito (3 silhuetas) → blocagem → luz e volume → materiais
+> com peças desenhadas à mão (`tools/pixel-art/lib/materiais/` + `lib/Grade.js`) → limpeza, com autocrítica e no mínimo
+> 3 rodadas salvas em `tools/pixel-art/rodadas/`. Piloto: Besta nova (`?besta=n`, aguardando aprovação).
 > O orc padrão é o **"Saqueador"** (`sprites/orc-b.js`, `ORC_VARIANT = 'b'` em `src/config/art.js`); o orc da T08
 > continua como alternativa (`?orc=atual` na URL). `tools/pixel-art/escolha-orc.html` compara "B antes × B ajustado".
 > Arte pronta para inimigos futuros fica em `tools/pixel-art/sprites/futuros/` (ver Plano de produção, Fase D).

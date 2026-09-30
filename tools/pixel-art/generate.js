@@ -100,6 +100,7 @@ function checkShading (name, frames) {
             if (!worst.has(st.name) || ratio > worst.get(st.name)) { worst.set(st.name, ratio); }
         }
     }
+    if (!worst.size) { return; }   // arte feita à mão (Grade, T22): o sombreamento é desenhado, não calculado
     const over = [...worst].filter(([, r]) => r > 0.34);
     const max = Math.max(...worst.values());
     console.log(`  sombreamento de "${name}": maior fração escura por parte = ${(max * 100).toFixed(0)}%` +

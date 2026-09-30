@@ -457,9 +457,11 @@ Entregável: no escolha-torres.html, "Besta A antes × depois" no tamanho real s
 
 ---
 
-## [!] T21 — Piloto SpriteCook da Besta Laser
+## [-] T21 — Piloto SpriteCook da Besta Laser
 
-**Bloqueada (2026-09-30):** as ferramentas do SpriteCook (generate_game_art, upload, check_job_status) não estão nesta sessão. O usuário precisa rodar `npx spritecook-mcp setup` no próprio terminal, fazer o login e reiniciar a sessão do Claude Code. Preparado: `arte-bruta/spritecook/referencias/chao-256.png` (recorte 256×256 do chão com caminho), `arte-bruta/spritecook/paleta-besta.json` (61 cores do ART_SPEC), `arte-bruta/spritecook/manifesto.json` (esqueleto) e `.mcp.json` no `.gitignore`.
+**Cancelada (2026-09-30):** o usuário decidiu não usar serviços pagos (pedido na T23). A arte das torres segue pela técnica própria da T22.
+
+**Estava bloqueada (2026-09-30):** as ferramentas do SpriteCook (generate_game_art, upload, check_job_status) não estão nesta sessão. O usuário precisa rodar `npx spritecook-mcp setup` no próprio terminal, fazer o login e reiniciar a sessão do Claude Code. Preparado: `arte-bruta/spritecook/referencias/chao-256.png` (recorte 256×256 do chão com caminho), `arte-bruta/spritecook/paleta-besta.json` (61 cores do ART_SPEC), `arte-bruta/spritecook/manifesto.json` (esqueleto) e `.mcp.json` no `.gitignore`.
 
 Quero usar o SpriteCook (plugin de geração de pixel art) para fazer um piloto da Besta Laser que combine com a arte atual do jogo.
 
@@ -476,3 +478,56 @@ Quero usar o SpriteCook (plugin de geração de pixel art) para fazer um piloto 
 4. Com a base escolhida por mim, gere a ARMA (besta mecânica de madeira e ferro com cordas de energia ciano) vista DE CIMA, apontando para a direita, ~64×64, usando a base como reference_asset_id. Ela será girada no jogo para mirar.
 
 5. Baixe os resultados para arte-bruta/spritecook/ e mantenha um manifesto (asset IDs, prompts, custo) em arte-bruta/spritecook/manifesto.json. Mostre no escolha-torres.html as variações da base no tamanho real sobre o chão, ao lado do orc e das árvores, junto com a Besta A atual para comparar. NÃO integre no jogo ainda — primeiro eu escolho.
+
+---
+
+## [x] T22 — Nova técnica de pixel art: piloto da Besta Laser
+
+**Concluída em 2026-09-30.** Resultado:
+- Nova técnica: `tools/pixel-art/lib/Grade.js` (compositor de peças à mão: caixas em 3/4 com topo claro/frente/lateral escura, tiles, carimbos, contorno externo, rim light, limpeza de órfãos) + biblioteca `tools/pixel-art/lib/materiais/` (blocos de pedra com rejunte e 3 variações, topo e lateral de pedra, ameia, musgo, tábuas vertical/horizontal/piso, poste, ponta de tábua, cinta, rebite, cantoneira, corda, estandarte azul em 2 quadros, janela com brilho em 2 quadros, 3 runas × 3 níveis). Rampa nova `azul` na paleta.
+- Besta nova em `tools/pixel-art/sprites/torres/besta-nova.js` (versão `n` em `towerArt.js`: base 112×104 com 4 quadros de idle — runas e janela pulsando, estandarte balançando 1 px —, arma 72×72 com 13 ângulos × 3 fases). Não trocada no jogo: teste com `?besta=n`.
+- Processo: conceito (`rodadas/besta-conceitos.png`, 3 silhuetas; escolhida a "robusta") → R1 (blocagem + luz) → R2 (materiais) → R3 (limpeza), cada rodada com os 5 problemas e as correções em `rodadas/besta-autocritica.md` (renderizadas por `rodadas/render.mjs`). Pendências da R3 listadas lá para a primeira revisão com a ferramenta da T23.
+- `escolha-torres.html`: "Besta A atual × Besta nova" (tamanho real e 4×, idle e disparo) + conceito e rodadas R1→R3. ART_SPEC.md: seção 10 com o processo de 4 etapas, a autocrítica e o checklist de limpeza como padrão para toda a arte; rampa `azul` na tabela.
+- T21 marcada como cancelada (pedido da T23: sem serviços pagos).
+
+Nova técnica de pixel art para as torres — piloto: Besta Laser. Tudo feito aqui, sem imagens externas. Esta tarefa SUBSTITUI as tarefas pendentes "nova técnica de pixel art para as torres" e o "complemento" dela (se ainda estiverem na fila, marque-as como canceladas e aponte para esta).
+
+Problema: as torres atuais estão "cruas" (vista quase lateral e chapada, cores lisas, estruturas de palito, pouca luz, sem detalhes nem vida, sem contato com o chão) porque são montadas com formas geométricas.
+
+DESIGN DA BESTA (descrição): torre de vigia robusta e mais larga que alta; base de blocos de pedra com rejunte, musgo nas frestas e 2–3 runas ciano gravadas e acesas; corpo com estrutura de madeira grossa travada com cintas de ferro rebitadas; plataforma de madeira no topo com ameias de pedra nos cantos; um estandarte azul do reino pendurado na lateral iluminada; uma pequena janela com brilho ciano; no topo, um suporte giratório de madeira e ferro com anel rúnico, onde vai a besta mecânica (madeira escura, ferro, arco com cordas de energia ciano e virote de aço). Ciano sempre discreto e só em runas/energia. Altura ~110–120 px, vista 3/4 de FRENTE (mesma câmera do orc e das árvores — não isométrica), luz do canto superior esquerdo, paleta e rampas do ART_SPEC.md, contorno seletivo.
+
+PROCESSO (padrão de pixel artist, 4 etapas + conceito):
+0. Conceito: desenhe 3 miniaturas de silhueta (só formas e massas, 2–3 tons) com proporções diferentes no tamanho real, escolha a mais legível e robusta ao lado do orc, e salve as 3 em tools/pixel-art/rodadas/besta-conceitos.png.
+1. Blocagem: silhueta, proporções e perspectiva 3/4 com formas grandes (topo das superfícies visível).
+2. Luz e volume: faces de topo (claro), frente (médio) e lateral (escuro), sombra de oclusão onde as peças se encontram, sombra de contato no chão, rim light de 1 px.
+3. Materiais e detalhes pixel a pixel: crie a biblioteca tools/pixel-art/lib/materiais/ com peças desenhadas à mão como grades de caracteres mapeadas para a paleta — tábua com veio (horizontal/vertical), bloco de pedra com rejunte e variações, ameia, cinta de ferro com rebite, corda, estandarte, janela com brilho, runas ciano. Componha a torre com essas peças (reutilizáveis nas próximas torres e no castelo).
+4. Limpeza pixel a pixel, olhando a imagem ampliada: remover pixels órfãos; corrigir jaggies nas diagonais e curvas; evitar pillow shading (a sombra segue a luz, não contorna todas as bordas); evitar banding; tirar detalhes que viram ruído no tamanho real.
+
+AUTOCRÍTICA: ao fim de cada rodada, renderize a torre no tamanho real sobre o chão ao lado do orc e de uma árvore do kit A, e ampliada 4×; OLHE a imagem, liste os 5 maiores problemas (legibilidade, volume, ruído, proporção, consistência com o orc) e corrija. Mínimo de 3 rodadas, salvas em tools/pixel-art/rodadas/besta-r1.png, r2, r3.
+
+PEÇAS E ANIMAÇÃO: base (com suporte giratório vazio) + arma separada para girar na mira (ângulos redesenhados pela grade, nunca rotação de imagem); idle com runas e janela pulsando e estandarte balançando 1 px; recuo e materialização rúnica funcionando.
+
+ENTREGA: escolha-torres.html com Besta A atual × Besta nova, no tamanho real sobre o chão e ampliadas 4×, com idle e disparo rodando, mais as rodadas r1→r3. NÃO troque a torre do jogo até eu aprovar. Registre o processo de 4 etapas, a autocrítica e o checklist de limpeza no ART_SPEC.md como padrão para toda a arte do jogo daqui em diante. npm run pixel e npm run build.
+
+---
+
+## [ ] T23 — Ferramenta de revisão de pixel art e /revisar
+
+Criar uma ferramenta de revisão de pixel art para eu atuar como diretor de arte, e o comando /revisar para aplicar minhas correções. Antes: cancele a T21 (piloto SpriteCook) — decidi não usar serviços pagos; marque como cancelada com o motivo.
+
+1. Ferramenta (tools/revisor/, abre com `npm run revisor`, só em desenvolvimento):
+   - Lista os sprites do jogo (public/assets/*.png) e as rodadas de trabalho (tools/pixel-art/rodadas/*.png); para sprite sheets, permite escolher o quadro.
+   - Visualização ampliada (zoom 4× a 16×) com grade de pixels e réguas numeradas nas bordas (número em todo pixel, destaque a cada 8), como um tabuleiro de batalha naval. Mostra também o sprite no tamanho real sobre o chão do mapa, ao lado do orc, para contexto.
+   - Marcação: clicar em um pixel ou arrastar um retângulo para selecionar uma área; abre uma caixa para eu escrever o comentário, escolher a categoria (forma/silhueta, luz e sombra, cor, ruído/sujeira, proporção, detalhe, outro) e a prioridade (alta/média/baixa). Cada marcação aparece numerada em cima da imagem e numa lista ao lado, com status (aberta / corrigida / recusada).
+   - Modo comparar: antes × depois lado a lado com o mesmo zoom, e um botão "piscar" que alterna entre as duas versões no mesmo lugar.
+   - Salvar: grava as marcações em tools/revisor/revisoes/<nome-do-sprite>.json (endpoint do servidor de desenvolvimento, só local). Guarde junto o hash do PNG revisado, para saber se a marcação é da versão atual.
+
+2. Comando /revisar <sprite> (crie como skill em .claude/skills/revisar/SKILL.md, no mesmo padrão de /fila e /proxima):
+   - Lê o JSON de revisões do sprite e processa as marcações abertas, da prioridade alta para a baixa.
+   - Para cada marcação: recorta e amplia a área marcada, OLHA a imagem, interpreta meu comentário (eu descrevo a sensação, não a solução técnica — traduza para termos de pixel art) e corrige no CÓDIGO-FONTE do sprite no gerador (sprites/materiais), nunca editando o PNG final, para a correção não se perder ao regerar.
+   - Regera, gera um recorte antes × depois de cada marcação, marca como corrigida (com uma frase explicando o que mudou) ou como "precisa de esclarecimento" com uma pergunta objetiva para mim.
+   - Se uma correção mudar outra área do sprite, avise. Ao final: npm run pixel, npm run build, commit "Revisão <sprite>: N correções".
+
+3. Registre no ART_SPEC.md o fluxo: eu reviso com a ferramenta → /revisar aplica → eu confiro no modo comparar.
+
+4. Primeiro uso: deixe a Besta Laser atual (resultado da T20) pronta na ferramenta, base e cabeça, e me explique em 3 linhas como abrir e fazer a primeira revisão.
