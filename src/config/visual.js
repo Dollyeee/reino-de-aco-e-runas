@@ -12,8 +12,8 @@ function pickRenderScale () {
 }
 export const RENDER_SCALE = pickRenderScale();
 
-// Pixel art: 1 pixel da arte = PIXEL_SCALE × PIXEL_SCALE pixels do mundo 1280×720.
-export const PIXEL_SCALE = 2;
+// Pixel art 1×: 1 pixel da arte = 1 pixel do mundo 1280×720 (inimigos comuns com ~100 px de altura).
+export const PIXEL_SCALE = 1;
 
 // Tipografia: Cinzel para títulos/nomes, Oxanium para HUD, custos e números de dano.
 export const FONT = '"Cinzel", Georgia, serif';
@@ -98,9 +98,9 @@ export const ENEMY_ANIM = {
     eyeGlowSize: 12,        // halo do olho robótico
     // sprites de pixel art com animação (sprite sheet)
     walkCycle: 44,          // px do mundo andados por ciclo completo da caminhada (define o frameRate)
-    knockback: 1,           // recuo ao levar dano, em pixels da ARTE (inteiro)
+    knockback: 2,           // recuo ao levar dano, em pixels da ARTE (inteiro)
     knockbackMs: 90,
-    pixelDeath: { blinks: 3, blinkMs: 70, sinkPx: 2 },  // morte em pixel art: pisca e afunda (px da arte)
+    pixelDeath: { blinks: 3, blinkMs: 70, sinkPx: 4 },  // morte em pixel art: pisca e afunda (px da arte)
     spawnMs: 300,
     death: {
         tipAngle: 1.35,     // tombo para frente (rad, ~77°)

@@ -161,7 +161,7 @@ Ajustes no pixel art do Orc (tools/pixel-art/sprites/orc.js): proporções (pern
 
 Sobre a sugestão de balanceamento da T01: aplique a Catapulta custo 135 e a onda 5 healthMult 3.5, mas ajuste a onda 4 para que a estratégia mista vença ~15/20 e "só Catapultas" ~13/20 na mesma simulação. Me mostre os números antes de commitar.
 
-## [ ] T08 — Pixel art em alta resolução
+## [x] T08 — Pixel art em alta resolução
 
 Pixel art em ALTA RESOLUÇÃO com mais detalhe, a partir do orc já ajustado (proporções e caminhada da tarefa anterior). Isso passa a valer para TODA a arte do jogo.
 
@@ -179,3 +179,11 @@ Pixel art em ALTA RESOLUÇÃO com mais detalhe, a partir do orc já ajustado (pr
 4. A caminhada continua gerada pelas partes (8 quadros) e deve ficar igual em ritmo à versão ajustada, só com mais resolução. Deslocamentos continuam inteiros (agora em pixels de 1×, então dobre os valores).
 
 5. Atualize ART_SPEC.md e CLAUDE.md: pixel art 1×, inimigos comuns ~100 px de altura, rampas de 5 tons, contorno seletivo. Rode npm run pixel e npm run build e gere no preview.html o comparativo "2× antigo × 1× novo" no tamanho real e ampliado 4×.
+
+**Resultado:**
+- `PIXEL_SCALE = 1` (`src/config/visual.js`); recuo de dano 2 px, morte afunda 4 px.
+- Orc redesenhado na grade 1× (`tools/pixel-art/sprites/orc.js`): quadro 116×104, personagem com ~96 px, pivot (58,104), olho (+39,−66), hit (0,−54), top −96. Folha `orc-walk.png` 928×104 (8 quadros) + `orc.png` + `orc-walk.json` (olho por quadro).
+- Gerador: `palette.js` com rampas de 5 tons com hue shift; `lib/PixelCanvas.js` com contorno seletivo (interno na cor mais escura do material), sombreamento por ranking (≤30% escuro por parte), especular, rim light e emissivos com halo; `lib/textures.js` (aço escovado, ferrugem nas bordas, couro, tecido, pele) com semente fixa em coordenadas locais — 0 px de diferença no peitoral, cabeça e ombreira entre quadros (não ferve).
+- Caminhada com o mesmo ritmo, deslocamentos dobrados (pernas ±10, quique 2, braço/clava ±6). Checagens: sombreamento máx. 30% ✓, pernas com diferença mínima de 453 px entre quadros ✓.
+- Versão 2× congelada em `tools/pixel-art/legacy/` só para o comparativo "2× antigo × 1× novo" do `preview.html` (tamanho real e 4×); `orc-v1.js` removido.
+- `CLAUDE.md` (Direção de arte) e `ART_SPEC.md` atualizados. `npm run pixel` e `npm run build` OK; no jogo: 8 quadros, escala 1, brilho do olho acompanha o quadro, sombra de pixels 56×16, sem avisos de `[arte]`.

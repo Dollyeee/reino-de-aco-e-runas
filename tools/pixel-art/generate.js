@@ -7,14 +7,14 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PNG } from 'pngjs';
 import orc from './sprites/orc.js';
-import { V1_WALK } from './sprites/orc-v1.js';
+import { V2_WALK, V2_FRAME } from './legacy/orc-v2.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..');
 const ASSETS = path.join(ROOT, 'public', 'assets');
 
 // mesmos valores de src/config/visual.js (PIXEL_SCALE e cores do chão)
-const PIXEL_SCALE = 2;
+const PIXEL_SCALE = 1;
 const GRASS = '#677444';
 const DIRT = '#96795a';
 
@@ -22,7 +22,11 @@ const SPRITES = [orc];
 
 // "Antes × depois" no preview (versões antigas congeladas; não vão para o jogo)
 const COMPARE = [
-    { title: 'Orc — antes × depois', before: V1_WALK, after: orc.sheets[0].frames, frame: orc.frame }
+    {
+        title: 'Orc — 2× antigo (T06) × 1× novo',
+        before: { label: '2× ANTIGO', frames: V2_WALK, frame: V2_FRAME, real: 2 },
+        after: { label: '1× NOVO', frames: orc.sheets[0].frames, frame: orc.frame, real: 1 }
+    }
 ];
 
 function encodeSheet (frames, frame) {
@@ -88,13 +92,16 @@ function previewHtml (entries, compares) {
     <section>
       <h2>${c.title}</h2>
       <div class="row">
-        <figure><canvas data-src="${c.beforeId}" data-scale="4" data-bg="${GRASS}"></canvas><figcaption>ANTES · 4× · grama</figcaption></figure>
-        <figure><canvas data-src="${c.afterId}" data-scale="4" data-bg="${GRASS}"></canvas><figcaption>DEPOIS · 4× · grama</figcaption></figure>
-        <figure><canvas data-src="${c.beforeId}" data-scale="${PIXEL_SCALE}" data-bg="${DIRT}"></canvas><figcaption>ANTES · tamanho real · terra</figcaption></figure>
-        <figure><canvas data-src="${c.afterId}" data-scale="${PIXEL_SCALE}" data-bg="${DIRT}"></canvas><figcaption>DEPOIS · tamanho real · terra</figcaption></figure>
+        <figure><canvas data-src="${c.beforeId}" data-scale="${c.beforeReal}" data-bg="${GRASS}"></canvas><figcaption>${c.beforeLabel} · tamanho real · grama</figcaption></figure>
+        <figure><canvas data-src="${c.afterId}" data-scale="${c.afterReal}" data-bg="${GRASS}"></canvas><figcaption>${c.afterLabel} · tamanho real · grama</figcaption></figure>
+        <figure><canvas data-src="${c.beforeId}" data-scale="${c.beforeReal}" data-bg="${DIRT}"></canvas><figcaption>${c.beforeLabel} · tamanho real · terra</figcaption></figure>
+        <figure><canvas data-src="${c.afterId}" data-scale="${c.afterReal}" data-bg="${DIRT}"></canvas><figcaption>${c.afterLabel} · tamanho real · terra</figcaption></figure>
       </div>
-      <figure class="strip"><canvas data-src="${c.beforeId}" data-scale="4" data-bg="${GRASS}" data-strip="1"></canvas><figcaption>ANTES — 8 quadros (4×)</figcaption></figure>
-      <figure class="strip"><canvas data-src="${c.afterId}" data-scale="4" data-bg="${GRASS}" data-strip="1"></canvas><figcaption>DEPOIS — 8 quadros (4×)</figcaption></figure>
+      <div class="row">
+        <figure><canvas data-src="${c.beforeId}" data-scale="${c.beforeReal * 4}" data-bg="${GRASS}"></canvas><figcaption>${c.beforeLabel} · ampliado 4×</figcaption></figure>
+        <figure><canvas data-src="${c.afterId}" data-scale="${c.afterReal * 4}" data-bg="${GRASS}"></canvas><figcaption>${c.afterLabel} · ampliado 4×</figcaption></figure>
+      </div>
+      <figure class="strip"><canvas data-src="${c.afterId}" data-scale="${c.afterReal * 2}" data-bg="${GRASS}" data-strip="1"></canvas><figcaption>${c.afterLabel} — 8 quadros (2×)</figcaption></figure>
     </section>`).join('\n');
     const blocks = entries.map((e) => `
     <section>
@@ -184,9 +191,12 @@ for (const sprite of SPRITES) {
     for (const sh of sprite.sheets) { if (sh.frames.length > 1) { checkLegs(sh.file, sh.frames, sprite.frame); } }
 }
 const compares = COMPARE.map((c, i) => {
-    const mk = (frames, tag) => ({ id: `cmp${i}_${tag}`, base64: encodeSheet(frames, c.frame).toString('base64'), frames: frames.length, fw: c.frame.w, fh: c.frame.h });
+    const mk = (side, tag) => ({ id: `cmp${i}_${tag}`, base64: encodeSheet(side.frames, side.frame).toString('base64'), frames: side.frames.length, fw: side.frame.w, fh: side.frame.h });
     const beforeData = mk(c.before, 'antes'), afterData = mk(c.after, 'depois');
-    return { title: c.title, beforeId: beforeData.id, afterId: afterData.id, beforeData, afterData };
+    return {
+        title: c.title, beforeId: beforeData.id, afterId: afterData.id, beforeData, afterData,
+        beforeLabel: c.before.label, afterLabel: c.after.label, beforeReal: c.before.real, afterReal: c.after.real
+    };
 });
 fs.writeFileSync(path.join(HERE, 'preview.html'), previewHtml(entries, compares));
 console.log('✓ tools/pixel-art/preview.html');

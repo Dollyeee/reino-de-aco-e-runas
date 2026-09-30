@@ -20,27 +20,42 @@ qualquer ponto válido do mapa (estilo Bloons TD); cada torre surge sobre uma pl
 Os sprites são gerados por `npm run pixel` a partir de módulos JS em `tools/pixel-art/sprites/`, que desenham
 cada personagem **em partes** numa grade pequena. Não se edita PNG à mão: muda-se o módulo e roda o gerador.
 
-> Transição em andamento: o **Orc Cibernético** já é pixel art (com caminhada). Torres, castelo, cenário,
+> Transição em andamento: o **Orc Cibernético** já é pixel art 1× (com caminhada). Torres, castelo, cenário,
 > projéteis e ícones ainda são os SVGs antigos (placeholders) e serão refeitos no mesmo gerador.
+
+### Resolução
+- **Pixel art 1×**: 1 pixel da arte = **1 pixel do mundo** 1280×720 (`PIXEL_SCALE` = 1). Vale para TODA a arte nova.
+- **Inimigos comuns com ~100 px de altura** (orc: quadro 116×104, personagem com ~96 px). Nada de ampliar sprite antigo:
+  as partes são redesenhadas na grade 1×.
 
 ### Gerador (`tools/pixel-art/`)
 - Primitivas rasterizadas na grade, **sem antialias**: retângulo, polígono, elipse, linha grossa, pixel avulso.
-- **Cel shading automático por parte**, rampa de 3 tons por material: claro nas bordas de cima/esquerda, escuro nos
-  pixels mais de baixo/direita (bordas primeiro), **no máximo ~30% de cada parte** (o gerador mede e avisa).
-  Luz do canto superior esquerdo.
-- **Contorno** `#1e1512` de 1 px em volta da silhueta inteira + contorno interno onde uma parte se sobrepõe a
-  outra já desenhada. Vizinhos são consultados com checagem de limites (nunca deslocamento circular de máscara).
-- **Paleta fixa** em `tools/pixel-art/palette.js` (pele, aço, couro, tecido, ciano, vermelho, presa + ferrugem).
-  Ciano `#3ff5ff` e vermelho só em energia, runas, olhos e brilhos.
+- **Rampas de 5 tons por material com hue shift** (`palette.js`): sombras puxam para roxo/azul frio, luzes para
+  amarelo quente. Tons 0–1 (escuros) nos pixels mais de baixo/direita, **no máximo ~30% de cada parte**; tom 3 na
+  borda de cima/esquerda; tom 2 no resto; **tom 4 só para brilho especular e rim light**.
+- **Contorno seletivo**: externo `#1e1512` em volta da silhueta; **internos na cor mais escura do próprio material**
+  (não preto), onde uma parte encosta em outra já desenhada. Vizinhos com checagem de limites (nunca deslocamento
+  circular de máscara).
+- **Texturas por material com semente fixa** (`lib/textures.js`), em coordenadas locais da parte, iguais em todos os
+  quadros (não "fervem"): aço escovado (riscos horizontais sutis), ferrugem (manchas nas bordas das placas), couro
+  (ruído leve), tecido (trama), pele (poucos pixels de volume). Texturas só variam entre os tons 2 e 3.
+- **Brilho especular**: 1–3 pixels no tom 4 no canto iluminado das placas de metal; **rim light** de 1 px na borda
+  direita da silhueta.
+- **Emissivos** (olho, runas, plasma): núcleo claro + halo de 1–2 px nos tons da rampa ciano/vermelha, sem contorno.
+- **Detalhes** com hierarquia de leitura: rebites (1 px claro + 1 px escuro), riscos, costuras; olho e arma continuam
+  sendo os pontos que mais chamam atenção.
+- **Paleta fixa** em `tools/pixel-art/palette.js` (pele, aço, aço claro, couro, tecido, presa, ciano, vermelho +
+  ferrugem). Ciano `#3ff5ff` e vermelho só em energia, runas, olhos e brilhos.
 - **Animação gerada pelas partes**, parametrizada por uma fase `t` (0..1), **só com deslocamentos inteiros**.
   Sprite sheets com os quadros lado a lado + um PNG parado + um JSON com dados por quadro (ex.: posição do olho);
-  `tools/pixel-art/preview.html` mostra tudo em loop (4× e tamanho real, sobre grama e terra) e o "antes × depois".
-  O gerador também confere se as pernas mudam de verdade entre os quadros da caminhada.
+  `tools/pixel-art/preview.html` mostra tudo em loop (tamanho real e ampliado, sobre grama e terra) e o comparativo
+  com a versão anterior (congelada em `tools/pixel-art/legacy/`).
+- O gerador confere o sombreamento (≤ ~30% escuro por parte) e se as pernas mudam de verdade entre os quadros.
 - Câmera 3/4, personagem olhando para a **direita** (o jogo espelha), pés na borda inferior do quadro.
 
 ### No jogo (renderização pixel-perfect)
-- `pixelArt: true` (filtro NEAREST, `roundPixels`, canvas "pixelated"). **1 pixel da arte = `PIXEL_SCALE` (2) px do
-  mundo** 1280×720. `RENDER_SCALE` e zoom das câmeras são sempre **inteiros**.
+- `pixelArt: true` (filtro NEAREST, `roundPixels`, canvas "pixelated"). `RENDER_SCALE` e zoom das câmeras são sempre
+  **inteiros**.
 - Texturas que não são pixel art (SVGs antigos, brilhos, sombras suaves) continuam com filtro LINEAR.
 - Em sprites de pixel art **não há escala fracionada nem rotação**: squash, quique e inclinação viram deslocamentos
   de pixels inteiros (ou quadros da animação). Flash branco (tint FILL) e piscar continuam. Tweens de escala só
@@ -48,8 +63,8 @@ cada personagem **em partes** numa grade pequena. Não se edita PNG à mão: mud
 - Posição dos sprites de pixel art alinhada à grade de `PIXEL_SCALE`.
 - Sombra no chão de pixel art = **elipse de pixels duros**, sem blur, deslocada para baixo/direita.
 - **Luzes pontuais e Bloom só nos brilhos** (olho, plasma, cristais), com intensidade moderada para não borrar.
-- Manifesto de arte (`src/config/art.js`): `pixel: true`, `frame` (tamanho do quadro) e `anims` (sprite sheet);
-  especificação dos assets em **`ART_SPEC.md`**.
+- Manifesto de arte (`src/config/art.js`): `pixel: true`, `frame` (tamanho do quadro), `anims` e `meta` (JSON do
+  gerador); especificação dos assets em **`ART_SPEC.md`**.
 
 ### Regras gerais que continuam
 - Iluminação dinâmica (`setLighting`), sombras numa camada própria abaixo dos objetos, `depth = DEPTH.OBJECTS + y`.
@@ -64,7 +79,7 @@ Personalidade vem do **peso**, não da elasticidade. Nada fica 100% parado, mas 
 - **Inimigos andam com passo pesado**. Com sprite sheet, a caminhada toca em loop e o `frameRate` é proporcional à
   velocidade (um ciclo a cada `ENEMY_ANIM.walkCycle` px); o quique procedural fica desligado. Poeira ocasional no
   chão nos quadros de passada. Constantes em `ENEMY_ANIM` (`src/config/visual.js`).
-- **Dano**: flash branco (tint FILL) + recuo de 1 pixel da arte por um instante.
+- **Dano**: flash branco (tint FILL) + recuo de 2 pixels por um instante.
 - **Morte (pixel art)**: para no quadro parado, pisca e afunda em passos de pixel, e se desfaz em faíscas/destroços.
 - **Arte vetorial antiga** (enquanto existir): squash contido (máx. 5–8%), tombo ao morrer.
 - **Easing `Elastic` só em UI e explosões.** No mundo use `Quad`, `Cubic`, `Sine` e `Back` com pouco overshoot.
