@@ -538,3 +538,20 @@ Criar uma ferramenta de revisão de pixel art para eu atuar como diretor de arte
 3. Registre no ART_SPEC.md o fluxo: eu reviso com a ferramenta → /revisar aplica → eu confiro no modo comparar.
 
 4. Primeiro uso: deixe a Besta Laser atual (resultado da T20) pronta na ferramenta, base e cabeça, e me explique em 3 linhas como abrir e fazer a primeira revisão.
+
+---
+
+## [x] T24 — Três bases novas para a Besta
+
+**Concluída em 2026-09-30.** Resultado:
+- 3 bases completamente diferentes para a Besta nova, com a técnica da T22 e câmera 3/4 frontal: **N1 Torreão redondo de pedra** (cilindro com ameias, porta, seteiras ciano, estandarte), **N2 Paliçada de troncos** (troncos pontudos com cintas, plataforma com parapeito, tocha acesa), **N3 Altar rúnico em degraus** (3 degraus com runas e cristais). Código em `tools/pixel-art/sprites/torres/besta-bases.js`; peças novas na biblioteca (tronco, ponta de tronco, porta, seteira, tocha, cristal pequeno). Mesma arma da N; idle próprio em cada (seteiras, tocha, runas/cristais).
+- Processo: conceito + R1 → R3 com autocrítica (`tools/pixel-art/rodadas/bases-*.png`, `bases-autocritica.md`).
+- `towerArt.js`: versões `n1`, `n2`, `n3` (base 112×104 com 4 quadros; encaixe da arma −75 / −66 / −57). No jogo continua a `n`; teste com `?besta=n1|n2|n3`. `escolha-torres.html`: seção "Base da Besta — atual × 3 opções novas" + rodadas.
+
+a base da torre eu achei muito estranha, faça 3 design completamente diferentes
+
+---
+
+## [ ] T25 — Zoom in/out dentro do jogo
+
+quer poder da zoom in e zoom out dentro do jogo por enquanto

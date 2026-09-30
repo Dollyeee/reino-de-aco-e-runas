@@ -218,3 +218,52 @@ const RUNAS_ROWS = [
     ['.x.', 'xxx', '.x.', 'x.x', 'x.x']
 ];
 export const runas = RUNAS_ROWS.map((rows) => [0, 1, 2].map((lvl) => ({ rows, key: RUNA(lvl) })));
+
+// ------------------------------------------------------------------------------------------ T24: peças novas
+// Tronco vertical de paliçada (6 × 12, repete na vertical): casca com sulcos, luz à esquerda, sombra à direita.
+export const tronco = { rows: [
+    'bccccd', 'bcdccd', 'bccccd', 'bcccdd', 'bccccd', 'bdcccd',
+    'bccccd', 'bccdcd', 'bccccd', 'bcccdd', 'bccccd', 'bcdccd'
+], key: key('casca') };
+// Ponta afiada do tronco (6 × 5) com o corte claro (cerne) de um lado.
+export const pontaTronco = { rows: [
+    '..ab..',
+    '.abcd.',
+    'abbccd',
+    'bccccd',
+    'bccccd'
+], key: key('casca', { a: ['cerne', 3], b: ['cerne', 2] }) };
+// Porta de madeira em arco com cintas de ferro (12 × 15).
+export const porta = { rows: [
+    '...eeeeee...',
+    '..eddddcde..',
+    '.edbccccdde.',
+    'edbcccccdde.',
+    'edbccccccdde',
+    'eGGGGGGGGGGe',
+    'edbccccccdde',
+    'edbccccccdde',
+    'edbccccHccde',
+    'edbccccccdde',
+    'eGGGGGGGGGGe',
+    'edbccccccdde',
+    'edbccccccdde',
+    'edcccccccdde',
+    'eeeeeeeeeeee'
+], key: key('madeira', { G: ['aco', 2, { k: true }], H: ['aco', 4, { k: true }] }) };
+// Seteira (fresta de flecha) com brilho ciano fraco/forte (3 × 9), 2 quadros.
+const SET = (on) => ({ e: ['pedra', 0], g: ['ciano', on ? 2 : 1, { e: on, k: true }] });
+const SETEIRA_ROWS = ['eee', 'ege', 'ege', 'ege', 'ege', 'ege', 'ege', 'ege', 'eee'];
+export const seteira = [{ rows: SETEIRA_ROWS, key: SET(false) }, { rows: SETEIRA_ROWS, key: SET(true) }];
+// Tocha: suporte de madeira + chama (fogo, emissiva) em 3 quadros (5 × 9).
+const TOCHA = key('fogo', { w: ['madeira', 2], v: ['madeira', 1], r: ['aco', 2] });
+for (const ch of ['a', 'b', 'c', 'd', 'e']) { TOCHA[ch] = [...TOCHA[ch].slice(0, 2), { e: true, k: true }]; }
+export const tocha = [
+    { rows: ['..a..', '.bab.', '.cbc.', 'dcbcd', '.ddd.', '.rrr.', '..w..', '..w..', '..v..'], key: TOCHA },
+    { rows: ['.a...', '.bab.', 'cbbc.', 'dcbcd', '.ddd.', '.rrr.', '..w..', '..w..', '..v..'], key: TOCHA },
+    { rows: ['...a.', '.bab.', '.cbbc', 'dcbcd', '.ddd.', '.rrr.', '..w..', '..w..', '..v..'], key: TOCHA }
+];
+// Cristal pequeno brotando (4 × 9): corpo 'cristal' + veio emissivo ciano; 2 quadros (brilho no topo).
+const CRI = (on) => key('cristal', { g: ['ciano', on ? 3 : 2, { e: true, k: true }] });
+const CRISTAL_ROWS = ['.g..', '.bc.', 'bbcd', 'bgcd', 'bgcd', 'bgdd', 'bgdd', 'bcdd', 'dddd'];
+export const cristalPequeno = [{ rows: CRISTAL_ROWS, key: CRI(false) }, { rows: CRISTAL_ROWS, key: CRI(true) }];

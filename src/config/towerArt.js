@@ -75,6 +75,31 @@ export const TOWER_ART = {
                 3: 'Rajada: segundo arco sobre o suporte; Perfurante: ponta de arpão e cinta dupla na coronha; Sentinela: luneta e bandeirola no suporte',
                 4: 'telhado de ardósia sobre as ameias; besta dupla (Rajada) / balestra de ferro (Perfurante) / farol rúnico na ameia de trás (Sentinela)'
             }
+        },
+        n1: {
+            name: 'Torreão redondo de pedra',
+            note: 'T24: cilindro de pedra com ameias em volta, porta de madeira, seteiras ciano e estandarte azul; a arma fica num pedestal acima das ameias.',
+            base: { frame: [112, 104], pivot: [56, 96], frames: 4, fps: 5 },
+            head: { frame: [72, 72], pivot: [36, 36], angles: HEAD_ANGLES, phases: 3 },
+            headMount: { x: 0, y: -75 }, muzzle: { x: 31, y: 0 }, crystal: { x: -9, y: 0 },
+            shadow: [60, 16],
+            upgrades: { 3: 'cobertura de ardósia nas ameias (Sentinela) / segunda seteira acesa (Rajada) / cinta de ferro no cilindro (Perfurante)', 4: 'torreão mais alto com um segundo andar e bandeiras' }        },
+        n2: {
+            name: 'Paliçada de troncos',
+            note: 'T24: muralha de troncos pontudos com cintas de ferro, plataforma atrás com parapeito e tocha acesa.',
+            base: { frame: [112, 104], pivot: [56, 96], frames: 4, fps: 5 },
+            head: { frame: [72, 72], pivot: [36, 36], angles: HEAD_ANGLES, phases: 3 },
+            headMount: { x: 0, y: -66 }, muzzle: { x: 31, y: 0 }, crystal: { x: -9, y: 0 },
+            shadow: [60, 16],
+            upgrades: { 3: 'estacas de ferro nas pontas (Perfurante) / plataforma dupla (Rajada) / torre de vigia com bandeira (Sentinela)', 4: 'paliçada dupla com portão e duas tochas' }        },
+        n3: {
+            name: 'Altar rúnico em degraus',
+            note: 'T24: três degraus de pedra baixos e largos com runas ciano e cristais nos cantos; pedestal alto no topo.',
+            base: { frame: [112, 104], pivot: [56, 96], frames: 4, fps: 5 },
+            head: { frame: [72, 72], pivot: [36, 36], angles: HEAD_ANGLES, phases: 3 },
+            headMount: { x: 0, y: -57 }, muzzle: { x: 31, y: 0 }, crystal: { x: -9, y: 0 },
+            shadow: [60, 16],
+            upgrades: { 3: 'cristais maiores nos cantos (Sentinela) / quarto degrau (Perfurante) / anel rúnico flutuando sobre o altar (Rajada)', 4: 'obelisco rúnico no lugar do pedestal, cristais em volta' }
         }
     },
     plasmaCatapult: {

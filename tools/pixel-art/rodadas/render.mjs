@@ -9,6 +9,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PNG } from 'pngjs';
 import { base, conceito, head, CONCEITOS } from '../sprites/torres/besta-nova.js';
+import { BASES } from '../sprites/torres/besta-bases.js';
 import { TOWER_ART, headFrameFor } from '../../../src/config/towerArt.js';
 import { DECOR_KITS } from '../../../src/config/decor.js';
 import { ORC_VARIANTS } from '../../../src/config/art.js';
@@ -80,6 +81,33 @@ function zoom (img, cx, cy, w, h, s) {
     const out = canvas(w * s, h * s);
     blit(out, img, Math.max(0, cx - w / 2), Math.max(0, cy - h), w, h, 0, 0, s);
     return out;
+}
+
+// T24: as 3 bases novas lado a lado — node tools/pixel-art/rodadas/render.mjs bases <rodada> <estágio>
+// (rodada "conceitos" = estágio 1). Saída: rodadas/bases-<rodada>.png
+if (mode === 'bases') {
+    const [rodada, st] = process.argv.slice(3);
+    const stage = rodada === 'conceitos' ? 1 : (+st || 4);
+    const W = 460, H = 180;
+    const out = canvas(W, H);
+    blit(out, ground, 280, 420, W, H, 0, 0);
+    blit(out, tree, 0, 0, tree.width, tree.height, 20 - treeD.pivot[0], 120 - treeD.pivot[1]);
+    const items = [];
+    Object.values(BASES).forEach((b, i) => {
+        const x = 110 + i * 125, y = 150;
+        const { g, mountY } = b.draw(1, stage);
+        items.push({ y, draw: () => {
+            blit(out, rgbaImg(g), 0, 0, g.w, g.h, x - D.base.pivot[0], y - D.base.pivot[1]);
+            const hc = head(headFrameFor(-0.35).angle, 0);
+            blit(out, { width: hc.w, height: hc.h, data: hc.toRGBA() }, 0, 0, hc.w, hc.h, x - D.head.pivot[0], y + mountY - D.head.pivot[1]);
+        } });
+    });
+    items.push({ y: 165, draw: () => blit(out, orc, 0, 0, orc.width, orc.height, 445 - orcV.pivot[0], 165 - orcV.pivot[1]) });
+    items.sort((a, b) => a.y - b.y).forEach((it) => it.draw());
+    const big = zoom(out, 235, 170, 390, 150, 3);
+    fs.writeFileSync(path.join(HERE, `bases-${rodada}.png`), PNG.sync.write(compose([out, big])));
+    console.log(`✓ rodadas/bases-${rodada}.png  (estágio ${stage}: ${Object.values(BASES).map((b) => b.nome).join(' | ')})`);
+    process.exit(0);
 }
 
 if (mode === 'conceitos') {

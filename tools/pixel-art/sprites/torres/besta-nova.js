@@ -175,7 +175,7 @@ export function base (frame = 0, stage = 4) {
     return g;
 }
 
-function ellipse (g, cx, cy, rx, ry, paint) {
+export function ellipse (g, cx, cy, rx, ry, paint) {
     for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y++) {
         for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x++) {
             const nx = (x + 0.5 - cx - 0.5) / rx, ny = (y + 0.5 - cy - 0.5) / ry;
@@ -185,7 +185,7 @@ function ellipse (g, cx, cy, rx, ry, paint) {
 }
 
 // anel rúnico: traços ciano curtos na borda do disco (nível do idle: 1 aceso, 2 forte)
-function ringCyan (g, cx, cy, rx, ry, lvl) {
+export function ringCyan (g, cx, cy, rx, ry, lvl) {
     for (let i = 0; i < 20; i++) {
         if (i % 3 === 2) { continue; }                       // falhas = runas separadas
         const a = (i / 20) * Math.PI * 2;
@@ -195,7 +195,7 @@ function ringCyan (g, cx, cy, rx, ry, lvl) {
 }
 
 // sombra de contato + terra + capim em volta (depois do contorno, só em pixels vazios; sem contorno)
-function groundContact (g, detail) {
+export function groundContact (g, detail) {
     const T = MATERIALS.terra, Gm = MATERIALS.grama;
     const put = (x, y, hex) => { const i = g.idx(x, y); if (i >= 0 && !g.cells[i]) { g.cells[i] = { m: '#', hex }; } };
     for (let y = -5; y <= 6; y++) {

@@ -6,6 +6,7 @@ import { TOWER_ART } from '../../../../src/config/towerArt.js';
 import { baseCanvas, spinCanvas } from './comum.js';
 import bestaA from './besta-a.js';
 import bestaNova from './besta-nova.js';
+import { bestaBases } from './besta-bases.js';
 
 const T = TOWER_ART.laserCrossbow;
 
@@ -15,6 +16,9 @@ export default {
 
     // N — nova técnica (T22): peças desenhadas à mão compostas numa Grade, em besta-nova.js
     n: bestaNova,
+
+    // N1–N3 — três bases novas (T24): torreão, paliçada e altar rúnico, em besta-bases.js (mesma arma da N)
+    ...bestaBases,
 
     // B — pedestal rúnico flutuante; besta de metal escuro com cristal-mira ciano
     b: {

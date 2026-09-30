@@ -63,6 +63,18 @@ export function escolhaTorresHtml ({ towerArt, bestaAntes, headAngles, armAngles
     towers['besta-n-t22'] = entry(towerArt.laserCrossbow.n, 'besta', `${A}torre-besta-n-base.png`, `${A}torre-besta-n-cabeca.png`, 'head');
     const novaTecnica = cell('besta-a-t22', 'Besta A atual (T20)', towerArt.laserCrossbow.a, 'besta') +
         cell('besta-n-t22', 'Besta nova (T22) — nova técnica', towerArt.laserCrossbow.n, 'besta');
+    // T24: base atual da Besta nova × 3 bases novas
+    const basesIds = ['n', 'n1', 'n2', 'n3'];
+    for (const v of basesIds) {
+        towers[`base-${v}`] = entry(towerArt.laserCrossbow[v], 'besta', `${A}torre-besta-${v}-base.png`, `${A}torre-besta-${v}-cabeca.png`, 'head');
+    }
+    const basesNovas = basesIds.map((v) => cell(`base-${v}`, `${v.toUpperCase()} — ${towerArt.laserCrossbow[v].name}${v === 'n' ? ' (base atual no jogo)' : ''}`, towerArt.laserCrossbow[v], 'besta')).join('');
+    const rodadasBases = [
+        ['bases-conceitos.png', '0 · conceito: 3 silhuetas (torreão · paliçada · altar)'],
+        ['bases-r1.png', 'R1 · blocagem + luz e volume'],
+        ['bases-r2.png', 'R2 · materiais e detalhes + correções da R1'],
+        ['bases-r3.png', 'R3 · limpeza + correções da R2 — final']
+    ].map(([f, cap]) => `<figure><img class="rod" src="rodadas/${f}" alt="${cap}"><figcaption>${cap}</figcaption></figure>`).join('');
     const rodadas = [
         ['besta-conceitos.png', '0 · conceito: 3 silhuetas (baixa e larga · robusta, escolhida · alta e estreita)'],
         ['besta-r1.png', 'R1 · blocagem + luz e volume (etapas 1–2)'],
@@ -105,6 +117,12 @@ export function escolhaTorresHtml ({ towerArt, bestaAntes, headAngles, armAngles
 <p>Gerado por <code>npm run pixel</code>. Cenário real do mapa 1 (chão, kit A, orc Saqueador). A animação repete a cada 9 s: materialização rúnica,
 depois combate. A peça de cima é redesenhada em cada ângulo (sem rotação de imagem) e o recuo é em pixels inteiros.
 Para testar no jogo: <code>TOWER_VARIANT</code> em <code>src/config/art.js</code> ou <code>?besta=a&amp;catapulta=c</code> na URL (padrão <code>'atual'</code> = SVGs).</p>
+<h2>Base da Besta — atual × 3 opções novas (T24)</h2>
+<div class="cols">${basesNovas}
+</div>
+<h2>Rodadas das 3 bases (autocrítica em <code>tools/pixel-art/rodadas/bases-autocritica.md</code>)</h2>
+<div class="rodadas">${rodadasBases}
+</div>
 <h2>Besta A atual × Besta nova (T22, nova técnica: peças desenhadas à mão, 4 etapas)</h2>
 <div class="cols">${novaTecnica}
 </div>
