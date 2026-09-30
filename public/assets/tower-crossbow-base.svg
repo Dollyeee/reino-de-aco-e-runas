@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="88" height="88" viewBox="0 0 88 88">
+  <!-- Base da Besta Laser: torre de pedra com faixa de runas. Ancoragem: centro inferior. Topo em (44, 28). -->
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <path d="M8 28 L8 70 A36 13 0 0 0 80 70 L80 28 Z" fill="#a8a0bd"/>
+    <path d="M50 82.8 A36 13 0 0 0 80 70 L80 28 L58 28 Z" fill="#7b7392"/>
+    <path d="M13 34 L13 70" stroke="#d6cfe6" stroke-width="5"/>
+    <path d="M8 44 A36 13 0 0 0 80 44" fill="none" stroke="#5f5874" stroke-width="2.5"/>
+    <path d="M8 60 A36 13 0 0 0 80 60" fill="none" stroke="#5f5874" stroke-width="2.5"/>
+    <path d="M30 56 L30 70 M58 56 L58 70 M22 40 L22 53 M44 44 L44 56 M66 40 L66 53" stroke="#5f5874" stroke-width="2.5"/>
+    <path d="M8 51 A36 13 0 0 0 80 51" fill="none" stroke="#2b1d33" stroke-width="7"/>
+    <path d="M8 51 A36 13 0 0 0 80 51" fill="none" stroke="#3ff5ff" stroke-width="3.5"/>
+    <path d="M24 60 L28 56 L32 60 M52 60 L56 56 L60 60" fill="none" stroke="#3ff5ff" stroke-width="2"/>
+    <path d="M8 28 L8 70 A36 13 0 0 0 80 70 L80 28" fill="none" stroke="#2b1d33" stroke-width="4.5"/>
+    <ellipse cx="44" cy="28" rx="36" ry="13" fill="#cbc4dd" stroke="#2b1d33" stroke-width="4.5"/>
+    <path d="M52 39 A30 10 0 0 0 76 28" fill="none" stroke="#aaa2c0" stroke-width="5"/>
+    <ellipse cx="44" cy="28" rx="22" ry="7.5" fill="#8f88a7"/>
+    <ellipse cx="44" cy="27" rx="11" ry="4.5" fill="#5a6275" stroke="#2b1d33" stroke-width="3"/>
+    <path d="M17 22 Q27 16 40 15" fill="none" stroke="#f1ecfa" stroke-width="3"/>
+  </g>
+</svg>

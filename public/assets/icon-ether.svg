@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <!-- Ícone de éter. -->
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <path d="M24 3 L40 20 L24 45 L8 20 Z" fill="#3ff5ff"/>
+    <path d="M24 3 L16 20 L24 45 L8 20 Z" fill="#b4fdff"/>
+    <path d="M24 3 L40 20 L24 45 L32 20 Z" fill="#13b6d6"/>
+    <path d="M24 3 L40 20 L24 45 L8 20 Z" fill="none" stroke="#2b1d33" stroke-width="4"/>
+    <path d="M8 20 L40 20" stroke="#2b1d33" stroke-width="2"/>
+    <path d="M14 18 L20 10" stroke="#ffffff" stroke-width="3"/>
+  </g>
+</svg>

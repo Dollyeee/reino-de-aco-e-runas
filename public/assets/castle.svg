@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="272" viewBox="0 0 260 272">
+  <!-- Castelo do Núcleo Arcano. Ancoragem: centro inferior (130, 272).
+       O cristal do Núcleo flutua sobre o pedestal em (130, 150) — desenhado pelo código. -->
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <!-- muralha do fundo -->
+    <rect x="44" y="104" width="172" height="50" fill="#9189a9" stroke="#2b1d33" stroke-width="4.5"/>
+    <path d="M44 104 L44 94 L60 94 L60 104 M78 104 L78 94 L94 94 L94 104 M112 104 L112 94 L128 94 L128 104 M146 104 L146 94 L162 94 L162 104 M180 104 L180 94 L196 94 L196 104"
+          fill="#a39bba" stroke="#2b1d33" stroke-width="4"/>
+    <path d="M60 122 L200 122 M60 138 L200 138" stroke="#6f6789" stroke-width="2"/>
+    <!-- pátio -->
+    <rect x="46" y="150" width="168" height="24" fill="#6f6689"/>
+    <!-- pedestal do núcleo -->
+    <path d="M108 150 L108 164 A22 7 0 0 0 152 164 L152 150 Z" fill="#a8a0bd" stroke="#2b1d33" stroke-width="4"/>
+    <ellipse cx="130" cy="150" rx="22" ry="7" fill="#cbc4dd" stroke="#2b1d33" stroke-width="4"/>
+    <ellipse cx="130" cy="150" rx="12" ry="3.5" fill="#3ff5ff"/>
+    <!-- muralha da frente -->
+    <rect x="44" y="176" width="172" height="88" fill="#b3abc9"/>
+    <rect x="170" y="176" width="46" height="88" fill="#8b83a5"/>
+    <path d="M50 184 L50 256" stroke="#d9d2ea" stroke-width="5"/>
+    <path d="M44 198 L216 198 M44 222 L216 222 M44 246 L216 246" stroke="#7a7296" stroke-width="2.5"/>
+    <path d="M74 176 L74 198 M150 198 L150 222 M96 222 L96 246 M190 176 L190 198 M180 222 L180 246" stroke="#7a7296" stroke-width="2.5"/>
+    <rect x="44" y="176" width="172" height="88" fill="none" stroke="#2b1d33" stroke-width="4.5"/>
+    <!-- ameias da frente -->
+    <path d="M44 176 L44 162 L64 162 L64 176 Z M82 176 L82 162 L102 162 L102 176 Z M158 176 L158 162 L178 162 L178 176 Z M196 176 L196 162 L216 162 L216 176 Z"
+          fill="#cbc4dd" stroke="#2b1d33" stroke-width="4"/>
+    <!-- faixa rúnica -->
+    <path d="M60 188 L200 188" stroke="#2b1d33" stroke-width="7"/>
+    <path d="M60 188 L200 188" stroke="#3ff5ff" stroke-width="3.5"/>
+    <!-- portão -->
+    <path d="M98 264 L98 214 Q130 184 162 214 L162 264 Z" fill="#8a82a3" stroke="#2b1d33" stroke-width="4.5"/>
+    <path d="M106 264 L106 218 Q130 196 154 218 L154 264 Z" fill="#2e2240"/>
+    <path d="M112 264 L112 224 M122 264 L122 212 M132 264 L132 209 M142 264 L142 212 M150 264 L150 222" stroke="#3ff5ff" stroke-width="2.5"/>
+    <path d="M108 232 L152 232 M108 250 L152 250" stroke="#13b6d6" stroke-width="2.5"/>
+    <path d="M106 264 L106 218 Q130 196 154 218 L154 264" fill="none" stroke="#2b1d33" stroke-width="3.5"/>
+    <path d="M125 190 L130 182 L135 190" fill="none" stroke="#3ff5ff" stroke-width="3"/>
+    <!-- estandartes -->
+    <path d="M76 204 L92 204 L92 240 L84 234 L76 240 Z" fill="#7b4bd6" stroke="#2b1d33" stroke-width="3.5"/>
+    <path d="M84 212 L84 226 M80 219 L88 219" stroke="#3ff5ff" stroke-width="2.5"/>
+    <path d="M168 204 L184 204 L184 240 L176 234 L168 240 Z" fill="#5d34b0" stroke="#2b1d33" stroke-width="3.5"/>
+    <path d="M176 212 L176 226 M172 219 L180 219" stroke="#3ff5ff" stroke-width="2.5"/>
+    <!-- torre esquerda -->
+    <path d="M8 88 L8 254 A32 10 0 0 0 72 254 L72 88 Z" fill="#b8b0ce"/>
+    <path d="M48 263.5 A32 10 0 0 0 72 254 L72 88 L52 88 Z" fill="#8b83a5"/>
+    <path d="M14 96 L14 250" stroke="#e0daf0" stroke-width="5"/>
+    <path d="M8 130 A32 10 0 0 0 72 130 M8 180 A32 10 0 0 0 72 180 M8 226 A32 10 0 0 0 72 226" fill="none" stroke="#7a7296" stroke-width="2.5"/>
+    <path d="M8 88 L8 254 A32 10 0 0 0 72 254 L72 88" fill="none" stroke="#2b1d33" stroke-width="4.5"/>
+    <rect x="34" y="140" width="10" height="22" rx="5" fill="#2e2240" stroke="#2b1d33" stroke-width="3"/>
+    <rect x="36.5" y="144" width="5" height="14" rx="2.5" fill="#3ff5ff"/>
+    <path d="M0 90 L40 18 L80 90 Q40 104 0 90 Z" fill="#e5594f"/>
+    <path d="M40 18 L80 90 Q62 97 46 98 Q52 60 40 18 Z" fill="#b63e3b"/>
+    <path d="M0 90 L40 18 L80 90 Q40 104 0 90 Z" fill="none" stroke="#2b1d33" stroke-width="4.5"/>
+    <path d="M14 78 L34 36" stroke="#ff9d8f" stroke-width="3.5"/>
+    <path d="M40 18 L40 4" stroke="#2b1d33" stroke-width="3.5"/>
+    <path d="M40 4 L56 9 L40 14 Z" fill="#3ff5ff" stroke="#2b1d33" stroke-width="3"/>
+    <!-- torre direita -->
+    <path d="M188 88 L188 254 A32 10 0 0 0 252 254 L252 88 Z" fill="#a39bbc"/>
+    <path d="M222 263.5 A32 10 0 0 0 252 254 L252 88 L226 88 Z" fill="#7d7598"/>
+    <path d="M194 96 L194 250" stroke="#d2cbe4" stroke-width="5"/>
+    <path d="M188 130 A32 10 0 0 0 252 130 M188 180 A32 10 0 0 0 252 180 M188 226 A32 10 0 0 0 252 226" fill="none" stroke="#6c6488" stroke-width="2.5"/>
+    <path d="M188 88 L188 254 A32 10 0 0 0 252 254 L252 88" fill="none" stroke="#2b1d33" stroke-width="4.5"/>
+    <rect x="214" y="140" width="10" height="22" rx="5" fill="#2e2240" stroke="#2b1d33" stroke-width="3"/>
+    <rect x="216.5" y="144" width="5" height="14" rx="2.5" fill="#3ff5ff"/>
+    <path d="M180 90 L220 18 L260 90 Q220 104 180 90 Z" fill="#dc524a"/>
+    <path d="M220 18 L260 90 Q242 97 226 98 Q232 60 220 18 Z" fill="#a93836"/>
+    <path d="M180 90 L220 18 L260 90 Q220 104 180 90 Z" fill="none" stroke="#2b1d33" stroke-width="4.5"/>
+    <path d="M194 78 L214 36" stroke="#ff9d8f" stroke-width="3.5"/>
+    <path d="M220 18 L220 4" stroke="#2b1d33" stroke-width="3.5"/>
+    <path d="M220 4 L236 9 L220 14 Z" fill="#3ff5ff" stroke="#2b1d33" stroke-width="3"/>
+  </g>
+</svg>

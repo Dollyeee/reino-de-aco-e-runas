@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="104" viewBox="0 0 128 104">
+  <!-- Base da Catapulta de Plasma: carroça de madeira com armação metálica. Ancoragem: centro inferior.
+       Pivô do braço: (64, 52). Desenhada virada para a DIREITA. -->
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <rect x="42" y="12" width="12" height="46" rx="4" fill="#b8733a" stroke="#2b1d33" stroke-width="4"/>
+    <rect x="76" y="12" width="12" height="46" rx="4" fill="#8f5426" stroke="#2b1d33" stroke-width="4"/>
+    <path d="M45 16 L45 50" stroke="#e1a263" stroke-width="2.5"/>
+    <rect x="36" y="9" width="58" height="12" rx="5" fill="#a4aec4" stroke="#2b1d33" stroke-width="4"/>
+    <path d="M40 12.5 L88 12.5" stroke="#e8edf5" stroke-width="2"/>
+    <path d="M65 4 L72 15 L65 26 L58 15 Z" fill="#3ff5ff"/>
+    <path d="M65 4 L72 15 L65 26 Z" fill="#13b6d6"/>
+    <path d="M65 4 L72 15 L65 26 L58 15 Z" fill="none" stroke="#2b1d33" stroke-width="3"/>
+    <rect x="10" y="42" width="108" height="42" rx="10" fill="#8f5426" stroke="#2b1d33" stroke-width="4.5"/>
+    <rect x="10" y="42" width="108" height="26" rx="9" fill="#cb8849" stroke="#2b1d33" stroke-width="4.5"/>
+    <path d="M14 50 L114 50 M14 59 L114 59" stroke="#a0632f" stroke-width="2"/>
+    <path d="M18 46 L60 46" stroke="#f0b980" stroke-width="3"/>
+    <path d="M30 68 L30 84 M98 68 L98 84" stroke="#9aa5bc" stroke-width="7"/>
+    <path d="M44 76 L84 76" stroke="#3ff5ff" stroke-width="3"/>
+    <path d="M52 72 L56 76 L52 80 M76 72 L72 76 L76 80" fill="none" stroke="#3ff5ff" stroke-width="2"/>
+    <circle cx="28" cy="86" r="15" fill="#6b4424" stroke="#aab4c8" stroke-width="5"/>
+    <circle cx="28" cy="86" r="17.5" fill="none" stroke="#2b1d33" stroke-width="3.5"/>
+    <path d="M18 80 A11 11 0 0 1 26 75" fill="none" stroke="#9c6a3e" stroke-width="3"/>
+    <circle cx="28" cy="86" r="5" fill="#3ff5ff" stroke="#2b1d33" stroke-width="3"/>
+    <circle cx="100" cy="86" r="15" fill="#5a381d" stroke="#8d97ad" stroke-width="5"/>
+    <circle cx="100" cy="86" r="17.5" fill="none" stroke="#2b1d33" stroke-width="3.5"/>
+    <circle cx="100" cy="86" r="5" fill="#3ff5ff" stroke="#2b1d33" stroke-width="3"/>
+    <circle cx="64" cy="52" r="7" fill="#9ea9bf" stroke="#2b1d33" stroke-width="3.5"/>
+  </g>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="52" height="18" viewBox="0 0 52 18">
+  <!-- Virote laser. Aponta para a DIREITA. Ancoragem: centro. -->
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <path d="M3 9 Q3 4 10 4 L40 4 L49 9 L40 14 L10 14 Q3 14 3 9 Z" fill="#3ff5ff" stroke="#2b1d33" stroke-width="3"/>
+    <path d="M8 9 L44 9" stroke="#ffffff" stroke-width="3.5"/>
+    <path d="M10 6.5 L30 6.5" stroke="#e8feff" stroke-width="1.5"/>
+  </g>
+</svg>

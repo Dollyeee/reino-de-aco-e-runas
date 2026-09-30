@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="84" height="86" viewBox="0 0 84 86">
+  <!-- Aglomerado de cristais de éter. Ancoragem: centro inferior (42, 86). -->
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="42" cy="72" rx="36" ry="12" fill="#8f87a6" stroke="#2b1d33" stroke-width="4"/>
+    <path d="M52 82 A36 12 0 0 0 78 72 L64 70 Z" fill="#6c6487"/>
+    <path d="M12 72 L22 38 L32 30 L36 70 Z" fill="#3ff5ff"/>
+    <path d="M12 72 L22 38 L26 70 Z" fill="#b4fdff"/>
+    <path d="M12 72 L22 38 L32 30 L36 70 Z" fill="none" stroke="#2b1d33" stroke-width="4"/>
+    <path d="M30 74 L34 18 L44 4 L54 18 L56 74 Z" fill="#3ff5ff"/>
+    <path d="M30 74 L34 18 L44 4 L42 74 Z" fill="#b4fdff"/>
+    <path d="M44 4 L54 18 L56 74 L46 74 Z" fill="#13b6d6"/>
+    <path d="M30 74 L34 18 L44 4 L54 18 L56 74 Z" fill="none" stroke="#2b1d33" stroke-width="4"/>
+    <path d="M36 26 L36 50" stroke="#ffffff" stroke-width="3"/>
+    <path d="M50 72 L54 40 L64 30 L72 70 Z" fill="#13b6d6"/>
+    <path d="M54 40 L64 30 L62 72 L50 72 Z" fill="#3ff5ff"/>
+    <path d="M50 72 L54 40 L64 30 L72 70 Z" fill="none" stroke="#2b1d33" stroke-width="4"/>
+    <path d="M20 76 Q42 84 64 76" fill="none" stroke="#2b1d33" stroke-width="3"/>
+  </g>
+</svg>

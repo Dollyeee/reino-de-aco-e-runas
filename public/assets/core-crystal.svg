@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="76" height="124" viewBox="0 0 76 124">
+  <!-- Núcleo Arcano. Ancoragem: centro (38, 62). -->
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <path d="M38 4 L66 36 L60 90 L38 120 L16 90 L10 36 Z" fill="#3ff5ff"/>
+    <path d="M38 4 L24 38 L22 88 L38 120 L16 90 L10 36 Z" fill="#b4fdff"/>
+    <path d="M38 4 L66 36 L60 90 L38 120 L50 88 L52 38 Z" fill="#13b6d6"/>
+    <path d="M24 38 L52 38 L50 88 L22 88 Z" fill="#5ef7ff"/>
+    <path d="M38 4 L66 36 L60 90 L38 120 L16 90 L10 36 Z" fill="none" stroke="#2b1d33" stroke-width="4.5"/>
+    <path d="M24 38 L52 38 M22 88 L50 88 M38 4 L24 38 M38 4 L52 38 M22 88 L38 120 M50 88 L38 120" fill="none" stroke="#1a8aa8" stroke-width="2"/>
+    <path d="M18 42 L18 70" stroke="#ffffff" stroke-width="4"/>
+    <path d="M28 20 L33 12" stroke="#ffffff" stroke-width="3"/>
+    <!-- anel rúnico dourado -->
+    <path d="M8 62 Q38 74 68 62" fill="none" stroke="#2b1d33" stroke-width="9"/>
+    <path d="M8 62 Q38 74 68 62" fill="none" stroke="#ffd34d" stroke-width="4.5"/>
+    <path d="M20 66 L22 70 M38 68 L38 72 M56 66 L54 70" stroke="#a8761c" stroke-width="2"/>
+  </g>
+</svg>

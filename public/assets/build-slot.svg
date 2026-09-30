@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60">
+  <!-- Plataforma rúnica. Ancoragem: centro da face de cima (50, 25). -->
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <path d="M6 25 L6 36 A44 17 0 0 0 94 36 L94 25 Z" fill="#877f9c"/>
+    <path d="M50 53 A44 17 0 0 0 94 36 L94 25 L62 25 Z" fill="#625a78"/>
+    <path d="M10 30 L10 37" stroke="#b9b1cc" stroke-width="3"/>
+    <path d="M6 25 L6 36 A44 17 0 0 0 94 36 L94 25" fill="none" stroke="#2b1d33" stroke-width="4.5"/>
+    <ellipse cx="50" cy="25" rx="44" ry="17" fill="#b7aecb" stroke="#2b1d33" stroke-width="4.5"/>
+    <path d="M58 40 A36 13 0 0 0 88 26" fill="none" stroke="#968dad" stroke-width="6"/>
+    <ellipse cx="50" cy="25" rx="30" ry="11" fill="#a097b8"/>
+    <ellipse cx="50" cy="25" rx="30" ry="11" fill="none" stroke="#3ff5ff" stroke-width="3"/>
+    <ellipse cx="50" cy="25" rx="19" ry="6.5" fill="none" stroke="#3ff5ff" stroke-width="2" stroke-dasharray="5 4"/>
+    <path d="M20 25 L28 25 M72 25 L80 25 M50 14 L50 17.5 M50 32.5 L50 36" stroke="#3ff5ff" stroke-width="2.5"/>
+    <circle cx="50" cy="25" r="3" fill="#c8fdff"/>
+    <path d="M16 19 Q28 11 44 10" fill="none" stroke="#e9e3f5" stroke-width="3"/>
+  </g>
+</svg>
