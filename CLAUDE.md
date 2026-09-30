@@ -192,7 +192,7 @@ mas fora do jogo; detalhes em `ART_SPEC.md`):
 
 ## Fluxo de trabalho
 
-Versionamento com **git** (branch `main`), remoto `origin` = repositório **privado** https://github.com/Dollyeee/reino-de-aco-e-runas.
+Versionamento com **git** (branch `main`), remoto `origin` = repositório **público** https://github.com/Dollyeee/reino-de-aco-e-runas.
 Identidade configurada só neste repositório (em outro PC, configure de novo com `git config user.name/user.email`).
 
 - **Sincronizar**: `git pull` antes de começar a trabalhar e `git push` depois de cada commit, para o outro PC achar tudo atualizado.
