@@ -49,6 +49,23 @@ export const TEXTURES = {
     }
 };
 
+// casca: sulcos verticais (tracejados) e alguns nós claros
+TEXTURES.casca = (p) => {
+    if (p.lx % 4 === 1 && hash(p.lx, p.ly >> 2, p.seed) < 0.7) { return p.tone === 3 ? -1 : 0; }
+    if (p.tone === 2 && hash(p.lx, p.ly, p.seed + 5) > 0.96) { return +1; }
+    return 0;
+};
+// folhagem: tufos de folhas em blocos de 2×2 (claros) com vãos
+TEXTURES.folhagem = (p) => {
+    const h = hash(p.lx >> 1, p.ly >> 1, p.seed);
+    if (h < 0.2) { return +1; }
+    if (h > 0.88) { return -1; }
+    return 0;
+};
+TEXTURES.pinho = TEXTURES.folhagem;
+TEXTURES.folhagemRunica = TEXTURES.folhagem;
+TEXTURES.cascaEscura = TEXTURES.casca;
+
 // variações de pele usam a mesma textura
 TEXTURES.peleOliva = TEXTURES.pele;
 TEXTURES.peleClara = TEXTURES.pele;

@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Decoração — escolha do kit</title>
+<style>
+  body { margin: 0; padding: 24px; background: #14100d; color: #f1e6cf; font: 14px/1.4 system-ui, sans-serif; }
+  h1 { font-size: 20px; margin: 0 0 4px; } h2 { font-size: 15px; margin: 28px 0 8px; color: #c8fdff; } h3 { font-size: 14px; margin: 18px 0 6px; }
+  p { margin: 0 0 12px; color: #b8a8a0; } code { color: #c8fdff; }
+  img { image-rendering: pixelated; display: block; }
+  .maps { display: flex; gap: 12px; align-items: flex-start; }
+  .map { margin: 0; flex: 1 1 0; min-width: 0; } .map img { width: 100%; border: 1px solid #2a1f18; }
+  figcaption { font-size: 12px; color: #b8a8a0; margin-top: 4px; }
+  .real { border: 1px solid #2a1f18; max-width: none; }
+  .row { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
+  .item { margin: 0; } .pair { display: flex; gap: 10px; align-items: flex-end; background: #4b5a36; padding: 8px; border: 1px solid #2a1f18; }
+</style>
+</head>
+<body>
+<h1>Decoração — 3 kits para escolher</h1>
+<p>Gerado por <code>npm run pixel</code>. Mesmas posições de decoração de <code>src/data/map01.js</code> (+ 4 arbustos e 1 elemento temático que só existem nos kits),
+sobre o chão novo, com orcs no caminho e o castelo como placeholder. Para testar no jogo: <code>DECOR_KIT</code> em <code>src/config/art.js</code>
+(<code>'a'</code>, <code>'b'</code> ou <code>'c'</code>; padrão <code>'atual'</code> = SVGs antigos) ou <code>?decor=a</code> na URL.</p>
+<h2>Mapa inteiro — lado a lado (clique para abrir no tamanho real)</h2>
+<div class="maps">
+      <figure class="map"><a href="decoracao/mapa-a.png"><img src="decoracao/mapa-a.png" alt="Kit A"></a>
+        <figcaption><b>Kit A — Bosque antigo</b><br>Carvalhos largos e retorcidos, copas densas verde-musgo, pedras com musgo; toco de árvore cortado.</figcaption></figure>
+      <figure class="map"><a href="decoracao/mapa-b.png"><img src="decoracao/mapa-b.png" alt="Kit B"></a>
+        <figcaption><b>Kit B — Fronteira de pinheiros</b><br>Pinheiros e abetos altos e escuros, arbustos espinhosos, pedras angulosas cinza-frias; marco de pedra com runa.</figcaption></figure>
+      <figure class="map"><a href="decoracao/mapa-c.png"><img src="decoracao/mapa-c.png" alt="Kit C"></a>
+        <figcaption><b>Kit C — Floresta rúnica</b><br>Árvores de casca escura com veias de ciano, cristais maiores brotando do chão, pedras com fissuras rúnicas; ruína de pilar com circuito exposto.</figcaption></figure>
+</div>
+
+      <h3>Kit A — Bosque antigo (tamanho real)</h3>
+      <img class="real" src="decoracao/mapa-a.png" alt="Kit A no mapa">
+      <h3>Kit B — Fronteira de pinheiros (tamanho real)</h3>
+      <img class="real" src="decoracao/mapa-b.png" alt="Kit B no mapa">
+      <h3>Kit C — Floresta rúnica (tamanho real)</h3>
+      <img class="real" src="decoracao/mapa-c.png" alt="Kit C no mapa">
+
+    <section>
+      <h2>Kit A — Bosque antigo: itens soltos</h2>
+      <div class="row">
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-a-arvore1.png" style="width:132px" alt="carvalho grande">
+          <img src="../../public/assets/decor-a-arvore1.png" style="width:528px" alt="carvalho grande 4×">
+        </div><figcaption>arvore1 · carvalho grande · 132×124</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-a-arvore2.png" style="width:108px" alt="carvalho torto">
+          <img src="../../public/assets/decor-a-arvore2.png" style="width:432px" alt="carvalho torto 4×">
+        </div><figcaption>arvore2 · carvalho torto · 108×112</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-a-arvore3.png" style="width:80px" alt="carvalho jovem">
+          <img src="../../public/assets/decor-a-arvore3.png" style="width:320px" alt="carvalho jovem 4×">
+        </div><figcaption>arvore3 · carvalho jovem · 80×92</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-a-arbusto1.png" style="width:48px" alt="moita redonda">
+          <img src="../../public/assets/decor-a-arbusto1.png" style="width:192px" alt="moita redonda 4×">
+        </div><figcaption>arbusto1 · moita redonda · 48×34</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-a-arbusto2.png" style="width:64px" alt="moita baixa">
+          <img src="../../public/assets/decor-a-arbusto2.png" style="width:256px" alt="moita baixa 4×">
+        </div><figcaption>arbusto2 · moita baixa · 64×34</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-a-pedraP.png" style="width:26px" alt="pedra pequena">
+          <img src="../../public/assets/decor-a-pedraP.png" style="width:104px" alt="pedra pequena 4×">
+        </div><figcaption>pedraP · pedra pequena · 26×18</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-a-pedraM.png" style="width:42px" alt="pedra média">
+          <img src="../../public/assets/decor-a-pedraM.png" style="width:168px" alt="pedra média 4×">
+        </div><figcaption>pedraM · pedra média · 42×30</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-a-pedraG.png" style="width:66px" alt="pedra grande">
+          <img src="../../public/assets/decor-a-pedraG.png" style="width:264px" alt="pedra grande 4×">
+        </div><figcaption>pedraG · pedra grande · 66×46</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-a-cristal.png" style="width:48px" alt="cristais">
+          <img src="../../public/assets/decor-a-cristal.png" style="width:192px" alt="cristais 4×">
+        </div><figcaption>cristal · cristais · 48×56</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-a-tema.png" style="width:48px" alt="toco cortado">
+          <img src="../../public/assets/decor-a-tema.png" style="width:192px" alt="toco cortado 4×">
+        </div><figcaption>tema · toco cortado · 48×36</figcaption></figure>
+      </div>
+    </section>
+    <section>
+      <h2>Kit B — Fronteira de pinheiros: itens soltos</h2>
+      <div class="row">
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-b-arvore1.png" style="width:70px" alt="pinheiro alto">
+          <img src="../../public/assets/decor-b-arvore1.png" style="width:280px" alt="pinheiro alto 4×">
+        </div><figcaption>arvore1 · pinheiro alto · 70×138</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-b-arvore2.png" style="width:96px" alt="abeto largo">
+          <img src="../../public/assets/decor-b-arvore2.png" style="width:384px" alt="abeto largo 4×">
+        </div><figcaption>arvore2 · abeto largo · 96×120</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-b-arvore3.png" style="width:52px" alt="pinheiro jovem">
+          <img src="../../public/assets/decor-b-arvore3.png" style="width:208px" alt="pinheiro jovem 4×">
+        </div><figcaption>arvore3 · pinheiro jovem · 52×86</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-b-arbusto1.png" style="width:50px" alt="espinheiro">
+          <img src="../../public/assets/decor-b-arbusto1.png" style="width:200px" alt="espinheiro 4×">
+        </div><figcaption>arbusto1 · espinheiro · 50×31</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-b-arbusto2.png" style="width:42px" alt="espinheiro baixo">
+          <img src="../../public/assets/decor-b-arbusto2.png" style="width:168px" alt="espinheiro baixo 4×">
+        </div><figcaption>arbusto2 · espinheiro baixo · 42×25</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-b-pedraP.png" style="width:26px" alt="pedra pequena">
+          <img src="../../public/assets/decor-b-pedraP.png" style="width:104px" alt="pedra pequena 4×">
+        </div><figcaption>pedraP · pedra pequena · 26×19</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-b-pedraM.png" style="width:42px" alt="pedra média">
+          <img src="../../public/assets/decor-b-pedraM.png" style="width:168px" alt="pedra média 4×">
+        </div><figcaption>pedraM · pedra média · 42×33</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-b-pedraG.png" style="width:66px" alt="pedra grande">
+          <img src="../../public/assets/decor-b-pedraG.png" style="width:264px" alt="pedra grande 4×">
+        </div><figcaption>pedraG · pedra grande · 66×53</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-b-cristal.png" style="width:46px" alt="cristais">
+          <img src="../../public/assets/decor-b-cristal.png" style="width:184px" alt="cristais 4×">
+        </div><figcaption>cristal · cristais · 46×57</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-b-tema.png" style="width:34px" alt="marco rúnico">
+          <img src="../../public/assets/decor-b-tema.png" style="width:136px" alt="marco rúnico 4×">
+        </div><figcaption>tema · marco rúnico · 34×62</figcaption></figure>
+      </div>
+    </section>
+    <section>
+      <h2>Kit C — Floresta rúnica: itens soltos</h2>
+      <div class="row">
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-c-arvore1.png" style="width:118px" alt="árvore rúnica grande">
+          <img src="../../public/assets/decor-c-arvore1.png" style="width:472px" alt="árvore rúnica grande 4×">
+        </div><figcaption>arvore1 · árvore rúnica grande · 118×128</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-c-arvore2.png" style="width:94px" alt="árvore rúnica alta">
+          <img src="../../public/assets/decor-c-arvore2.png" style="width:376px" alt="árvore rúnica alta 4×">
+        </div><figcaption>arvore2 · árvore rúnica alta · 94×120</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-c-arvore3.png" style="width:74px" alt="árvore rúnica jovem">
+          <img src="../../public/assets/decor-c-arvore3.png" style="width:296px" alt="árvore rúnica jovem 4×">
+        </div><figcaption>arvore3 · árvore rúnica jovem · 74×96</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-c-arbusto1.png" style="width:48px" alt="moita escura">
+          <img src="../../public/assets/decor-c-arbusto1.png" style="width:192px" alt="moita escura 4×">
+        </div><figcaption>arbusto1 · moita escura · 48×34</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-c-arbusto2.png" style="width:64px" alt="moita baixa escura">
+          <img src="../../public/assets/decor-c-arbusto2.png" style="width:256px" alt="moita baixa escura 4×">
+        </div><figcaption>arbusto2 · moita baixa escura · 64×34</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-c-pedraP.png" style="width:26px" alt="pedra pequena">
+          <img src="../../public/assets/decor-c-pedraP.png" style="width:104px" alt="pedra pequena 4×">
+        </div><figcaption>pedraP · pedra pequena · 26×18</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-c-pedraM.png" style="width:42px" alt="pedra média">
+          <img src="../../public/assets/decor-c-pedraM.png" style="width:168px" alt="pedra média 4×">
+        </div><figcaption>pedraM · pedra média · 42×30</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-c-pedraG.png" style="width:66px" alt="pedra grande">
+          <img src="../../public/assets/decor-c-pedraG.png" style="width:264px" alt="pedra grande 4×">
+        </div><figcaption>pedraG · pedra grande · 66×46</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-c-cristal.png" style="width:68px" alt="cristais grandes">
+          <img src="../../public/assets/decor-c-cristal.png" style="width:272px" alt="cristais grandes 4×">
+        </div><figcaption>cristal · cristais grandes · 68×85</figcaption></figure>
+        <figure class="item"><div class="pair">
+          <img src="../../public/assets/decor-c-tema.png" style="width:56px" alt="ruína de pilar">
+          <img src="../../public/assets/decor-c-tema.png" style="width:224px" alt="ruína de pilar 4×">
+        </div><figcaption>tema · ruína de pilar · 56×94</figcaption></figure>
+      </div>
+    </section>
+</body>
+</html>

@@ -49,6 +49,15 @@ Cada material é uma **rampa de 5 tons com hue shift**: 0 = mais escuro … 4 = 
 | `gramaSol` | regiões levemente mais claras do gramado | `#242f2b` | `#384630` | `#4f5e38` | `#667443` | `#898f55` |
 | `gramaSombra` | regiões levemente mais escuras do gramado | `#222b2c` | `#33412f` | `#475634` | `#5e6c3e` | `#81884f` |
 | `musgo` | manchas de musgo (entre os tons 1 e 2 da grama) | `#1f292a` | `#2e3b2d` | `#404f31` | `#55643a` | `#74804a` |
+| `folhagem` | decoração: copas de carvalho (kit A) | `#1a2226` | `#2a3930` | `#3d5037` | `#556b41` | `#7a8a55` |
+| `pinho` | decoração: pinheiros e espinheiros (kit B) | `#131b21` | `#1c2b2c` | `#283d35` | `#37523f` | `#557050` |
+| `folhagemRunica` | decoração: copas da floresta rúnica (kit C) | `#15191f` | `#1f2a2e` | `#2b3c3b` | `#3c534c` | `#5b7466` |
+| `casca` | decoração: troncos | `#1f191e` | `#352a29` | `#4c3c33` | `#665140` | `#857056` |
+| `cascaEscura` | decoração: troncos rúnicos (kit C) | `#141218` | `#221d24` | `#322a30` | `#463a3e` | `#62545a` |
+| `cerne` | decoração: madeira cortada (toco) | `#3a2a26` | `#5c4535` | `#7d6247` | `#9c7f5c` | `#bba07a` |
+| `pedraFria` | decoração: pedras angulosas (kit B) | `#1b1d28` | `#2e323d` | `#474c57` | `#646b73` | `#8e949a` |
+| `pedraRunica` | decoração: pedras com fissuras (kit C) | `#15151d` | `#25242d` | `#37363f` | `#4d4b52` | `#6e6b6c` |
+| `cristal` | decoração: corpo dos cristais (o brilho é o ciano) | `#152238` | `#1c3c55` | `#2a6878` | `#4a9aa2` | `#9fdcd6` |
 | `terra` | chão (caminho) | `#35272a` | `#58443a` | `#7a6049` | `#977b5b` | `#b59c76` |
 | `ciano` ⚡ | energia rúnica, plasma, runas | `#0c3252` | `#14788c` | `#3ff5ff` | `#a8fcf0` | `#f2fff0` |
 | `vermelho` ⚡ | olhos, perigo, núcleo ferido | `#3a0a26` | `#78101c` | `#ff3b4e` | `#ff9a78` | `#fff0d8` |
@@ -129,7 +138,8 @@ e texturas de material com semente fixa.
 - **Nunca desenhada no sprite.** O jogo desenha uma **elipse de pixels duros** (sem blur) na camada de sombras,
   cor `rgb(30, 14, 40)` com opacidade 0,28 (`SHADOW.alpha`), **deslocada +7, +4 px** (para baixo/direita).
 - Tamanho (`SHADOWS` em `src/config/art.js`): personagens ≈ 40–60% da largura do quadro × altura de ¼ da largura
-  (orc 42×11); torres e castelo ≈ a largura da base (Besta 84×30, Catapulta 124×38, castelo 270×60).
+  (orc 42×11); torres e castelo ≈ a largura da base (Besta 84×30, Catapulta 124×38, castelo 270×60);
+  decoração (T15) ≈ 70–90% da largura da base/copa × altura de ⅓ da largura (ex.: carvalho grande 86×26, pedra média 36×12).
 - O chão (tiles, tufos, pedrinhas) não tem sombra projetada: só a sombra de contato de 1 px embutida no desenho.
 - Sprites de pixel art não escalam a sombra; objetos no ar (projéteis) usam a sombra suave que encolhe com a altura.
 
@@ -290,15 +300,35 @@ entram quando a fase deles chegar.
 - Emite luz (não é afetado pela iluminação do cenário): cores claras e saturadas de ciano.
 - **Animação procedural**: flutua, pulsa, reflexo (Shine), flash vermelho ao ser atingido.
 
-### Árvore — `tree`
+### Kits de decoração em pixel art (T15) — `decor-<item>`
+Três kits completos para escolha, cada um com os mesmos 10 itens: 3 árvores (`arvore1` grande, `arvore2` média,
+`arvore3` pequena), 2 arbustos, 3 pedras (`pedraP`, `pedraM`, `pedraG`), 1 aglomerado de cristal (`cristal`, com veios
+emissivos ciano) e 1 elemento temático (`tema`). Fonte: `tools/pixel-art/sprites/decoracao/kit-a|b|c.js` (peças comuns em
+`comum.js`); arquivos `public/assets/decor-<kit>-<item>.png`; comparação em `tools/pixel-art/escolha-decoracao.html`.
+- **A — Bosque antigo**: carvalhos retorcidos, copas em tufos verde-musgo (`folhagem`), pedras com musgo, toco cortado com anéis.
+- **B — Fronteira de pinheiros**: pinheiros/abetos em camadas (`pinho`), espinheiros, pedras angulosas com facetas
+  (`pedraFria`), marco de pedra com runa ciano gravada.
+- **C — Floresta rúnica**: casca escura com veias de ciano (`cascaEscura`), copas verde-azuladas (`folhagemRunica`) com
+  brilhos, cristais maiores brotando do chão, pedras com fissuras rúnicas (`pedraRunica`), ruína de pilar com circuito.
+- **Menos saturada e contrastada** que orcs e torres (rampas próprias da decoração). Nada infantil: copas em tufos
+  irregulares, sem frutas, sem copa redonda em tronco fino.
+- **Encaixes** (quadro, pivot na borda de baixo, sombra, raio de bloqueio `block`, `glow` dos cristais) em
+  `src/config/decor.js`; o gerador falha se o desenho não bater com o quadro ou se um ponto cair fora dele, e avisa se a
+  base não encostar no chão ou se a arte encostar na borda.
+- **No mapa**: cada árvore/pedra/cristal de `map01.js` vira o item do tamanho correspondente (`decorItemFor`, pela escala
+  antiga); arbustos e o elemento temático são entradas `kitOnly` (só existem com um kit). Sem balanço nem escala (pixel
+  art); cristais sem iluminação de cena, com halo e luz pulsando.
+- **Seletor**: `DECOR_KIT` em `src/config/art.js` (`'atual'` = SVGs abaixo, padrão até a escolha) ou `?decor=a|b|c` na URL.
+
+### Árvore — `tree` (SVG atual)
 - **Tamanho**: 100×122 · pivot 50,122 (base do tronco).
 - **Animação procedural**: balança ±1,5° girando em torno da base; mantenha a base do tronco no pivot.
 - Sombra: elipse 80×26 (× escala da árvore no mapa).
 
-### Pedra — `rock`
+### Pedra — `rock` (SVG atual)
 - **Tamanho**: 76×56 · pivot 38,56. Estática. Sombra: elipse 66×20.
 
-### Aglomerado de cristais — `crystal-cluster`
+### Aglomerado de cristais — `crystal-cluster` (SVG atual)
 - **Tamanho**: 84×86 · pivot 42,86.
 - `glow` (+2, −46): centro do halo de luz que o jogo desenha.
 - Emite luz (sem iluminação de cena). **Animação procedural**: pulsa levemente.

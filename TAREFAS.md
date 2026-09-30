@@ -318,7 +318,14 @@ BUG: bolinhas vermelhas "atirando" à frente dos orcs. Causa encontrada: public/
 
 ---
 
-## [ ] T15 — Kits de decoração em pixel art
+## [x] T15 — Kits de decoração em pixel art
+
+**Concluída em 2026-09-30.** Resultado:
+- **3 kits × 10 itens** desenhados em código (`tools/pixel-art/sprites/decoracao/kit-a|b|c.js` + `comum.js`), com rampas próprias menos saturadas (folhagem, pinho, folhagemRunica, casca, cascaEscura, cerne, pedraFria, pedraRunica, cristal) e texturas de casca/folhagem → `public/assets/decor-<kit>-<item>.png`. Encaixes (quadro, pivot, sombra, raio de bloqueio, brilho) em `src/config/decor.js`; o gerador confere quadro, pontos, base no chão e arte cortada.
+- **`tools/pixel-art/escolha-decoracao.html`**: os 3 kits no mapa inteiro lado a lado (mesmas posições de `map01.js`, chão novo, orcs, castelo placeholder; PNGs em `tools/pixel-art/decoracao/mapa-a|b|c.png`) + itens soltos em 1× e 4×. `map01.js` ganhou 4 arbustos e 1 elemento temático marcados `kitOnly` (só existem com kit).
+- **Jogo**: `DECOR_KIT` em `src/config/art.js` (padrão `'atual'` = SVGs) ou `?decor=a|b|c`; `MapRenderer.placeKitDecorations` (1×, sombra de pixels do item, cristais com halo/luz, sem balanço); `PlacementRules` usa o raio `block` de cada item (testado: "Bloqueado por um arbusto" / "por decoração").
+- Padrão inalterado: simulação com a mesma assinatura antes/depois da T15 (mista 508b8b6f, só Bestas de6f57, só Catapultas b3934d63). Observação: mista e só Bestas mudaram de assinatura em relação à T11 por causa do novo ponto de acerto do orc (T13; a Besta mira nele) — resultados finais iguais (mista perde, só Bestas 20/20, só Catapultas perde).
+- Pendências: escolher o kit; no jogo a luz ambiente escurece a decoração (sobretudo as veias ciano do kit C). Prints em `Claude outputs/jogo-kit-a|b|c.jpg` e `kits-lado-a-lado.png`.
 
 Converter a decoração do mapa (árvores, pedras, cristais) para pixel art 1×, gerando 3 KITS completos para eu escolher — não 3 versões soltas de cada item. Siga o ART_SPEC.md (paleta, luz do canto superior esquerdo, contorno seletivo, densidade de detalhe) e mantenha a decoração um pouco menos saturada e contrastada que orcs e torres, para não competir com o que importa no jogo. Nada infantil (sem frutinhas, sem formas de pirulito).
 

@@ -21,8 +21,9 @@ Os sprites são gerados por `npm run pixel` a partir de módulos JS em `tools/pi
 cada personagem **em partes** numa grade pequena. Não se edita PNG à mão: muda-se o módulo e roda o gerador.
 
 > Transição em andamento: o **Orc Cibernético** (com caminhada) e o **chão do mapa 1** (T12) já são pixel art 1×.
-> Torres, castelo, decoração (árvores, pedras, cristais), projéteis e ícones ainda são os SVGs antigos
-> (placeholders) e serão refeitos no mesmo gerador.
+> A **decoração** tem 3 kits em pixel art aguardando escolha (T15: `DECOR_KIT` em `src/config/art.js`, padrão `'atual'` =
+> SVGs; comparação em `tools/pixel-art/escolha-decoracao.html`). Torres, castelo, projéteis e ícones ainda são os SVGs
+> antigos (placeholders) e serão refeitos no mesmo gerador.
 > **Guia de estilo ("bíblia") em `ART_SPEC.md`**: paleta completa, luz, contorno, densidade de detalhe, tamanhos de
 > referência e sombras. Toda arte nova segue esse guia.
 > O orc padrão é o **"Saqueador"** (`sprites/orc-b.js`, `ORC_VARIANT = 'b'` em `src/config/art.js`); o orc da T08
@@ -110,10 +111,11 @@ Personalidade vem do **peso**, não da elasticidade. Nada fica 100% parado, mas 
 ```
 index.html
 tools/sim/simulacao.js    simulação determinística de balanceamento (roda no navegador, ver cabeçalho do arquivo)
-tools/pixel-art/          gerador de pixel art (`npm run pixel`): palette.js, lib/PixelCanvas.js, sprites/*.js (futuros/ = inimigos futuros), cenario/ (chão dos mapas + cena de referência), legacy/, preview.html, escolha-orc.html, cena-referencia.png
+tools/pixel-art/          gerador de pixel art (`npm run pixel`): palette.js, lib/PixelCanvas.js, sprites/*.js (futuros/ = inimigos futuros, decoracao/ = kits A/B/C), cenario/ (chão dos mapas + cena de referência), legacy/, preview.html, escolha-orc.html, escolha-decoracao.html (+ decoracao/mapa-*.png), cena-referencia.png
 public/assets/            SVGs substituíveis (torres, inimigos, castelo, cristais, cenário, ícones)
 src/
   main.js                 configuração do Phaser.Game
+  config/decor.js         kits de decoração (itens, quadros, sombras, raio de bloqueio) e decorItemFor
   config/balance.js       TODOS os valores de balanceamento (dano, alcance, custo, vida, velocidade, ondas, economia)
   config/visual.js        cores, profundidades, luzes, bloom, escala de renderização
   data/map01.js           caminho, castelo e decoração do mapa 1 (decorações também bloqueiam construção)
@@ -165,7 +167,7 @@ Tudo em **pixel art 1×**, seguindo o guia de estilo do `ART_SPEC.md`:
 - [x] Chão e caminho do mapa 1 + guia de estilo (T12)
 - [ ] Torres (Besta Laser, Catapulta de Plasma) e plataforma rúnica
 - [ ] Castelo + Núcleo Arcano
-- [ ] Decoração (árvores, pedras, cristais)
+- [ ] Decoração (árvores, pedras, cristais) — 3 kits gerados (T15), aguardando a escolha do usuário
 - [ ] Projéteis e efeitos
 - [ ] UI com fonte pixel
 

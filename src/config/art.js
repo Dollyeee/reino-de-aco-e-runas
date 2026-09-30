@@ -20,6 +20,27 @@
 // Trocar SVG por PNG: mude só `file` (e `scale`, se o arquivo for em alta resolução). Mantendo `size`
 // e `pivot`, todo o encaixe continua igual.
 
+import { DECOR_ITEMS, DECOR_KITS } from './decor.js';
+
+// ---------------------------------------------------------------------------------------------------------
+// Kit de decoração do mapa (T15): 'atual' (SVGs antigos, padrão até a escolha) | 'a' Bosque antigo |
+// 'b' Fronteira de pinheiros | 'c' Floresta rúnica. Para testar sem editar este arquivo: ?decor=a na URL.
+// Comparação dos kits: tools/pixel-art/escolha-decoracao.html. Itens e encaixes: src/config/decor.js.
+export const DECOR_KIT = 'atual';
+
+function pickDecorKit () {
+    let k = DECOR_KIT;
+    try {
+        const q = new URLSearchParams(globalThis.location ? globalThis.location.search : '').get('decor');
+        if (q && (q === 'atual' || DECOR_KITS[q])) { k = q; }
+    } catch (e) { /* fora do navegador (gerador): usa DECOR_KIT */ }
+    return k;
+}
+
+export const DECOR_ACTIVE = pickDecorKit();
+// kit de pixel art ativo (null = arte atual em SVG)
+export const DECOR = DECOR_KITS[DECOR_ACTIVE] || null;
+
 // ---------------------------------------------------------------------------------------------------------
 // Versão do Orc Cibernético usada no jogo: 'b' (padrão, "Saqueador", escolhida na T09 e ajustada na T10) | 'atual'
 // (orc da T08, mantido como alternativa). As versões A e C viraram arte para inimigos futuros
@@ -86,6 +107,14 @@ export const ART = {
     'icon-core':            { file: 'icon-core.svg', size: [48, 48], pivot: [24, 24] },
     'icon-wave':            { file: 'icon-wave.svg', size: [48, 48], pivot: [24, 24] }
 };
+
+// decoração em pixel art do kit ativo: chaves 'decor-<item>' (arvore1, pedraM, cristal...)
+if (DECOR) {
+    for (const item of DECOR_ITEMS) {
+        const d = DECOR.items[item];
+        ART[`decor-${item}`] = { file: `decor-${DECOR_ACTIVE}-${item}.png`, pixel: true, size: d.frame, pivot: d.pivot, glow: d.glow };
+    }
+}
 
 export function artFormat (key) {
     return ART[key].file.split('.').pop().toLowerCase();

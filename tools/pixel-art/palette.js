@@ -31,7 +31,18 @@ export const MATERIALS = {
     musgo: ['#1f292a', '#2e3b2d', '#404f31', '#55643a', '#74804a'],
     terra: ['#35272a', '#58443a', '#7a6049', '#977b5b', '#b59c76'],
     pedra: ['#23222c', '#3d3c46', '#5b5a5f', '#7c7a76', '#a5a18f'],
-    madeira: ['#26161e', '#472a26', '#6e442c', '#946236', '#bf8e4c']
+    madeira: ['#26161e', '#472a26', '#6e442c', '#946236', '#bf8e4c'],
+
+    // decoração (T15): um pouco menos saturada e contrastada que orcs e torres, para não competir com eles
+    folhagem: ['#1a2226', '#2a3930', '#3d5037', '#556b41', '#7a8a55'],        // copas de carvalho (verde-musgo)
+    pinho: ['#131b21', '#1c2b2c', '#283d35', '#37523f', '#557050'],           // pinheiros e abetos (escuro)
+    folhagemRunica: ['#15191f', '#1f2a2e', '#2b3c3b', '#3c534c', '#5b7466'],  // copas da floresta rúnica
+    casca: ['#1f191e', '#352a29', '#4c3c33', '#665140', '#857056'],           // troncos
+    cascaEscura: ['#141218', '#221d24', '#322a30', '#463a3e', '#62545a'],     // troncos da floresta rúnica
+    cerne: ['#3a2a26', '#5c4535', '#7d6247', '#9c7f5c', '#bba07a'],           // madeira cortada (toco)
+    pedraFria: ['#1b1d28', '#2e323d', '#474c57', '#646b73', '#8e949a'],       // pedras angulosas cinza-frias
+    pedraRunica: ['#15151d', '#25242d', '#37363f', '#4d4b52', '#6e6b6c'],     // pedras escuras com fissuras
+    cristal: ['#152238', '#1c3c55', '#2a6878', '#4a9aa2', '#9fdcd6']          // corpo dos cristais (o brilho é o ciano)
 };
 
 // Cores avulsas

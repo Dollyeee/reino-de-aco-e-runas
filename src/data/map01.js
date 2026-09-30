@@ -26,7 +26,10 @@ export const MAP01 = {
     // Castelo e Núcleo Arcano (ponto de contato com o chão)
     castle: { x: 1165, y: 522 },
 
-    // Decoração (tipo = nome do SVG em public/assets/). Também bloqueia a construção de torres.
+    // Decoração. Também bloqueia a construção de torres.
+    // Com a arte atual (SVG), `type` é o nome do SVG em public/assets/ e `scale` a escala dele.
+    // Com um kit de pixel art (DECOR_KIT em src/config/art.js), `type` + `scale` escolhem o item do kit
+    // (src/config/decor.js, decorItemFor); entradas `kitOnly` (arbustos e elemento temático) só existem nos kits.
     decorations: [
         { type: 'tree', x: 60, y: 110, scale: 1.0 },
         { type: 'tree', x: 120, y: 90, scale: 0.8 },
@@ -48,6 +51,11 @@ export const MAP01 = {
         { type: 'crystal-cluster', x: 60, y: 520, scale: 0.9, light: true },
         { type: 'crystal-cluster', x: 830, y: 440, scale: 0.8, light: true },
         { type: 'crystal-cluster', x: 540, y: 265, scale: 0.75, light: true },
-        { type: 'crystal-cluster', x: 1010, y: 712, scale: 0.8, light: true }
+        { type: 'crystal-cluster', x: 1010, y: 712, scale: 0.8, light: true },
+        { type: 'bush', x: 250, y: 112, kitOnly: true },
+        { type: 'bush', x: 720, y: 145, variant: 2, kitOnly: true },
+        { type: 'bush', x: 470, y: 655, variant: 2, kitOnly: true },
+        { type: 'bush', x: 150, y: 455, kitOnly: true },
+        { type: 'landmark', x: 200, y: 578, kitOnly: true }
     ]
 };

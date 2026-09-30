@@ -20,7 +20,12 @@ import { V2_WALK, V2_FRAME } from './legacy/orc-v2.js';
 import { MATERIALS, SINGLE, OUTLINE } from './palette.js';
 import { MAP01 } from '../../src/data/map01.js';
 import { drawGround, TILE } from './cenario/chao.js';
-import { drawScene } from './cenario/cena.js';
+import { drawScene, drawDecorMap } from './cenario/cena.js';
+import { DECOR_KITS, DECOR_ITEMS, decorItemFor } from '../../src/config/decor.js';
+import { escolhaDecoracaoHtml } from './escolha-decoracao.js';
+import kitA from './sprites/decoracao/kit-a.js';
+import kitB from './sprites/decoracao/kit-b.js';
+import kitC from './sprites/decoracao/kit-c.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..');
@@ -281,6 +286,34 @@ const compares = COMPARE.map((c, i) => {
         beforeLabel: c.before.label, afterLabel: c.after.label, beforeReal: c.before.real, afterReal: c.after.real
     };
 });
+// ---------------------------------------------------------------- decoração (T15)
+// 3 kits × 10 itens → public/assets/decor-<kit>-<item>.png. Quadro e encaixes vêm de src/config/decor.js.
+const KIT_DRAW = { a: kitA, b: kitB, c: kitC };
+const decor = {};
+for (const [kit, draw] of Object.entries(KIT_DRAW)) {
+    decor[kit] = {};
+    for (const item of DECOR_ITEMS) {
+        const def = DECOR_KITS[kit].items[item];
+        const cv = draw[item]();
+        if (cv.w !== def.frame[0] || cv.h !== def.frame[1]) {
+            throw new Error(`[pixel] decor ${kit}/${item}: desenho ${cv.w}×${cv.h} ≠ frame ${def.frame} de src/config/decor.js`);
+        }
+        const [fw, fh] = def.frame;
+        checkPoint(`DECOR_KITS.${kit}.${item}.pivot`, { x: def.pivot[0], y: def.pivot[1] }, fw, fh);
+        if (def.glow) { checkPoint(`DECOR_KITS.${kit}.${item}.glow`, { x: def.pivot[0] + def.glow.x, y: def.pivot[1] + def.glow.y }, fw, fh); }
+        // a arte precisa encostar no chão (contorno na última linha) e ter 1 px livre nas laterais e em cima
+        const rgba = cv.toRGBA();
+        const rowHas = (y) => { for (let x = 0; x < fw; x++) { if (rgba[(y * fw + x) * 4 + 3]) { return true; } } return false; };
+        const colHas = (x) => { for (let y = 0; y < fh; y++) { if (rgba[(y * fw + x) * 4 + 3]) { return true; } } return false; };
+        if (!rowHas(fh - 1)) { console.log(`  ⚠️ decor ${kit}/${item}: a base não encosta na borda de baixo do quadro`); }
+        if (rowHas(0) || colHas(0) || colHas(fw - 1)) { console.log(`  ⚠️ decor ${kit}/${item}: arte encostando na borda do quadro (cortada?)`); }
+        fs.writeFileSync(path.join(ASSETS, `decor-${kit}-${item}.png`), encodeRGBA(rgba, fw, fh));
+        decor[kit][item] = { cv, rgba, def };
+    }
+    checkShading(`decoração ${kit}`, Object.values(decor[kit]).map((d) => d.cv));
+    console.log(`✓ public/assets/decor-${kit}-*.png  (kit ${kit.toUpperCase()} "${DECOR_KITS[kit].name}", ${DECOR_ITEMS.length} itens)`);
+}
+
 // ---------------------------------------------------------------- cenário (T12)
 const { img: ground, track, tiles } = drawGround(MAP01);
 fs.writeFileSync(path.join(ASSETS, 'chao-map01.png'), encodeRGBA(ground.toRGBA(), ground.w, ground.h));
@@ -290,9 +323,24 @@ fs.writeFileSync(path.join(ASSETS, 'chao-map01.json'), JSON.stringify(groundMeta
 console.log(`✓ public/assets/chao-map01.png  (${ground.w}×${ground.h}, chão do mapa "${MAP01.name}")`);
 
 const orcV = ORC_VARIANTS.b;
-const scene = drawScene(ground, track, MAP01, { frames: orcB.sheets[0].frames, frame: orcB.frame, pivot: orcV.pivot, shadow: orcV.shadow });
+const orcRef = { frames: orcB.sheets[0].frames, frame: orcB.frame, pivot: orcV.pivot, shadow: orcV.shadow };
+const scene = drawScene(ground, track, MAP01, orcRef);
 fs.writeFileSync(path.join(HERE, 'cena-referencia.png'), encodeRGBA(scene, ground.w, ground.h));
 console.log('✓ tools/pixel-art/cena-referencia.png  (1280×720)');
+
+// escolha-decoracao.html: cada kit aplicado no mapa inteiro (mesmas posições de map01.js) + itens soltos
+fs.mkdirSync(path.join(HERE, 'decoracao'), { recursive: true });
+for (const kit of Object.keys(KIT_DRAW)) {
+    const placed = MAP01.decorations.map((d) => {
+        const item = decorItemFor(d);
+        return { x: d.x, y: d.y, rgba: decor[kit][item].rgba, def: decor[kit][item].def };
+    });
+    fs.writeFileSync(path.join(HERE, 'decoracao', `mapa-${kit}.png`), encodeRGBA(drawDecorMap(ground, track, MAP01, orcRef, placed), ground.w, ground.h));
+}
+fs.writeFileSync(path.join(HERE, 'escolha-decoracao.html'), escolhaDecoracaoHtml({
+    kits: Object.keys(KIT_DRAW).map((id) => ({ id, ...DECOR_KITS[id] })), items: DECOR_ITEMS, grass: GRASS
+}));
+console.log('✓ tools/pixel-art/escolha-decoracao.html  (+ decoracao/mapa-a|b|c.png)');
 
 // preview: tiles lado a lado, mosaico 8×5 sorteado e recorte do mapa
 const tileStrip = new Uint8Array(tiles.length * TILE * TILE * 4);

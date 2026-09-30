@@ -76,6 +76,38 @@ function ellipseOutline (buf, w, h, cx, cy, ew, eh, color) {
     }
 }
 
+// Mapa inteiro com um kit de decoração (T15): chão + decoração nas posições de map01.js + orcs no caminho +
+// castelo placeholder. decor = [{ x, y, rgba, def }] (def = item de src/config/decor.js).
+export function drawDecorMap (ground, track, map, orc, decor) {
+    const w = ground.w, h = ground.h;
+    const buf = ground.toRGBA();
+    const objs = decor.map((d) => ({
+        y: d.y,
+        shadow: () => shadow(buf, w, h, d.x, d.y, d.def.shadow[0], d.def.shadow[1]),
+        draw: () => sprite(buf, w, h, d.rgba, d.def.frame[0], d.def.frame[1], d.x - d.def.pivot[0], d.y - d.def.pivot[1])
+    }));
+    const c = map.castle;
+    objs.push({
+        y: c.y,
+        shadow: () => shadow(buf, w, h, c.x, c.y, CASTLE_BOX.shadow[0], CASTLE_BOX.shadow[1]),
+        draw: () => box(buf, w, h, c.x - CASTLE_BOX.w / 2, c.y - CASTLE_BOX.h, CASTLE_BOX.w, CASTLE_BOX.h, CASTLE_BOX.color)
+    });
+    for (const [dist, f] of ORCS) {
+        const p = track.getPointAt(dist);
+        const x = Math.round(p.x), y = Math.round(p.y);
+        const rgba = orc.frames[f % orc.frames.length].toRGBA();
+        objs.push({
+            y,
+            shadow: () => shadow(buf, w, h, x, y, orc.shadow[0], orc.shadow[1]),
+            draw: () => sprite(buf, w, h, rgba, orc.frame.w, orc.frame.h, x - orc.pivot[0], y - orc.pivot[1])
+        });
+    }
+    for (const o of objs) { o.shadow(); }
+    objs.sort((a, b) => a.y - b.y);
+    for (const o of objs) { o.draw(); }
+    return buf;
+}
+
 // ground = Raster do chão; orc = { frames: [PixelCanvas], frame: {w,h}, pivot: [x,y], shadow: [w,h] }
 export function drawScene (ground, track, map, orc) {
     const w = ground.w, h = ground.h;

@@ -1,5 +1,7 @@
 import { BALANCE } from '../config/balance.js';
 import { HUD, TOWER_BAR, WORLD } from '../config/visual.js';
+import { DECOR } from '../config/art.js';
+import { decorItemFor } from '../config/decor.js';
 
 // Retângulo ocupado pela barra de torres (usado pela UI e pelas regras).
 export function towerBarRect () {
@@ -22,6 +24,17 @@ function uiRects () {
 
 function rectsOverlap (a, b) {
     return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+}
+
+// Raio de bloqueio de uma decoração: kit de pixel art → tamanho real do item (src/config/decor.js);
+// arte atual (SVG) → BALANCE.placement.decorationRadius × escala (entradas `kitOnly` não existem).
+function decorationRadius (d) {
+    if (DECOR) {
+        const item = decorItemFor(d);
+        return item ? DECOR.items[item].block : 0;
+    }
+    if (d.kitOnly) { return 0; }
+    return (BALANCE.placement.decorationRadius[d.type] || 0) * (d.scale || 1);
 }
 
 // Decide se uma torre pode ser construída num ponto (x, y) do chão.
@@ -70,9 +83,9 @@ export default class PlacementRules {
 
         // sem sobrepor decorações
         for (const d of this.map.decorations) {
-            const dr = (P.decorationRadius[d.type] || 0) * (d.scale || 1);
+            const dr = decorationRadius(d);
             if (dr > 0 && Math.hypot(d.x - x, d.y - y) < r + dr) {
-                const names = { tree: 'uma árvore', rock: 'uma pedra', 'crystal-cluster': 'um cristal' };
+                const names = { tree: 'uma árvore', rock: 'uma pedra', 'crystal-cluster': 'um cristal', bush: 'um arbusto' };
                 return { ok: false, reason: `Bloqueado por ${names[d.type] || 'decoração'}` };
             }
         }
