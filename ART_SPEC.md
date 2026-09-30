@@ -10,7 +10,7 @@ serão refeitos no gerador seguindo as mesmas regras; as medidas deles continuam
 ## Regras da pixel art (valem para todo sprite novo)
 
 - **Resolução 1×**: 1 pixel da arte = **1 pixel do mundo** (`PIXEL_SCALE` = 1, mundo 1280×720).
-  **Inimigos comuns com ~100 px de altura** (orc: quadro 116×104).
+  **Inimigos comuns com ~100 px de altura** (orc Saqueador: quadro 136×110, personagem com ~107 px com o moicano).
 - **Fundo transparente**, **sem antialias**, só cores da paleta fixa (`tools/pixel-art/palette.js`), em
   **rampas de 5 tons com hue shift** (sombras frias arroxeadas/azuladas, luzes quentes amareladas):
   pele · aço · aço claro · couro · tecido · presa · ciano · vermelho (+ ferrugem). Ciano e vermelho só em energia,
@@ -47,7 +47,7 @@ serão refeitos no gerador seguindo as mesmas regras; as medidas deles continuam
 
 | Arquivo | Tamanho lógico | Pivot (no quadro) | Olha para | Animação feita pelo código |
 |---|---|---|---|---|
-| `enemy-cyber-orc` (pixel art 1×) | 116×104 | 58,104 (inferior central) | direita (espelhado) | caminhada em 8 quadros, dano, morte |
+| `enemy-cyber-orc` (pixel art 1×, Saqueador) | 136×110 | 61,110 (entre os pés) | direita (espelhado) | caminhada em 8 quadros, dano, morte |
 | `tower-crossbow-base` | 88×88 | 44,88 (inferior central) | frente (simétrica) | squash |
 | `tower-crossbow-head` | 116×66 | 58,33 (centro = eixo de giro) | direita (gira 360°) | giro, recuo, brilho |
 | `tower-catapult-base` | 128×104 | 64,104 (inferior central) | direita (espelhada) | squash, vira de lado |
@@ -64,45 +64,47 @@ serão refeitos no gerador seguindo as mesmas regras; as medidas deles continuam
 
 ## Assets
 
-### Orc Cibernético — `enemy-cyber-orc` (pixel art 1×) ✅
-- **Arquivos**: `orc-walk.png` (folha 928×104, **8 quadros** de 116×104), `orc-walk.json` (posição do olho por
-  quadro) e `orc.png` (parado, 116×104). Fonte: `tools/pixel-art/sprites/orc.js` (versão 2× anterior congelada em
-  `tools/pixel-art/legacy/orc-v2.js`, usada só no comparativo do preview).
-- **Quadro**: 116×104 = tamanho no mundo; personagem com ~96 px de altura · pivot no pé, centro inferior (58, 104) ·
+### Orc Cibernético — `enemy-cyber-orc` (pixel art 1×, "Saqueador") ✅
+Versão padrão do jogo (`ORC_VARIANT = 'b'` em `src/config/art.js`), escolhida na T09 e ajustada na T10.
+- **Arquivos**: `orc-b-walk.png` (folha 1088×110, **8 quadros** de 136×110), `orc-b-walk.json` (olho por quadro) e
+  `orc-b.png` (parado). Fonte: `tools/pixel-art/sprites/orc-b.js`. A versão da T09 (antes do ajuste) está congelada
+  em `tools/pixel-art/legacy/orc-b-v1.js`, só para o comparativo "B antes × B ajustado" de `escolha-orc.html`.
+- **Quadro**: 136×110 = tamanho no mundo (a lâmina e seu brilho ocupam a direita) · pivot entre os pés (61, 110) ·
   **olha para a direita** (espelhado para a esquerda).
-- **Proporções**: pernas ~1/3 da altura (coxas de pele, grevas de aço claro, botas com sola e cadarço), tronco ~40%
-  curvado para frente, cabeça grande e projetada (mandíbula saliente, dentes, 2 presas com volume, orelha para fora,
-  sobrancelha pesada).
-- **Detalhes**: rebites e riscos no peitoral de aço claro, barriga em malha de aço escuro, ombreira com ferrugem,
-  rebites, um espinho e runa ciano; cinto com costura e fivela com runa ciano; veias nos braços; clava com espinhos,
-  núcleo de plasma e runas ciano gravadas. Olho vermelho e núcleo da clava são os pontos mais brilhantes.
-- **Caminhada** (poses-chave, ritmo igual à versão 2×): contato com pernas ±10 px e tronco 2 px à frente (quadros 0 e 4);
-  passagem com pernas juntas, corpo 2 px acima e pé de trás a 6 px do chão (quadros 2 e 6); braço de trás e clava ±6 px.
-- **Pontos de encaixe** (px do mundo, a partir do pivot): `eye` (+39, −66) na pose parada (na caminhada vem do
-  JSON) · `hit` (0, −54) · `top` −96.
+- **Corpo**: alto e magro, inclinado para frente como quem vai atacar; pernas longas (coxa de pele, canela enfaixada,
+  bota de couro com sola e biqueira de aço); colete de couro, alça, cinto com bolsa, faixas; ombreira pequena;
+  cabeça projetada com orelha longa, mandíbula comprida, presa, moicano, monóculo vermelho e placa de metal rebitada.
+- **Braço da frente inteiro mecânico**: braço de aço com pistão, cotovelo, antebraço blindado, garra, cabos e 2 linhas
+  ciano; **lâmina de plasma** saindo do antebraço (núcleo claro de 4 px + brilho ciano de 2 px que se espalha no vazio,
+  sem contorno). Lâmina e olho vermelho são os dois pontos focais.
+- **Caminhada**: passos longos (pernas ±14 px, pé sobe 8 px) com joelhos dobrados; corpo sobe 2 px na passagem e dá um
+  bote de 2 px à frente no contato; braço de carne balança ±8 px; lâmina firme.
+- **Pontos de encaixe** (px do mundo, a partir do pivot): `eye` (+33, −86) na pose parada (na caminhada vem do
+  JSON) · `hit` (0, −60) · `top` −106. Sombra: elipse de pixels 56×15. `walkCycle` 44.
 - **No jogo**: animação "walk" em loop com velocidade proporcional ao passo; dano = flash branco + recuo de 2 px;
-  morte = quadro parado, pisca, afunda e vira faíscas. Sombra: elipse de pixels 56×16.
+  morte = quadro parado, pisca, afunda e vira faíscas.
 
-### Orc Cibernético — versões candidatas (T09, pixel art 1×)
-Escolhidas por `ORC_VARIANT` em `src/config/art.js` (`'atual' | 'a' | 'b' | 'c'`; teste rápido com `?orc=` na URL).
-Pontos de encaixe, sombra e `walkCycle` de cada uma ficam em `ORC_VARIANTS`. Comparação lado a lado, andando e no
-caminho: `tools/pixel-art/escolha-orc.html`.
+### Orc Cibernético da T08 — alternativa (`ORC_VARIANT = 'atual'` ou `?orc=atual`)
+- `orc-walk.png` (928×104, 8 quadros de 116×104), `orc-walk.json`, `orc.png`; fonte `tools/pixel-art/sprites/orc.js`.
+  Pivot (58, 104) · `eye` (+39, −66) · `hit` (0, −54) · `top` −96 · sombra 56×16. Clava de plasma, tronco curvado.
 
-| Versão | Arquivos | Quadro | Pivot | Olho (parado) | Hit | Top | Sombra | walkCycle |
+### Arte pronta para inimigos futuros (`tools/pixel-art/sprites/futuros/`, ainda fora do jogo)
+Nasceram como versões A e C do orc (T09). `npm run pixel` continua gerando os PNGs; o inimigo e seu manifesto
+entram quando a fase deles chegar.
+
+| Sprite | Arquivos | Quadro | Pivot | Olho (parado) | Hit | Top | Sombra | walkCycle |
 |---|---|---|---|---|---|---|---|---|
-| A "Brutamontes" (`sprites/orc-a.js`) | `orc-a-walk.png/json`, `orc-a.png` | 128×110 | 70,110 | +34,−52 | 0,−50 | −104 | 80×18 | 52 |
-| B "Saqueador" (`sprites/orc-b.js`) | `orc-b-walk.png/json`, `orc-b.png` | 128×110 | 61,110 | +33,−86 | 0,−60 | −106 | 52×14 | 44 |
-| C "Ciborgue de guerra" (`sprites/orc-c.js`) | `orc-c-walk.png/json`, `orc-c.png` | 128×106 | 65,106 | +41,−80 | 0,−52 | −92 | 64×16 | 42 |
+| Brutamontes (`futuros/brutamontes.js`) | `brutamontes-walk.png/json`, `brutamontes.png` | 128×110 | 70,110 | +34,−52 | 0,−50 | −104 | 80×18 | 52 |
+| Ciborgue de guerra (`futuros/ciborgue.js`) | `ciborgue-walk.png/json`, `ciborgue.png` | 128×106 | 65,106 | +41,−80 | 0,−52 | −92 | 64×16 | 42 |
 
-- **A**: muito largo e curvado, cabeça pequena e baixa entre os ombros, braços enormes, placas rebitadas, pele oliva
-  escura, martelo de duas mãos com cabeça de plasma apoiado no ombro. Caminhada: passo curto (±8 px), corpo afunda
-  2 px no apoio, tronco balança ±2 px e o ombro do martelo sobe/desce 2 px a cada passo.
-- **B**: alto e magro, inclinado para frente, colete de couro, faixas, ombreira pequena, moicano, pele verde clara,
-  braço da frente inteiro mecânico com lâmina de plasma. Caminhada: passos longos (±14 px, pé sobe 8 px), bote de
-  2 px à frente no contato, braço de carne balança ±8 px.
-- **C**: pernas de pássaro (joelho para frente, jarrete alto para trás), cabos, reator ciano no peito, capacete com
-  visor vermelho horizontal, presas por baixo, braço-canhão; pele verde-acinzentada só nos ombros e no maxilar.
-  Caminhada mecânica: pé anda em linha reta no apoio, afunda 3 px no pouso ("tranco") e o canhão atrasa 1 quadro.
+- **Brutamontes** (candidato ao inimigo blindado e lento da Fase 2): muito largo e curvado, cabeça pequena e baixa
+  entre os ombros, braços enormes, placas rebitadas, pele oliva escura, martelo de duas mãos com cabeça de plasma
+  apoiado no ombro. Caminhada: passo curto (±8 px), corpo afunda 2 px no apoio, tronco balança ±2 px e o ombro do
+  martelo sobe/desce 2 px a cada passo.
+- **Ciborgue de guerra** (candidato a inimigo mecânico de elite): pernas de pássaro (joelho para frente, jarrete alto
+  para trás), cabos, reator ciano no peito, capacete com visor vermelho horizontal, presas por baixo, braço-canhão;
+  pele verde-acinzentada só nos ombros e no maxilar. Caminhada mecânica: pé anda em linha reta no apoio, afunda 3 px
+  no pouso ("tranco") e o canhão atrasa 1 quadro.
 
 ### Besta Laser — base `tower-crossbow-base` + cabeça `tower-crossbow-head`
 - **Base**: 88×88 · pivot 44,88 · simétrica (não espelha).

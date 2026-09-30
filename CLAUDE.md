@@ -22,13 +22,13 @@ cada personagem **em partes** numa grade pequena. Não se edita PNG à mão: mud
 
 > Transição em andamento: o **Orc Cibernético** já é pixel art 1× (com caminhada). Torres, castelo, cenário,
 > projéteis e ícones ainda são os SVGs antigos (placeholders) e serão refeitos no mesmo gerador.
-> Há 3 versões candidatas do orc (`sprites/orc-a.js`, `orc-b.js`, `orc-c.js`), comparadas em
-> `tools/pixel-art/escolha-orc.html`; o jogo usa a escolhida em `ORC_VARIANT` (`src/config/art.js`, padrão `'atual'`,
-> ou `?orc=a|b|c|atual` na URL para testar).
+> O orc padrão é o **"Saqueador"** (`sprites/orc-b.js`, `ORC_VARIANT = 'b'` em `src/config/art.js`); o orc da T08
+> continua como alternativa (`?orc=atual` na URL). `tools/pixel-art/escolha-orc.html` compara "B antes × B ajustado".
+> Arte pronta para inimigos futuros fica em `tools/pixel-art/sprites/futuros/` (ver Roadmap).
 
 ### Resolução
 - **Pixel art 1×**: 1 pixel da arte = **1 pixel do mundo** 1280×720 (`PIXEL_SCALE` = 1). Vale para TODA a arte nova.
-- **Inimigos comuns com ~100 px de altura** (orc: quadro 116×104, personagem com ~96 px). Nada de ampliar sprite antigo:
+- **Inimigos comuns com ~100 px de altura** (orc Saqueador: quadro 136×110, ~107 px com o moicano). Nada de ampliar sprite antigo:
   as partes são redesenhadas na grade 1×.
 
 ### Gerador (`tools/pixel-art/`)
@@ -45,6 +45,7 @@ cada personagem **em partes** numa grade pequena. Não se edita PNG à mão: mud
 - **Brilho especular**: 1–3 pixels no tom 4 no canto iluminado das placas de metal; **rim light** de 1 px na borda
   direita da silhueta.
 - **Emissivos** (olho, runas, plasma): núcleo claro + halo de 1–2 px nos tons da rampa ciano/vermelha, sem contorno.
+  Com `glow: true` o halo também se espalha no vazio (lâminas e energia fora da silhueta), sem contorno externo em volta.
 - **Detalhes** com hierarquia de leitura: rebites (1 px claro + 1 px escuro), riscos, costuras; olho e arma continuam
   sendo os pontos que mais chamam atenção.
 - **Paleta fixa** em `tools/pixel-art/palette.js` (pele, aço, aço claro, couro, tecido, presa, ciano, vermelho +
@@ -101,7 +102,7 @@ Personalidade vem do **peso**, não da elasticidade. Nada fica 100% parado, mas 
 
 ```
 index.html
-tools/pixel-art/          gerador de pixel art (`npm run pixel`): palette.js, lib/PixelCanvas.js, sprites/*.js, preview.html, escolha-orc.html
+tools/pixel-art/          gerador de pixel art (`npm run pixel`): palette.js, lib/PixelCanvas.js, sprites/*.js (futuros/ = inimigos futuros), legacy/, preview.html, escolha-orc.html
 public/assets/            SVGs substituíveis (torres, inimigos, castelo, cristais, cenário, ícones)
 src/
   main.js                 configuração do Phaser.Game
@@ -145,6 +146,13 @@ Convenções:
 - **Fase 3**: **Ninho do Dragão Mecânico** (fogo em linha); chefe **Dragão Ancestral** reconstruído com peças
   de metal; trilha sonora e efeitos sonoros.
 - **Fase 4**: mais mapas, menu inicial, seleção de fases e salvamento de progresso.
+
+**Arte pronta para inimigos futuros** (pixel art 1×, em `tools/pixel-art/sprites/futuros/`, gerada por `npm run pixel`
+mas fora do jogo; detalhes em `ART_SPEC.md`):
+- **Brutamontes** (`futuros/brutamontes.js`): orc largo e blindado com martelo de plasma no ombro, passo curto e
+  pesado — candidato ao **inimigo blindado e lento da Fase 2**.
+- **Ciborgue de guerra** (`futuros/ciborgue.js`): pernas mecânicas de pássaro, reator no peito, visor vermelho,
+  braço-canhão — candidato a **inimigo mecânico de elite**.
 
 ## Comandos
 

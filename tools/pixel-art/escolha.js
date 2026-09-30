@@ -1,9 +1,9 @@
-// Página de escolha entre versões de um sprite (hoje: Orc Cibernético, T09) — gerada por `npm run pixel`.
+// Página de comparação entre versões de um sprite (hoje: Orc Cibernético, "B antes × B ajustado") — gerada por `npm run pixel`.
 // Mostra cada versão parada e andando em loop, no tamanho real do jogo (grama e terra) e ampliada 4×,
 // e 2 inimigos de cada versão andando juntos sobre o caminho, como numa onda.
 
 // variants: [{ id, label, note, walk: {base64, frames}, idle: {base64}, fw, fh, pivot, walkCycle, shadow }]
-export function escolhaHtml ({ title, variants, speed, grass, dirt }) {
+export function escolhaHtml ({ title, intro = '', variants, speed, grass, dirt }) {
     const data = Object.fromEntries(variants.map((v) => [v.id, {
         walk: `data:image/png;base64,${v.walk.base64}`, idle: `data:image/png;base64,${v.idle.base64}`,
         frames: v.walk.frames, fw: v.fw, fh: v.fh, pivot: v.pivot, walkCycle: v.walkCycle, shadow: v.shadow
@@ -54,8 +54,7 @@ export function escolhaHtml ({ title, variants, speed, grass, dirt }) {
 </head>
 <body>
 <h1>${title}</h1>
-<p>Gerado por <code>npm run pixel</code>. Caminhada em loop na cadência do jogo (um ciclo a cada <code>walkCycle</code> px andados a ${speed} px/s).
-Para testar no jogo: <code>ORC_VARIANT</code> em <code>src/config/art.js</code>, ou abra o jogo com <code>?orc=a</code> / <code>b</code> / <code>c</code> / <code>atual</code>.</p>
+<p>Gerado por <code>npm run pixel</code>. Caminhada em loop na cadência do jogo (um ciclo a cada <code>walkCycle</code> px andados a ${speed} px/s). ${intro}</p>
 
 <h2>Tamanho real do jogo</h2>
 <div class="cols">${cols}</div>

@@ -1,4 +1,5 @@
-// Orc Cibernético — versão C "Ciborgue de guerra" (pixel art 1×, candidata; o jogo usa a versão escolhida em ORC_VARIANT).
+// Ciborgue de guerra — ARTE PRONTA PARA UM INIMIGO FUTURO (pixel art 1×; ainda não entra no jogo).
+// Nasceu como versão C do Orc Cibernético (T09). Candidato a inimigo mecânico de elite.
 // Mais máquina que orc: pernas mecânicas com articulação invertida (tipo pássaro), cabos expostos, reator ciano
 // no peito, capacete cobrindo metade do rosto com visor vermelho horizontal, presas por baixo. O braço da frente
 // é um canhão de plasma. Pele verde-acinzentada só nos ombros e no maxilar.
@@ -6,7 +7,7 @@
 // (o corpo afunda 3 px no quadro do contato e o canhão atrasa 1 quadro).
 // Quadro 128×106, olhando para a DIREITA, pés na borda inferior.
 
-import { PixelCanvas } from '../lib/PixelCanvas.js';
+import { PixelCanvas } from '../../lib/PixelCanvas.js';
 
 export const FRAME = { w: 128, h: 106 };
 export const WALK_FRAMES = 8;
@@ -53,7 +54,7 @@ function leg (cv, hipX, hipY, pose, name) {
     cv.part('acoClaro', (m) => m.poly([[fx + 9, g - 3], [fx + 15, g - 1], [fx + 16, g], [fx + 9, g]]), { name: `${name}: garras`, specular: 1 });
 }
 
-export function drawOrcC (pose = IDLE_POSE) {
+export function drawCiborgue (pose = IDLE_POSE) {
     const cv = new PixelCanvas(FRAME.w, FRAME.h);
     const b = pose.bob;
     const cb = b + pose.cannon;
@@ -138,10 +139,10 @@ export function eyeAt (pose) {
 const walkPoses = Array.from({ length: WALK_FRAMES }, (_, i) => walkPose(i));
 
 export default {
-    name: 'orc-c',
+    name: 'ciborgue',
     frame: FRAME,
     sheets: [
-        { file: 'orc-c-walk.png', frames: walkPoses.map((p) => drawOrcC(p)), meta: { eye: walkPoses.map(eyeAt), idleEye: eyeAt(IDLE_POSE) } },
-        { file: 'orc-c.png', frames: [drawOrcC(IDLE_POSE)] }
+        { file: 'ciborgue-walk.png', frames: walkPoses.map((p) => drawCiborgue(p)), meta: { eye: walkPoses.map(eyeAt), idleEye: eyeAt(IDLE_POSE) } },
+        { file: 'ciborgue.png', frames: [drawCiborgue(IDLE_POSE)] }
     ]
 };

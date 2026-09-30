@@ -212,3 +212,57 @@ Entregáveis:
 - Seletor `ORC_VARIANT` em `src/config/art.js` (padrão `'atual'`) + `?orc=a|b|c|atual` na URL; `ORC_VARIANTS` guarda quadro, pivot, olho, hit, topo, sombra e `walkCycle` de cada versão. `Enemy` usa o `walkCycle` do manifesto quando existe.
 - Testado no jogo com as 4 versões: sprite no tamanho certo, brilho do olho acompanhando o quadro, sombra de pixels, cadência própria, dano (recuo 2 px) e morte; sem avisos de `[arte]`. O orc atual continua idêntico e é o padrão. `npm run pixel` e `npm run build` OK.
 - Pendente: o usuário escolher a versão (depois, trocar o padrão de `ORC_VARIANT` ou remover as candidatas não usadas).
+
+---
+
+## [x] T10 — Fixar a versão B (Saqueador) como Orc Cibernético padrão
+
+A versão B passa a ser o Orc Cibernético padrão. Ajustes na B antes de fixar:
+1. Um pouco mais de massa, sem perder a silhueta magra e curvada: ombros e peito ~15% mais largos, braço mecânico mais grosso, botas um pouco maiores — para não parecer frágil ao lado das torres no tamanho real.
+2. Lâmina de plasma ~30% maior e mais grossa (3–4 px), com núcleo claro + halo ciano de 1–2 px; ela e o olho vermelho são os dois pontos focais.
+3. Mais leitura "cibernética": uma ou duas linhas ciano no braço mecânico e um pequeno implante/placa de metal na cabeça, sem poluir.
+4. Manter a caminhada atual da B, só ajustando para as novas proporções.
+
+Depois:
+- `ORC_VARIANT` padrão = `'b'` em `src/config/art.js`.
+- NÃO apagar A e C: mover para `tools/pixel-art/sprites/futuros/` (orc-a → "brutamontes", orc-c → "ciborgue") e registrar no roadmap do CLAUDE.md como arte pronta para inimigos futuros (brutamontes = candidato ao inimigo blindado e lento da Fase 2; ciborgue = inimigo mecânico de elite).
+- Atualizar `escolha-orc.html` com "B antes × B ajustado", rodar `npm run pixel` e `npm run build`.
+
+**Resultado:**
+- Saqueador ajustado (`tools/pixel-art/sprites/orc-b.js`, quadro 136×110): tronco, colete e ombreira mais largos (~15% nos ombros/peito), braço mecânico com espessura 10 (antes 7), cotovelo e antebraço maiores, 2 linhas ciano no braço, botas maiores com sola, placa de metal rebitada na cabeça, lâmina de 27 px (antes 21) com núcleo de 4 px e brilho ciano de 2 px no vazio. Caminhada igual (mesma tabela de poses); pernas com diferença mínima de 595 px entre quadros, sombreamento máx. 30%.
+- `PixelCanvas.emissive(..., { glow: true })`: halo que se espalha no vazio, sem contorno externo em volta.
+- `ORC_VARIANT = 'b'` (padrão); `ORC_VARIANTS` agora tem só `b` e `atual` (orc da T08, `?orc=atual`). Encaixes do Saqueador: pivot (61,110), olho (+33,−86), hit (0,−60), top −106, sombra 56×15, walkCycle 44.
+- A e C movidos para `tools/pixel-art/sprites/futuros/brutamontes.js` e `ciborgue.js` (PNGs renomeados para `brutamontes*` / `ciborgue*`, idênticos aos antigos `orc-a*` / `orc-c*`), registrados no Roadmap do CLAUDE.md e no ART_SPEC.md.
+- `escolha-orc.html` agora mostra "B antes (T09) × B ajustado (T10)" (tamanho real, 4× e 2 na onda); a B antiga está congelada em `tools/pixel-art/legacy/orc-b-v1.js`.
+- `npm run pixel` e `npm run build` OK; testado no jogo sem parâmetro na URL (Saqueador ajustado é o padrão).
+
+---
+
+## [ ] T11 — Estrutura de tipos de dano e características de inimigos
+
+Preparar a estrutura de tipos de dano e características de inimigos (sem criar conteúdo novo — Fase 1 continua com 2 torres e 1 inimigo).
+
+1. Em balance.js:
+   - Cada torre ganha `damageType` ('perfurante' para a Besta, 'explosivo' para a Catapulta) e `canHit` (ex.: ['terrestre'] ou ['terrestre','voador']).
+   - Cada inimigo ganha `traits` (lista: ex. 'terrestre', 'blindado', 'voador', 'escudo') e `resist` (multiplicador por tipo de dano, padrão 1.0). O Orc atual: traits ['terrestre'], sem resistências.
+   - Tabela central BALANCE.traitRules descrevendo o efeito de cada trait (blindado: resist perfurante 0.4; voador: só torres com 'voador' em canHit acertam; escudo: absorve X de dano e regenera Y/s, resist explosivo 0.3 enquanto o escudo existir). Deixe definidas mas sem inimigo usando ainda.
+2. O cálculo de dano e a escolha de alvo das torres passam a usar damageType, canHit, traits e resist. Com os valores atuais, o jogo tem que se comportar EXATAMENTE igual (confirme rodando a mesma simulação da T07 e comparando os resultados).
+3. Prepare o hook para upgrades mudarem capacidades (ex.: um upgrade futuro trocar damageType ou adicionar 'voador' ao canHit), sem implementar upgrades.
+4. Registre no CLAUDE.md (seção de roadmap) a tabela de design: Saqueador rápido; Brutamontes blindado (fraco a explosivo); Ciborgue com escudo (fraco a perfurante, resiste a plasma); Gárgula voadora (Catapulta não acerta); Enxame (fraco a área). Regras de design: preferir resistências a imunidades, toda fraqueza precisa ser visível, upgrades desbloqueiam capacidades.
+5. npm run build sem erros.
+
+---
+
+## [ ] T12 — Conversão para pixel art 1×, etapa 1: guia de estilo + chão e caminho
+
+Início da conversão do jogo inteiro para pixel art 1×. Etapa 1: guia de estilo + chão e caminho.
+
+1. Guia de estilo: com base no orc B aprovado, escrever em ART_SPEC.md a "bíblia" da pixel art do jogo: paleta completa (rampas de 5 tons com hue shift por material: grama, terra, pedra, madeira, aço, couro, pele, ciano rúnico, vermelho, fogo/laranja), luz do canto superior esquerdo, contorno seletivo, densidade de detalhe (quantos pixels um rebite, uma pedra, uma folha ocupam), tamanhos de referência (orc ~100 px, torres, castelo, árvores) e regras de sombra no chão. Tudo que vier depois segue esse arquivo.
+
+2. Chão e caminho em pixel art gerada pelo tools/pixel-art:
+   - Tiles de grama (4–6 variações + tufos, flores pequenas e pedrinhas espalhados por semente fixa), com a paleta mais escura e dessaturada que o orc, para os personagens se destacarem.
+   - Caminho de terra com borda irregular, sulcos/pegadas e pedrinhas; transição grama→terra com pixels de borda (sem linha reta).
+   - Desenhar o mapa usando os mesmos dados de map01.js (caminho e curvas), para o traçado continuar idêntico.
+3. Cena de referência: gerar tools/pixel-art/cena-referencia.png com o mapa inteiro (chão novo + orc B em alguns pontos do caminho + retângulos placeholder no lugar das torres e do castelo), no tamanho real 1280×720.
+4. Integrar o chão novo no jogo (substituindo o desenho atual do MapRenderer), mantendo sombras, profundidade e iluminação. Torres, castelo, decoração e UI continuam como estão nesta etapa.
+5. npm run pixel e npm run build. Mostrar ao usuário a cena de referência e um print do jogo rodando.

@@ -166,6 +166,7 @@ export class PixelCanvas {
         this.mat = new Array(w * h).fill(null);        // material do pixel (para rim light)
         this.tone = new Int8Array(w * h).fill(-1);
         this.emit = new Uint8Array(w * h);             // pixel emissivo (sem rim light)
+        this.glow = new Uint8Array(w * h);             // halo de brilho no vazio (sem contorno externo em volta)
         this.parts = 0;
         this.stats = [];                               // { name, total, dark }
     }
@@ -267,6 +268,7 @@ export class PixelCanvas {
 
     // Emissivo: núcleo claro (tom 4 por dentro, tom 3 na borda) + halo de 1–2 px (tons 2 e 1)
     // pintado só sobre o que já existe. Sem contorno e sem rim light.
+    //   opts.glow: o halo também se espalha no vazio (lâminas, projéteis de energia), sem contorno em volta.
     emissive (material, build, opts = {}) {
         const m = this.mask();
         build(m);
@@ -278,7 +280,7 @@ export class PixelCanvas {
             const tone = ring === 1 ? 2 : 1;
             for (let y = 0; y < this.h; y++) {
                 for (let x = 0; x < this.w; x++) {
-                    if (m.has(x, y) || !this.filled(x, y)) { continue; }
+                    if (m.has(x, y) || (!opts.glow && !this.filled(x, y))) { continue; }
                     let near = false;
                     for (let dy = -ring; dy <= ring && !near; dy++) {
                         for (let dx = -ring; dx <= ring && !near; dx++) {
@@ -287,6 +289,7 @@ export class PixelCanvas {
                     }
                     if (near) {
                         const i = y * this.w + x;
+                        if (this.owner[i] < 0) { this.owner[i] = id; this.mat[i] = material; this.glow[i] = 1; }
                         this.color[i] = MATERIALS[material][tone];
                         this.emit[i] = 1;
                     }
@@ -300,6 +303,7 @@ export class PixelCanvas {
                 const i = y * this.w + x;
                 this.setPixel(i, material, inner ? core : 3, id);
                 this.emit[i] = 1;
+                this.glow[i] = 0;
             }
         }
         return this;
@@ -333,7 +337,8 @@ export class PixelCanvas {
         return this;
     }
 
-    // Rim light de 1 px na borda direita da silhueta + contorno externo de 1 px.
+    // Rim light de 1 px na borda direita da silhueta + contorno externo de 1 px
+    // (o halo de brilho no vazio não ganha contorno: o brilho se desfaz no fundo).
     finish () {
         for (let y = 0; y < this.h; y++) {
             for (let x = 0; x < this.w; x++) {
@@ -342,11 +347,12 @@ export class PixelCanvas {
                 this.color[i] = MATERIALS[this.mat[i]][3];
             }
         }
+        const solid = (x, y) => this.filled(x, y) && !this.glow[y * this.w + x];
         const add = [];
         for (let y = 0; y < this.h; y++) {
             for (let x = 0; x < this.w; x++) {
                 if (this.filled(x, y)) { continue; }
-                if (this.filled(x - 1, y) || this.filled(x + 1, y) || this.filled(x, y - 1) || this.filled(x, y + 1)) {
+                if (solid(x - 1, y) || solid(x + 1, y) || solid(x, y - 1) || solid(x, y + 1)) {
                     add.push(y * this.w + x);
                 }
             }

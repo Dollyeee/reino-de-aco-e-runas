@@ -1,16 +1,17 @@
 // Gerador de pixel art: `npm run pixel`
 // Desenha cada sprite de tools/pixel-art/sprites/ e exporta PNGs para public/assets/,
 // além de tools/pixel-art/preview.html (animação em loop, ampliada 4× e no tamanho real do jogo) e
-// tools/pixel-art/escolha-orc.html (comparação das versões do orc para escolha).
+// tools/pixel-art/escolha-orc.html (comparação "B antes × B ajustado" do orc padrão).
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PNG } from 'pngjs';
 import orc from './sprites/orc.js';
-import orcA from './sprites/orc-a.js';
 import orcB from './sprites/orc-b.js';
-import orcC from './sprites/orc-c.js';
+import brutamontes from './sprites/futuros/brutamontes.js';
+import ciborgue from './sprites/futuros/ciborgue.js';
+import { B1_WALK, B1_IDLE, B1_FRAME } from './legacy/orc-b-v1.js';
 import { escolhaHtml } from './escolha.js';
 import { ORC_VARIANTS } from '../../src/config/art.js';
 import { BALANCE } from '../../src/config/balance.js';
@@ -25,14 +26,16 @@ const PIXEL_SCALE = 1;
 const GRASS = '#677444';
 const DIRT = '#96795a';
 
-const SPRITES = [orc, orcA, orcB, orcC];
+// orc do jogo (atual da T08 e Saqueador padrão) + arte pronta para inimigos futuros (sprites/futuros/)
+const SPRITES = [orc, orcB, brutamontes, ciborgue];
 
-// Página de escolha das versões do orc (ORC_VARIANT em src/config/art.js)
+// Página escolha-orc.html: Saqueador como estava na T09 × ajustado na T10 (mesmos pivot, sombra e walkCycle)
+const B_BEFORE = { frame: B1_FRAME, sheets: [{ frames: B1_WALK }, { frames: [B1_IDLE] }] };
 const ORC_CHOICE = [
-    { id: 'atual', sprite: orc, note: 'Versão da T08: clava de plasma, tronco curvado, proporções médias.' },
-    { id: 'a', sprite: orcA, note: 'Largo e curvado, cabeça baixa entre os ombros, martelo de plasma no ombro. Passo curto e pesado, balança o corpo.' },
-    { id: 'b', sprite: orcB, note: 'Alto e magro, inclinado para o ataque, moicano, braço mecânico com lâmina de plasma. Passos longos.' },
-    { id: 'c', sprite: orcC, note: 'Mais máquina: pernas de pássaro, reator no peito, visor vermelho, braço-canhão. Passo mecânico com tranco.' }
+    { id: 'b', key: 'antes', label: 'B antes (T09)', sprite: B_BEFORE,
+      note: 'Como foi escolhido: magro, lâmina fina, braço mecânico estreito.' },
+    { id: 'b', key: 'ajustado', label: 'B ajustado (T10) — padrão', sprite: orcB,
+      note: 'Ombros e peito ~15% mais largos, braço mecânico mais grosso com 2 linhas ciano, botas maiores, lâmina ~30% maior com brilho, placa na cabeça.' }
 ];
 
 // "Antes × depois" no preview (versões antigas congeladas; não vão para o jogo)
@@ -216,21 +219,26 @@ const compares = COMPARE.map((c, i) => {
 fs.writeFileSync(path.join(HERE, 'preview.html'), previewHtml(entries, compares));
 console.log('✓ tools/pixel-art/preview.html');
 
+for (const [id, V] of Object.entries(ORC_VARIANTS)) {
+    const sprite = { atual: orc, b: orcB }[id];
+    if (sprite && (V.frame[0] !== sprite.frame.w || V.frame[1] !== sprite.frame.h)) {
+        console.log(`  ⚠️ ORC_VARIANTS.${id}.frame (${V.frame}) difere do sprite (${sprite.frame.w}×${sprite.frame.h})`);
+    }
+}
 const choice = ORC_CHOICE.map((c) => {
     const V = ORC_VARIANTS[c.id];
     const [walk, idle] = c.sprite.sheets;
-    if (V.frame[0] !== c.sprite.frame.w || V.frame[1] !== c.sprite.frame.h) {
-        console.log(`  ⚠️ ORC_VARIANTS.${c.id}.frame (${V.frame}) difere do sprite (${c.sprite.frame.w}×${c.sprite.frame.h})`);
-    }
     return {
-        id: c.id, label: V.label, note: c.note, fw: c.sprite.frame.w, fh: c.sprite.frame.h,
+        id: c.key, label: c.label, note: c.note, fw: c.sprite.frame.w, fh: c.sprite.frame.h,
         pivot: V.pivot, walkCycle: V.walkCycle, shadow: V.shadow,
         walk: { base64: encodeSheet(walk.frames, c.sprite.frame).toString('base64'), frames: walk.frames.length },
         idle: { base64: encodeSheet(idle.frames, c.sprite.frame).toString('base64') }
     };
 });
 fs.writeFileSync(path.join(HERE, 'escolha-orc.html'), escolhaHtml({
-    title: 'Orc Cibernético — escolha da versão', variants: choice,
+    title: 'Orc Cibernético — B antes × B ajustado', variants: choice,
+    intro: 'O Saqueador (versão B) é o Orc Cibernético padrão do jogo (<code>ORC_VARIANT = \'b\'</code> em <code>src/config/art.js</code>; ' +
+        '<code>?orc=atual</code> na URL mostra o orc da T08). A e C viraram arte para inimigos futuros em <code>sprites/futuros/</code>.',
     speed: BALANCE.enemies.cyberOrc.speed, grass: GRASS, dirt: DIRT
 }));
 console.log('✓ tools/pixel-art/escolha-orc.html');

@@ -21,21 +21,17 @@
 // e `pivot`, todo o encaixe continua igual.
 
 // ---------------------------------------------------------------------------------------------------------
-// Versão do Orc Cibernético usada no jogo: 'atual' | 'a' | 'b' | 'c'  (T09 — candidatas para escolha)
-//   atual = orc da T08 · a = "Brutamontes" · b = "Saqueador" · c = "Ciborgue de guerra"
-// Para testar sem editar este arquivo: abra o jogo com ?orc=a (ou b, c, atual) no fim da URL.
-export const ORC_VARIANT = 'atual';
+// Versão do Orc Cibernético usada no jogo: 'b' (padrão, "Saqueador", escolhida na T09 e ajustada na T10) | 'atual'
+// (orc da T08, mantido como alternativa). As versões A e C viraram arte para inimigos futuros
+// (tools/pixel-art/sprites/futuros/). Para testar sem editar este arquivo: ?orc=atual (ou ?orc=b) na URL.
+export const ORC_VARIANT = 'b';
 
 // Arquivos (gerados por `npm run pixel`, tools/pixel-art/sprites/) e pontos de encaixe de cada versão.
 export const ORC_VARIANTS = {
     atual: { label: 'Atual (T08)', prefix: 'orc', frame: [116, 104], pivot: [58, 104],
              eye: { x: 39, y: -66 }, hit: { x: 0, y: -54 }, top: -96, shadow: [56, 16], walkCycle: 44 },
-    a:     { label: 'A — Brutamontes', prefix: 'orc-a', frame: [128, 110], pivot: [70, 110],
-             eye: { x: 34, y: -52 }, hit: { x: 0, y: -50 }, top: -104, shadow: [80, 18], walkCycle: 52 },
-    b:     { label: 'B — Saqueador', prefix: 'orc-b', frame: [128, 110], pivot: [61, 110],
-             eye: { x: 33, y: -86 }, hit: { x: 0, y: -60 }, top: -106, shadow: [52, 14], walkCycle: 44 },
-    c:     { label: 'C — Ciborgue de guerra', prefix: 'orc-c', frame: [128, 106], pivot: [65, 106],
-             eye: { x: 41, y: -80 }, hit: { x: 0, y: -52 }, top: -92, shadow: [64, 16], walkCycle: 42 }
+    b:     { label: 'Saqueador', prefix: 'orc-b', frame: [136, 110], pivot: [61, 110],
+             eye: { x: 33, y: -86 }, hit: { x: 0, y: -60 }, top: -106, shadow: [56, 15], walkCycle: 44 }
 };
 
 function pickOrcVariant () {

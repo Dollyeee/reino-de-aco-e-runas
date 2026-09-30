@@ -1,4 +1,5 @@
-// Orc Cibernético — versão A "Brutamontes" (pixel art 1×, candidata; o jogo usa a versão escolhida em ORC_VARIANT).
+// Brutamontes — ARTE PRONTA PARA UM INIMIGO FUTURO (pixel art 1×; ainda não entra no jogo).
+// Nasceu como versão A do Orc Cibernético (T09). Candidato ao inimigo blindado e lento da Fase 2 (Golem de Sucata / afins).
 // Muito largo e curvado, cabeça pequena e baixa entre os ombros, braços enormes, armadura pesada de placas
 // com rebites, pele verde-oliva escura. Martelo de guerra de duas mãos, cabeça de plasma ciano, apoiado no ombro.
 // Caminhada lenta e pesada: passo curto, o corpo afunda no apoio e balança de um lado para o outro
@@ -6,7 +7,7 @@
 // Quadro 128×110, olhando para a DIREITA, pés na borda inferior. Coordenadas desenhadas numa grade 128×112
 // e reenquadradas 2 px para cima (origin); a cabeça do martelo tem margem para subir na caminhada.
 
-import { PixelCanvas } from '../lib/PixelCanvas.js';
+import { PixelCanvas } from '../../lib/PixelCanvas.js';
 
 export const FRAME = { w: 128, h: 110 };
 export const WALK_FRAMES = 8;
@@ -50,7 +51,7 @@ function leg (cv, hipX, hipY, pose, name) {
     cv.rivet(fx + 5, ank + 1, 'aco');
 }
 
-export function drawOrcA (pose = IDLE_POSE) {
+export function drawBrutamontes (pose = IDLE_POSE) {
     const cv = new PixelCanvas(FRAME.w, FRAME.h, { origin: ORIGIN });
     const b = pose.bob;
     const sx = pose.sx;
@@ -168,10 +169,10 @@ export function eyeAt (pose) {
 const walkPoses = Array.from({ length: WALK_FRAMES }, (_, i) => walkPose(i / WALK_FRAMES));
 
 export default {
-    name: 'orc-a',
+    name: 'brutamontes',
     frame: FRAME,
     sheets: [
-        { file: 'orc-a-walk.png', frames: walkPoses.map((p) => drawOrcA(p)), meta: { eye: walkPoses.map(eyeAt), idleEye: eyeAt(IDLE_POSE) } },
-        { file: 'orc-a.png', frames: [drawOrcA(IDLE_POSE)] }
+        { file: 'brutamontes-walk.png', frames: walkPoses.map((p) => drawBrutamontes(p)), meta: { eye: walkPoses.map(eyeAt), idleEye: eyeAt(IDLE_POSE) } },
+        { file: 'brutamontes.png', frames: [drawBrutamontes(IDLE_POSE)] }
     ]
 };
