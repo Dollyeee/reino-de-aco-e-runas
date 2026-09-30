@@ -22,7 +22,7 @@ export default class GameScene extends Phaser.Scene {
 
     create () {
         const cam = setupWorldCamera(this.cameras.main);
-        cam.setBackgroundColor(COLORS.grass);
+        cam.setBackgroundColor(COLORS.grass);   // só aparece se o chão não carregar
 
         // iluminação dinâmica + pós-processamento (Bloom + vinheta)
         this.lights.enable().setAmbientColor(LIGHTING.ambient);

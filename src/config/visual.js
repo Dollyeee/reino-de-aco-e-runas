@@ -43,18 +43,8 @@ export const COLORS = {
     white: 0xffffff,
     gold: 0xffd34d,
 
-    // Mundo: dessaturado e mais escuro (musgo, pedra fria, terra batida)
-    grass: 0x677444,
-    grassDark: 0x535d38,
-    grassLight: 0x7a8651,
-    grassBlade: 0x39432a,
-    dirtOutline: 0x2a1d15,
-    dirt: 0x96795a,
-    dirtDark: 0x745c42,
-    dirtLight: 0xab8f6c,
-    stone: 0x7b7a76,
-    stoneLight: 0x939089,
-    flowers: [0xb9b29a, 0xa79a6e, 0x8f8578],
+    // Mundo: o chão é pixel art (tools/pixel-art/cenario/chao.js, paleta em tools/pixel-art/palette.js)
+    grass: 0x4b5a36,            // tom de base da grama (fundo da câmera)
 
     uiPanel: 0x2b1d33,
     uiPanelLight: 0x44305a,

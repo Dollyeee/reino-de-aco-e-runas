@@ -4,6 +4,10 @@
 export const MAP01 = {
     name: 'Vale das Runas',
 
+    // Chão em pixel art gerado por `npm run pixel` a partir deste arquivo (tools/pixel-art/cenario/chao.js).
+    // Mudou o caminho? Rode `npm run pixel` de novo (o jogo avisa no console se o chão estiver desatualizado).
+    ground: 'ground-map01',
+
     // Pontos do caminho (os cantos são arredondados automaticamente)
     path: [
         { x: -80, y: 180 },

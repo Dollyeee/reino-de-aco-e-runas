@@ -20,8 +20,11 @@ qualquer ponto válido do mapa (estilo Bloons TD); cada torre surge sobre uma pl
 Os sprites são gerados por `npm run pixel` a partir de módulos JS em `tools/pixel-art/sprites/`, que desenham
 cada personagem **em partes** numa grade pequena. Não se edita PNG à mão: muda-se o módulo e roda o gerador.
 
-> Transição em andamento: o **Orc Cibernético** já é pixel art 1× (com caminhada). Torres, castelo, cenário,
-> projéteis e ícones ainda são os SVGs antigos (placeholders) e serão refeitos no mesmo gerador.
+> Transição em andamento: o **Orc Cibernético** (com caminhada) e o **chão do mapa 1** (T12) já são pixel art 1×.
+> Torres, castelo, decoração (árvores, pedras, cristais), projéteis e ícones ainda são os SVGs antigos
+> (placeholders) e serão refeitos no mesmo gerador.
+> **Guia de estilo ("bíblia") em `ART_SPEC.md`**: paleta completa, luz, contorno, densidade de detalhe, tamanhos de
+> referência e sombras. Toda arte nova segue esse guia.
 > O orc padrão é o **"Saqueador"** (`sprites/orc-b.js`, `ORC_VARIANT = 'b'` em `src/config/art.js`); o orc da T08
 > continua como alternativa (`?orc=atual` na URL). `tools/pixel-art/escolha-orc.html` compara "B antes × B ajustado".
 > Arte pronta para inimigos futuros fica em `tools/pixel-art/sprites/futuros/` (ver Roadmap).
@@ -65,6 +68,9 @@ cada personagem **em partes** numa grade pequena. Não se edita PNG à mão: mud
   de pixels inteiros (ou quadros da animação). Flash branco (tint FILL) e piscar continuam. Tweens de escala só
   na UI e em efeitos.
 - Posição dos sprites de pixel art alinhada à grade de `PIXEL_SCALE`.
+- **Chão**: uma imagem 1280×720 por mapa (`chao-map01.png`), gerada por `npm run pixel` a partir de `src/data/map01.js`
+  e do `PathTrack` (`tools/pixel-art/cenario/chao.js`): tiles de grama 32×32 + caminho de terra com borda irregular.
+  Mudou o caminho → rode `npm run pixel` (o jogo avisa no console se o chão ficou desatualizado).
 - Sombra no chão de pixel art = **elipse de pixels duros**, sem blur, deslocada para baixo/direita.
 - **Luzes pontuais e Bloom só nos brilhos** (olho, plasma, cristais), com intensidade moderada para não borrar.
 - Manifesto de arte (`src/config/art.js`): `pixel: true`, `frame` (tamanho do quadro), `anims` e `meta` (JSON do
@@ -103,7 +109,7 @@ Personalidade vem do **peso**, não da elasticidade. Nada fica 100% parado, mas 
 ```
 index.html
 tools/sim/simulacao.js    simulação determinística de balanceamento (roda no navegador, ver cabeçalho do arquivo)
-tools/pixel-art/          gerador de pixel art (`npm run pixel`): palette.js, lib/PixelCanvas.js, sprites/*.js (futuros/ = inimigos futuros), legacy/, preview.html, escolha-orc.html
+tools/pixel-art/          gerador de pixel art (`npm run pixel`): palette.js, lib/PixelCanvas.js, sprites/*.js (futuros/ = inimigos futuros), cenario/ (chão dos mapas + cena de referência), legacy/, preview.html, escolha-orc.html, cena-referencia.png
 public/assets/            SVGs substituíveis (torres, inimigos, castelo, cristais, cenário, ícones)
 src/
   main.js                 configuração do Phaser.Game
@@ -111,7 +117,7 @@ src/
   config/visual.js        cores, profundidades, luzes, bloom, escala de renderização
   data/map01.js           caminho, castelo e decoração do mapa 1 (decorações também bloqueiam construção)
   scenes/                 BootScene (carregamento), GameScene (mundo), UIScene (HUD), ResultScene (vitória/derrota)
-  world/                  desenho do mapa, caminho (PathTrack), castelo + Núcleo Arcano, PlacementRules (área válida)
+  world/                  MapRenderer (chão em pixel art + decoração), caminho (PathTrack), castelo + Núcleo Arcano, PlacementRules (área válida)
   towers/                 Tower (base, com plataforma rúnica), LaserCrossbow, PlasmaCatapult, TowerPlacer (modo posicionamento)
   enemies/                Enemy (base: traits, resist, escudo, receiveAttack), CyberOrc
   combat/                 damage.js — quem acerta quem (canHit × camada) e dano final (resist × traits)
@@ -180,7 +186,7 @@ mas fora do jogo; detalhes em `ART_SPEC.md`):
 
 - `npm install` — instala dependências
 - `npm run dev` — servidor de desenvolvimento (Vite) em http://localhost:5173
-- `npm run pixel` — gera os sprites de pixel art em `public/assets/`, o `tools/pixel-art/preview.html` e o `tools/pixel-art/escolha-orc.html`
+- `npm run pixel` — gera os sprites e o chão (`chao-map01.png`) em `public/assets/`, o `tools/pixel-art/preview.html`, o `tools/pixel-art/escolha-orc.html` e a `tools/pixel-art/cena-referencia.png`
 - `npm run build` — build de produção em `dist/`
 - `npm run preview` — serve o build de produção
 

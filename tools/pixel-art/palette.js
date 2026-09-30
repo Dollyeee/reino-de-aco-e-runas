@@ -19,13 +19,25 @@ export const MATERIALS = {
     presa: ['#4e4656', '#8e8474', '#cbbd9c', '#e9ddbc', '#fffaec'],
     // emissivos (olho, runas, plasma): núcleo claro + halo nos tons da rampa
     ciano: ['#0c3252', '#14788c', '#3ff5ff', '#a8fcf0', '#f2fff0'],
-    vermelho: ['#3a0a26', '#78101c', '#ff3b4e', '#ff9a78', '#fff0d8']
+    vermelho: ['#3a0a26', '#78101c', '#ff3b4e', '#ff9a78', '#fff0d8'],
+    fogo: ['#4a1020', '#a8321c', '#ec6a24', '#ffae3c', '#ffe8a0'],        // emissivo: explosões, brasas, forja
+
+    // cenário (T12): mais escuro e dessaturado que os personagens, para eles se destacarem
+    grama: ['#232d2c', '#35432f', '#4b5a36', '#627040', '#858b52'],
+    terra: ['#35272a', '#58443a', '#7a6049', '#977b5b', '#b59c76'],
+    pedra: ['#23222c', '#3d3c46', '#5b5a5f', '#7c7a76', '#a5a18f'],
+    madeira: ['#26161e', '#472a26', '#6e442c', '#946236', '#bf8e4c']
 };
 
 // Cores avulsas
 export const SINGLE = {
     ferrugem: '#7a4a2c',
-    ferrugemEscura: '#4e2c26'
+    ferrugemEscura: '#4e2c26',
+    // flores do chão: pétalas dessaturadas + miolo
+    florCreme: '#c4bd9c',
+    florAmarela: '#b9a55e',
+    florLilas: '#958aa4',
+    florMiolo: '#e0cf82'
 };
 
 // Índices da rampa

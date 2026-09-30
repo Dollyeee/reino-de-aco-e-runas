@@ -47,6 +47,9 @@ export const ORC_ACTIVE = pickOrcVariant();
 const ORC = ORC_VARIANTS[ORC_ACTIVE];
 
 export const ART = {
+    // chão do mapa 1 (pixel art 1×, 1280×720 = mundo inteiro); meta = dados do mapa usados no desenho
+    'ground-map01':         { file: 'chao-map01.png', pixel: true, size: [1280, 720], pivot: [0, 0], meta: 'chao-map01.json' },
+
     'build-slot':           { file: 'build-slot.svg', size: [100, 60], pivot: [50, 25] },
 
     'tower-crossbow-base':  { file: 'tower-crossbow-base.svg', size: [88, 88], pivot: [44, 88],

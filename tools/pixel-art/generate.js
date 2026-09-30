@@ -2,6 +2,8 @@
 // Desenha cada sprite de tools/pixel-art/sprites/ e exporta PNGs para public/assets/,
 // além de tools/pixel-art/preview.html (animação em loop, ampliada 4× e no tamanho real do jogo) e
 // tools/pixel-art/escolha-orc.html (comparação "B antes × B ajustado" do orc padrão).
+// Cenário (T12): chão do mapa 1 (public/assets/chao-map01.png, a partir de src/data/map01.js) e
+// tools/pixel-art/cena-referencia.png (mapa inteiro com orcs e placeholders de torres/castelo).
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -16,15 +18,19 @@ import { escolhaHtml } from './escolha.js';
 import { ORC_VARIANTS } from '../../src/config/art.js';
 import { BALANCE } from '../../src/config/balance.js';
 import { V2_WALK, V2_FRAME } from './legacy/orc-v2.js';
+import { MATERIALS, SINGLE, OUTLINE } from './palette.js';
+import { MAP01 } from '../../src/data/map01.js';
+import { drawGround, TILE } from './cenario/chao.js';
+import { drawScene } from './cenario/cena.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..');
 const ASSETS = path.join(ROOT, 'public', 'assets');
 
-// mesmos valores de src/config/visual.js (PIXEL_SCALE e cores do chão)
+// mesmo valor de src/config/visual.js; fundos do preview = tons de base do chão novo
 const PIXEL_SCALE = 1;
-const GRASS = '#677444';
-const DIRT = '#96795a';
+const GRASS = MATERIALS.grama[2];
+const DIRT = MATERIALS.terra[2];
 
 // orc do jogo (atual da T08 e Saqueador padrão) + arte pronta para inimigos futuros (sprites/futuros/)
 const SPRITES = [orc, orcB, brutamontes, ciborgue];
@@ -46,6 +52,12 @@ const COMPARE = [
         after: { label: '1× NOVO', frames: orc.sheets[0].frames, frame: orc.frame, real: 1 }
     }
 ];
+
+function encodeRGBA (rgba, width, height) {
+    const png = new PNG({ width, height });
+    png.data.set(rgba);
+    return PNG.sync.write(png);
+}
 
 function encodeSheet (frames, frame) {
     const n = frames.length;
@@ -105,7 +117,30 @@ function writeSheet (sheet, frame) {
     return { file: sheet.file, frames: sheet.frames.length, width: frame.w * sheet.frames.length, height: frame.h, base64: buf.toString('base64') };
 }
 
-function previewHtml (entries, compares) {
+// Seção do cenário no preview: paleta completa, tiles de grama (sozinhos e emendados) e um recorte do chão.
+function groundHtml (g) {
+    const swatches = Object.entries(MATERIALS).map(([name, ramp]) => `
+      <div class="ramp"><b>${name}</b>${ramp.map((c, i) => `<span style="background:${c}" title="${name}[${i}] ${c}"></span>`).join('')}<code>${ramp.join(' ')}</code></div>`).join('');
+    const singles = Object.entries({ contorno: OUTLINE, ...SINGLE }).map(([n, c]) => `<span class="one" style="background:${c}" title="${n} ${c}"></span><code>${n} ${c}</code>`).join(' ');
+    return `
+    <section>
+      <h2>Paleta completa (rampas de 5 tons: 0 mais escuro → 4 mais claro)</h2>
+      ${swatches}
+      <div class="ramp">${singles}</div>
+    </section>
+    <section>
+      <h2>Chão — ${g.tiles} tiles de grama ${TILE}×${TILE} (4×) e emendados em mosaico (2×)</h2>
+      <div class="row">
+        <figure><img src="data:image/png;base64,${g.tilesB64}" style="width:${g.tilesW * 4}px"><figcaption>variações 0–${g.tiles - 1} (4×)</figcaption></figure>
+        <figure><img src="data:image/png;base64,${g.mosaicB64}" style="width:${g.mosaicW * 2}px"><figcaption>mosaico sorteado (2×)</figcaption></figure>
+      </div>
+      <h2>Chão do mapa 1 — recorte (3×) e inteiro (1×)</h2>
+      <figure><img src="data:image/png;base64,${g.cropB64}" style="width:${g.cropW * 3}px"><figcaption>curva em U: borda irregular, sulcos, pegadas, pedrinhas, tufos e flores</figcaption></figure>
+      <figure><img src="data:image/png;base64,${g.fullB64}" style="width:${g.fullW}px"><figcaption>public/assets/chao-map01.png (1280×720, tamanho real)</figcaption></figure>
+    </section>`;
+}
+
+function previewHtml (entries, compares, ground) {
     const compareBlocks = compares.map((c) => `
     <section>
       <h2>${c.title}</h2>
@@ -147,12 +182,16 @@ function previewHtml (entries, compares) {
   p { margin: 0 0 12px; color: #b8a8a0; }
   .row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
   figure { margin: 0; } figcaption { font-size: 12px; color: #b8a8a0; margin-top: 4px; }
-  canvas { image-rendering: pixelated; display: block; border: 1px solid #2a1f18; }
+  canvas, img { image-rendering: pixelated; display: block; border: 1px solid #2a1f18; }
+  .ramp { display: flex; align-items: center; gap: 2px; margin: 3px 0; } .ramp b { width: 90px; font-weight: 600; }
+  .ramp span { width: 26px; height: 18px; display: inline-block; } .ramp span.one { width: 18px; }
+  .ramp code { margin: 0 10px 0 8px; color: #8a7a70; font-size: 11px; }
 </style>
 </head>
 <body>
 <h1>Pixel art — preview</h1>
 <p>Gerado por <code>npm run pixel</code>. Animações em loop a 10 quadros/s. "Tamanho real" = ${PIXEL_SCALE} px de tela por pixel da arte (como no mundo 1280×720 do jogo).</p>
+${ground}
 ${compareBlocks}
 ${blocks}
 <script>
@@ -216,7 +255,45 @@ const compares = COMPARE.map((c, i) => {
         beforeLabel: c.before.label, afterLabel: c.after.label, beforeReal: c.before.real, afterReal: c.after.real
     };
 });
-fs.writeFileSync(path.join(HERE, 'preview.html'), previewHtml(entries, compares));
+// ---------------------------------------------------------------- cenário (T12)
+const { img: ground, track, tiles } = drawGround(MAP01);
+fs.writeFileSync(path.join(ASSETS, 'chao-map01.png'), encodeRGBA(ground.toRGBA(), ground.w, ground.h));
+// dados do mapa usados no desenho: o jogo avisa no console se map01.js mudar sem rodar `npm run pixel`
+const groundMeta = { map: MAP01.name, path: MAP01.path, pathWidth: MAP01.pathWidth, cornerRadius: MAP01.cornerRadius };
+fs.writeFileSync(path.join(ASSETS, 'chao-map01.json'), JSON.stringify(groundMeta, null, 2) + '\n');
+console.log(`✓ public/assets/chao-map01.png  (${ground.w}×${ground.h}, chão do mapa "${MAP01.name}")`);
+
+const orcV = ORC_VARIANTS.b;
+const scene = drawScene(ground, track, MAP01, { frames: orcB.sheets[0].frames, frame: orcB.frame, pivot: orcV.pivot, shadow: orcV.shadow });
+fs.writeFileSync(path.join(HERE, 'cena-referencia.png'), encodeRGBA(scene, ground.w, ground.h));
+console.log('✓ tools/pixel-art/cena-referencia.png  (1280×720)');
+
+// preview: tiles lado a lado, mosaico 8×5 sorteado e recorte do mapa
+const tileStrip = new Uint8Array(tiles.length * TILE * TILE * 4);
+tiles.forEach((t, v) => {
+    const rgba = t.toRGBA();
+    for (let y = 0; y < TILE; y++) { tileStrip.set(rgba.subarray(y * TILE * 4, (y + 1) * TILE * 4), (y * tiles.length * TILE + v * TILE) * 4); }
+});
+const MW = 8 * TILE, MH = 5 * TILE;
+const mosaic = new Uint8Array(MW * MH * 4);
+for (let ty = 0; ty < 5; ty++) {
+    for (let tx = 0; tx < 8; tx++) {
+        const rgba = tiles[(tx * 7 + ty * 3 + tx * ty) % tiles.length].toRGBA();
+        for (let y = 0; y < TILE; y++) { mosaic.set(rgba.subarray(y * TILE * 4, (y + 1) * TILE * 4), ((ty * TILE + y) * MW + tx * TILE) * 4); }
+    }
+}
+const CROP = { x: 250, y: 380, w: 420, h: 230 };
+const full = ground.toRGBA();
+const crop = new Uint8Array(CROP.w * CROP.h * 4);
+for (let y = 0; y < CROP.h; y++) { crop.set(full.subarray(((CROP.y + y) * ground.w + CROP.x) * 4, ((CROP.y + y) * ground.w + CROP.x + CROP.w) * 4), y * CROP.w * 4); }
+const groundSection = groundHtml({
+    tiles: tiles.length, tilesW: tiles.length * TILE, tilesB64: encodeRGBA(tileStrip, tiles.length * TILE, TILE).toString('base64'),
+    mosaicW: MW, mosaicB64: encodeRGBA(mosaic, MW, MH).toString('base64'),
+    cropW: CROP.w, cropB64: encodeRGBA(crop, CROP.w, CROP.h).toString('base64'),
+    fullW: ground.w, fullB64: encodeRGBA(full, ground.w, ground.h).toString('base64')
+});
+
+fs.writeFileSync(path.join(HERE, 'preview.html'), previewHtml(entries, compares, groundSection));
 console.log('✓ tools/pixel-art/preview.html');
 
 for (const [id, V] of Object.entries(ORC_VARIANTS)) {

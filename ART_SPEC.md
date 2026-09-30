@@ -4,31 +4,150 @@ Direção de arte: **pixel art desenhada em código** (seção "Direção de art
 Os sprites são módulos JS em `tools/pixel-art/sprites/`; `npm run pixel` desenha cada um **em partes** e exporta
 os PNGs para `public/assets/` + `tools/pixel-art/preview.html`. Para mudar a arte, mude o módulo — não o PNG.
 
-Situação: o **Orc Cibernético** já é pixel art. Os demais assets abaixo ainda são SVGs antigos (placeholders) e
-serão refeitos no gerador seguindo as mesmas regras; as medidas deles continuam valendo como referência.
+Situação: o **Orc Cibernético** e o **chão do mapa 1** já são pixel art. Os demais assets abaixo ainda são SVGs
+antigos (placeholders) e serão refeitos no gerador seguindo o guia de estilo abaixo; as medidas deles continuam
+valendo como referência.
 
-## Regras da pixel art (valem para todo sprite novo)
+# Guia de estilo — a "bíblia" da pixel art
 
-- **Resolução 1×**: 1 pixel da arte = **1 pixel do mundo** (`PIXEL_SCALE` = 1, mundo 1280×720).
-  **Inimigos comuns com ~100 px de altura** (orc Saqueador: quadro 136×110, personagem com ~107 px com o moicano).
-- **Fundo transparente**, **sem antialias**, só cores da paleta fixa (`tools/pixel-art/palette.js`), em
-  **rampas de 5 tons com hue shift** (sombras frias arroxeadas/azuladas, luzes quentes amareladas):
-  pele · aço · aço claro · couro · tecido · presa · ciano · vermelho (+ ferrugem). Ciano e vermelho só em energia,
-  runas, olhos e brilhos.
-- **Partes**: cada sprite é desenhado em partes, de trás para frente. O gerador sombreia cada parte (tons escuros em
-  no máximo ~30%, embaixo/à direita), aplica a textura do material e o brilho especular nas placas de metal.
-- **Contorno seletivo**: externo `#1e1512` de 1 px em volta da silhueta; internos na cor mais escura do material
-  da parte da frente. **Rim light** de 1 px na borda direita da silhueta.
-- **Emissivos** (olho, runas, plasma): núcleo claro + halo de 1–2 px, sem contorno.
+Escrito a partir do **orc Saqueador aprovado** (T09/T10) e do chão da T12. **Tudo que for desenhado daqui em diante
+segue este guia.** Se uma arte nova precisar quebrar uma regra, a regra muda aqui primeiro.
+
+Referências vivas: `tools/pixel-art/preview.html` (paleta completa, tiles, recorte do chão, sprites em loop) e
+`tools/pixel-art/cena-referencia.png` (mapa inteiro 1280×720 com orcs e placeholders de torres/castelo).
+
+## 1. Resolução e escala
+
+- **1×**: 1 pixel da arte = **1 pixel do mundo** 1280×720 (`PIXEL_SCALE` = 1). Nada é ampliado nem reduzido.
+- Sem antialias, sem rotação e sem escala fracionada nos sprites (o jogo só desloca em pixels inteiros).
+- **Fundo transparente**; só cores da paleta (`tools/pixel-art/palette.js`).
+
+## 2. Paleta
+
+Cada material é uma **rampa de 5 tons com hue shift**: 0 = mais escuro … 4 = mais claro. As sombras puxam para
+**roxo/azul frio** e as luzes para **amarelo quente** (nunca "preto + branco" do mesmo matiz).
+
+| Material | Uso | 0 | 1 | 2 (base) | 3 | 4 |
+|---|---|---|---|---|---|---|
+| `pele` | pele de orc (padrão) | `#243028` | `#3a5230` | `#5f7f35` | `#8aa845` | `#c4d06a` |
+| `peleClara` | Saqueador (B) | `#26382e` | `#3f6436` | `#68963e` | `#98c052` | `#d6e67c` |
+| `peleOliva` | Brutamontes | `#1e2226` | `#2f3a2c` | `#4a5a2e` | `#6b7a3a` | `#a0a45a` |
+| `peleCinza` | Ciborgue | `#22282e` | `#3a4644` | `#5a6a5a` | `#7f8f7a` | `#b6bea2` |
+| `aco` | armaduras, braço mecânico | `#1c1a2a` | `#2e3244` | `#474f60` | `#6f7886` | `#b8b8ae` |
+| `acoClaro` | placas, biqueiras, emissores | `#2e3244` | `#474f60` | `#6e7688` | `#9ea6b0` | `#dedcc8` |
+| `couro` | colete, botas, cintos | `#22161e` | `#3c2a26` | `#5a3e2a` | `#7a5634` | `#a67c46` |
+| `tecido` | faixas, panos | `#2e1226` | `#54202c` | `#80352c` | `#a24e36` | `#c87c4a` |
+| `borracha` | cabos, mangueiras | `#16121c` | `#261e2c` | `#3a2e40` | `#54445a` | `#7e6c80` |
+| `presa` | dentes, ossos, chifres | `#4e4656` | `#8e8474` | `#cbbd9c` | `#e9ddbc` | `#fffaec` |
+| `madeira` | catapulta, portões, cabos de ferramenta | `#26161e` | `#472a26` | `#6e442c` | `#946236` | `#bf8e4c` |
+| `pedra` | castelo, pedras, pedrinhas, sulcos rúnicos | `#23222c` | `#3d3c46` | `#5b5a5f` | `#7c7a76` | `#a5a18f` |
+| `grama` | chão (grama, tufos) | `#232d2c` | `#35432f` | `#4b5a36` | `#627040` | `#858b52` |
+| `terra` | chão (caminho) | `#35272a` | `#58443a` | `#7a6049` | `#977b5b` | `#b59c76` |
+| `ciano` ⚡ | energia rúnica, plasma, runas | `#0c3252` | `#14788c` | `#3ff5ff` | `#a8fcf0` | `#f2fff0` |
+| `vermelho` ⚡ | olhos, perigo, núcleo ferido | `#3a0a26` | `#78101c` | `#ff3b4e` | `#ff9a78` | `#fff0d8` |
+| `fogo` ⚡ | explosões, brasas, forja | `#4a1020` | `#a8321c` | `#ec6a24` | `#ffae3c` | `#ffe8a0` |
+
+Avulsas: contorno `#1e1512` · ferrugem `#7a4a2c` / `#4e2c26` · flores `#c4bd9c` (creme), `#b9a55e` (amarela),
+`#958aa4` (lilás), miolo `#e0cf82`.
+
+⚡ = **emissivo**: ciano, vermelho e fogo **só** em energia, runas, olhos, brilhos e explosões — nunca em
+roupa, pedra ou madeira "pintadas".
+
+**Contraste entre camadas** (o que deixa os personagens legíveis):
+- **Cenário** (grama, terra, pedra do chão): rampas **mais escuras e dessaturadas**; o tom de base fica em valor
+  médio-baixo e o tom 4 é raro (só pontas de capim ao sol, brilho de pedrinha).
+- **Personagens e torres**: saturação maior e faixa de valor mais ampla (tons 0 a 4), contorno externo escuro.
+- **Emissivos**: os pixels mais claros e saturados da tela; o olho e a arma são os pontos focais do inimigo.
+- Teste: todo sprite novo precisa ler bem **sobre a grama e sobre a terra** (o preview mostra os dois fundos).
+
+## 3. Luz e sombreamento
+
+- Luz do **canto superior esquerdo**. Em cada parte: **tom 3** na borda de cima/esquerda, **tom 2** no resto,
+  **tons 0–1** nos pixels mais de baixo/direita — **no máximo ~30% da parte** (o gerador confere) —, **tom 4** só em
+  brilho especular (1–3 px no canto iluminado das placas de metal) e rim light.
+- **Rim light**: 1 px no tom 3 na borda direita da silhueta (personagens, torres, objetos em pé).
+- **Relevo × depressão no chão**: o que sobe (pedras, tufos) é claro em cima/esquerda e escuro embaixo/direita;
+  o que afunda (caminho, sulcos, circuitos gravados) tem a **parede de cima/esquerda escura** (sombra do barranco)
+  e a **borda de baixo/direita clara**.
+
+## 4. Contorno seletivo
+
+- **Externo**: 1 px `#1e1512` em volta da silhueta de personagens, torres e objetos em pé.
+- **Interno**: onde uma parte encosta em outra já desenhada, a borda leva o **tom 0 do material da parte da frente**
+  (nunca preto).
+- **Sem contorno**: emissivos (núcleo claro + halo de 1–2 px nos tons da rampa; com `glow` o halo se espalha no vazio)
+  e **elementos do chão** (tiles, tufos, flores, pedrinhas, caminho): o volume vem do tom mais escuro do próprio material
+  embaixo/à direita.
+
+## 5. Densidade de detalhe
+
+Hierarquia: silhueta → grandes massas de material → poucos detalhes → pontos focais emissivos.
+**Proibido "ruído de 1 px" espalhado**: todo detalhe é uma marca com forma (2 px ou mais), exceto brilho especular
+e texturas de material com semente fixa.
+
+| Detalhe | Tamanho em pixels |
+|---|---|
+| Rebite | 2 px: 1 claro (tom 4) + 1 escuro (tom 0) embaixo/à direita; espaçamento ≥ 4 px |
+| Costura, risco, junta | linha de 1 px no tom 0–1, tracejada a cada 2–3 px |
+| Placa de metal | ≥ 6×4 px (menor que isso vira rebite) |
+| Olho / emissor | núcleo de 2–4 px + halo de 1–2 px |
+| Runa | glifo de 3×5 px, traço de 1 px, emissivo |
+| Lâmina de grama | 1×2 a 1×3 px (ponta tom 3/4, pé tom 1 à direita) |
+| Tufo de capim | 4–9 px de largura × 4–7 px de altura, sombra de contato de 1 px (tom 0) |
+| Flor | cruz de 3×3 px ou 1 px, com 1 px de haste/sombra; grupos de 1–3 |
+| Folha / aglomerado de folhas (árvores) | massas de 3×2 a 5×4 px com 1 px de luz (tom 3/4) em cima/esquerda |
+| Pedrinha no chão | 2×2 a 7×5 px (tom 3–4 em cima/esquerda, 1 embaixo/direita) |
+| Tijolo / pedra de muralha | 8–12 × 5–7 px, junta de 1 px |
+| Tábua de madeira | 4–6 px de largura, veio de 1 px a cada 3–5 px |
+
+## 6. Tamanhos de referência (no mundo 1280×720)
+
+| Objeto | Tamanho | Observação |
+|---|---|---|
+| Inimigo comum (orc Saqueador) | ~100–107 px de altura (quadro 136×110) | régua de tudo |
+| Inimigo pesado / elite | 100–115 px (Brutamontes 128×110, Ciborgue 128×106) | mais largo, não muito mais alto |
+| Inimigo voador (futuro) | 60–90 px | voa ~40 px acima da sombra |
+| Torre (base + peça de cima) | 100–150 px de altura, base 80–130 px | Besta ~100 px, Catapulta ~150 px com o braço |
+| Plataforma rúnica | 100×60 px | centro da face de cima = ponto da torre |
+| Castelo | ~260×272 px (≈ 2,5× o orc) | maior objeto do mapa |
+| Núcleo Arcano | 76×124 px | |
+| Árvore | 100–130 px de altura (≈ 1–1,3× o orc), copa 70–100 px | |
+| Pedra decorativa | 30–76 px de largura | |
+| Aglomerado de cristais | ~84×86 px | |
+| Largura do caminho | 66 px (`MAP01.pathWidth`) | cabe um orc de lado com folga |
+| Projéteis | 10–52 px | |
+
+## 7. Sombra no chão
+
+- **Nunca desenhada no sprite.** O jogo desenha uma **elipse de pixels duros** (sem blur) na camada de sombras,
+  cor `rgb(30, 14, 40)` com opacidade 0,28 (`SHADOW.alpha`), **deslocada +7, +4 px** (para baixo/direita).
+- Tamanho (`SHADOWS` em `src/config/art.js`): personagens ≈ 40–60% da largura do quadro × altura de ¼ da largura
+  (orc 56×15); torres e castelo ≈ a largura da base (Besta 84×30, Catapulta 124×38, castelo 270×60).
+- O chão (tiles, tufos, pedrinhas) não tem sombra projetada: só a sombra de contato de 1 px embutida no desenho.
+- Sprites de pixel art não escalam a sombra; objetos no ar (projéteis) usam a sombra suave que encolhe com a altura.
+
+## 8. Regras de sprite (personagens, torres, objetos)
+
+- **Partes**: cada sprite é desenhado em partes, de trás para frente. O gerador sombreia cada parte, aplica a textura
+  do material e o brilho especular nas placas de metal.
 - **Texturas** com semente fixa e presas à parte (não mudam entre quadros): aço escovado, ferrugem nas bordas,
   couro, tecido, volume de pele.
-- **Câmera 3/4**, luz do canto superior esquerdo, personagem **olhando para a direita** (o jogo espelha).
+- **Câmera 3/4**, personagem **olhando para a direita** (o jogo espelha).
 - **Ancoragem**: pés/base na **borda inferior central** do quadro (linha de baixo = contorno do chão).
 - **Margem**: pelo menos 1 px livre em volta de tudo, **considerando o maior deslocamento da animação**.
 - **Animação**: gerada pelas partes a partir de uma fase `t` (0..1), só com **deslocamentos inteiros**. Exporta uma
   folha com os quadros lado a lado (`<nome>-walk.png`), um quadro parado (`<nome>.png`) e um JSON com dados por quadro.
-- **NÃO desenhe**: sombra projetada (o jogo desenha uma elipse de pixels), halos fora da silhueta além do halo dos
-  emissivos, rotação ou escala (proibidas em pixel art).
+- **NÃO desenhe**: sombra projetada, halos fora da silhueta além do halo dos emissivos, rotação ou escala.
+
+## 9. Chão e mapas
+
+- O chão de cada mapa é **uma imagem do tamanho do mundo** (1280×720), gerada por `npm run pixel` a partir dos dados
+  do mapa (`src/data/map01.js`) e do mesmo `PathTrack` do jogo → o traçado desenhado é o que os inimigos seguem.
+- Grama em **tiles de 32×32** (6 variações com o **mesmo tom de base**, para não aparecer emenda) + manchas de musgo
+  (um tom abaixo, borda recortada) + tufos, flores e pedrinhas espalhados por semente fixa.
+- Caminho de terra com **borda irregular** (nunca linha reta), barranco escuro em cima/esquerda e claro embaixo/direita,
+  capim avançando sobre a terra, sulcos, pegadas e pedrinhas.
+- Mudou o caminho do mapa? Rode `npm run pixel`; o jogo avisa no console se o chão estiver desatualizado.
 
 ## Como registrar um sprite no jogo
 
@@ -47,6 +166,7 @@ serão refeitos no gerador seguindo as mesmas regras; as medidas deles continuam
 
 | Arquivo | Tamanho lógico | Pivot (no quadro) | Olha para | Animação feita pelo código |
 |---|---|---|---|---|
+| `ground-map01` (pixel art 1×, chão) | 1280×720 | 0,0 (canto superior esquerdo) | — | nenhuma |
 | `enemy-cyber-orc` (pixel art 1×, Saqueador) | 136×110 | 61,110 (entre os pés) | direita (espelhado) | caminhada em 8 quadros, dano, morte |
 | `tower-crossbow-base` | 88×88 | 44,88 (inferior central) | frente (simétrica) | squash |
 | `tower-crossbow-head` | 116×66 | 58,33 (centro = eixo de giro) | direita (gira 360°) | giro, recuo, brilho |
@@ -63,6 +183,13 @@ serão refeitos no gerador seguindo as mesmas regras; as medidas deles continuam
 | `icon-ether` / `icon-core` / `icon-wave` | 48×48 | 24,24 (centro) | — | "respiram" na interface |
 
 ## Assets
+
+### Chão do mapa 1 — `ground-map01` (pixel art 1×) ✅
+- **Arquivos**: `chao-map01.png` (1280×720, o mundo inteiro) + `chao-map01.json` (caminho, largura e raio usados no
+  desenho, para o jogo conferir). Fonte: `tools/pixel-art/cenario/chao.js` (dados de `src/data/map01.js`).
+- **No jogo**: `MapRenderer` coloca a imagem em (0, 0) na camada `DEPTH.GROUND`, com iluminação dinâmica.
+  Decoração, sombras, torres e castelo ficam por cima como antes.
+- Cena de conferência: `tools/pixel-art/cena-referencia.png` (`tools/pixel-art/cenario/cena.js`).
 
 ### Orc Cibernético — `enemy-cyber-orc` (pixel art 1×, "Saqueador") ✅
 Versão padrão do jogo (`ORC_VARIANT = 'b'` em `src/config/art.js`), escolhida na T09 e ajustada na T10.

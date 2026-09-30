@@ -31,6 +31,7 @@ export default class BootScene extends Phaser.Scene {
                 if (def.meta) { this.load.json(`${key}:meta`, `assets/${def.meta}`); }
             } else if (format === 'png' || format === 'webp') {
                 this.load.image(key, url);
+                if (def.meta) { this.load.json(`${key}:meta`, `assets/${def.meta}`); }
             } else {
                 console.error(`[arte] formato não suportado em "${key}": ${def.file} (use .svg, .png ou .webp)`);
             }

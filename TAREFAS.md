@@ -260,7 +260,14 @@ Preparar a estrutura de tipos de dano e características de inimigos (sem criar 
 
 ---
 
-## [ ] T12 — Conversão para pixel art 1×, etapa 1: guia de estilo + chão e caminho
+## [x] T12 — Conversão para pixel art 1×, etapa 1: guia de estilo + chão e caminho
+
+**Concluída em 2026-09-30.** Resultado:
+- **Bíblia da pixel art** no `ART_SPEC.md` (seção "Guia de estilo"): paleta completa com hex (rampas novas em `palette.js`: grama, terra, pedra, madeira, fogo; as do orc não mudaram), luz do canto superior esquerdo, relevo × depressão no chão, contorno seletivo, tabela de densidade de detalhe, tamanhos de referência e regras de sombra.
+- **Chão gerado** por `tools/pixel-art/cenario/chao.js` a partir de `map01.js` + `PathTrack` (traçado idêntico): 6 tiles de grama 32×32 com o mesmo tom de base, manchas de musgo, 520 tufos, flores em grupos, pedrinhas; caminho de terra com borda irregular, barranco escuro em cima/esquerda e claro embaixo/direita, capim entrando na terra, sulcos, pegadas e pedrinhas; circuitos rúnicos perto do castelo em pixel art.
+- **No jogo**: `MapRenderer` carrega `public/assets/chao-map01.png` (manifesto `ground-map01`) no lugar do desenho em canvas; sombras, profundidade e iluminação iguais. O `chao-map01.json` guarda o caminho usado e o jogo avisa no console se `map01.js` mudar sem rodar `npm run pixel`. Cores antigas do chão removidas de `COLORS`.
+- `tools/pixel-art/cena-referencia.png` (1280×720, gerada por `cenario/cena.js`): chão + 8 orcs Saqueador no caminho + placeholders de 6 torres e do castelo; `preview.html` ganhou a paleta completa, os tiles, um mosaico e um recorte do chão.
+- `npm run pixel` e `npm run build` OK; sprites dos personagens idênticos (só os JSONs mudaram o fim de linha). Teste manual: jogar e julgar o contraste do chão com a luz ambiente do jogo (fica um pouco mais escuro que a cena de referência).
 
 Início da conversão do jogo inteiro para pixel art 1×. Etapa 1: guia de estilo + chão e caminho.
 
