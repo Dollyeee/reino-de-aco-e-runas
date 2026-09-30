@@ -4,7 +4,7 @@
     {
       "name": "dev",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["C:/Users/ACER/Desktop/reino-de-aco-e-runas/node_modules/vite/bin/vite.js", "C:/Users/ACER/Desktop/reino-de-aco-e-runas", "--port", "5173", "--strictPort", "--open", "false"],
+      "runtimeArgs": ["node_modules/vite/bin/vite.js", "--port", "5173", "--strictPort", "--open", "false"],
       "port": 5173
     }
   ]
