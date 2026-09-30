@@ -6,11 +6,11 @@ import { addArt } from '../world/art.js';
 // Virote laser: voa em linha reta (corrigindo levemente a mira) até o alvo.
 // Guarda posição no chão (gx, gy) + altura, para a sombra acompanhar no chão.
 export default class LaserBolt {
-    constructor (scene, groundX, groundY, height, target, damage, speed) {
+    constructor (scene, groundX, groundY, height, target, attack, speed) {
         this.scene = scene;
         this.target = target;
         this.targetH = target.hitHeight;   // altura do ponto de acerto (manifesto de arte)
-        this.damage = damage;
+        this.attack = attack;           // { damage, damageType, canHit }
         this.speed = speed;
         this.gx = groundX;
         this.gy = groundY;
@@ -68,7 +68,7 @@ export default class LaserBolt {
     hit () {
         const x = this.gx, y = this.gy - this.targetH;
         if (this.target.alive) {
-            this.target.takeDamage(this.damage, '#ffffff');
+            this.target.receiveAttack(this.attack.damage, this.attack.damageType, '#ffffff');
             this.scene.effects.boltHit(x, y);
         } else {
             this.scene.effects.sparks.explode(3, x, y);

@@ -124,7 +124,7 @@ export default class PlasmaCatapult extends Tower {
             targetY: aim.y,
             flightTime: s.flightTime,
             arcHeight: s.arcHeight,
-            damage: s.damage,
+            attack: this.attack(s.damage),
             edgeDamageFactor: s.edgeDamageFactor,
             splashRadius: s.splashRadius
         }));

@@ -102,6 +102,7 @@ Personalidade vem do **peso**, não da elasticidade. Nada fica 100% parado, mas 
 
 ```
 index.html
+tools/sim/simulacao.js    simulação determinística de balanceamento (roda no navegador, ver cabeçalho do arquivo)
 tools/pixel-art/          gerador de pixel art (`npm run pixel`): palette.js, lib/PixelCanvas.js, sprites/*.js (futuros/ = inimigos futuros), legacy/, preview.html, escolha-orc.html
 public/assets/            SVGs substituíveis (torres, inimigos, castelo, cristais, cenário, ícones)
 src/
@@ -112,7 +113,8 @@ src/
   scenes/                 BootScene (carregamento), GameScene (mundo), UIScene (HUD), ResultScene (vitória/derrota)
   world/                  desenho do mapa, caminho (PathTrack), castelo + Núcleo Arcano, PlacementRules (área válida)
   towers/                 Tower (base, com plataforma rúnica), LaserCrossbow, PlasmaCatapult, TowerPlacer (modo posicionamento)
-  enemies/                Enemy (base), CyberOrc
+  enemies/                Enemy (base: traits, resist, escudo, receiveAttack), CyberOrc
+  combat/                 damage.js — quem acerta quem (canHit × camada) e dano final (resist × traits)
   projectiles/            LaserBolt, PlasmaBall
   waves/                  WaveManager
   effects/                Effects (explosões, números de dano, flashes, luzes temporárias), Shadow
@@ -121,6 +123,10 @@ src/
 
 Convenções:
 - Balanceamento **só** em `src/config/balance.js`. Nenhum número de gameplay espalhado pelo código.
+- **Tipos de dano e traits**: torre tem `damageType` e `canHit`; inimigo tem `traits` e `resist`; efeitos das traits
+  em `BALANCE.traitRules`. Todo dano passa por `enemy.receiveAttack(dano, tipo)` e todo alvo por `canHit`
+  (`src/combat/damage.js`). Capacidades da torre mudam só via `Tower.addCapabilityMod` (hook dos upgrades).
+- Mudança que não deveria alterar o gameplay: confirme com `tools/sim/simulacao.js` (mesma assinatura antes e depois).
 - Comunicação entre cenas via `this.game.events` (eventos nomeados em `src/config/events.js`).
 - Coordenadas de mundo fixas em 1280×720; a renderização usa `RENDER_SCALE` (câmeras com zoom) para ficar nítida.
 - Todas as entidades do mundo são `Container`s posicionados no **ponto de contato com o chão**.
@@ -146,6 +152,22 @@ Convenções:
 - **Fase 3**: **Ninho do Dragão Mecânico** (fogo em linha); chefe **Dragão Ancestral** reconstruído com peças
   de metal; trilha sonora e efeitos sonoros.
 - **Fase 4**: mais mapas, menu inicial, seleção de fases e salvamento de progresso.
+
+**Design de inimigos × tipos de dano** (estrutura pronta desde a T11: `damageType`, `canHit`, `traits`, `resist`,
+`BALANCE.traitRules`):
+
+| Inimigo | Traits | Fraqueza / resistência |
+|---|---|---|
+| Saqueador (orc atual) | terrestre | rápido, sem resistências |
+| Brutamontes | terrestre, blindado | resiste a perfurante, fraco a explosivo |
+| Ciborgue | terrestre, escudo | fraco a perfurante, resiste a plasma/explosivo enquanto tem escudo |
+| Gárgula | voador | a Catapulta não acerta |
+| Enxame | terrestre (muitos, pouca vida) | fraco a dano em área |
+
+Regras de design:
+- Preferir **resistências** a imunidades (a única "imunidade" é de camada: voador × `canHit`).
+- Toda fraqueza precisa ser **visível** (arte, cor, efeito ao acertar), nunca só um número escondido.
+- **Upgrades desbloqueiam capacidades** (trocar `damageType`, adicionar 'voador' ao `canHit`) via `Tower.addCapabilityMod`.
 
 **Arte pronta para inimigos futuros** (pixel art 1×, em `tools/pixel-art/sprites/futuros/`, gerada por `npm run pixel`
 mas fora do jogo; detalhes em `ART_SPEC.md`):

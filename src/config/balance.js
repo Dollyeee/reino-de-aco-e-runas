@@ -27,6 +27,8 @@ export const BALANCE = {
             description: 'Rápida e barata.\nDisparo laser em linha reta.',
             cost: 60,
             damage: 11,
+            damageType: 'perfurante',
+            canHit: ['terrestre'],   // camadas que consegue acertar (ver traitRules)
             range: 150,              // raio de alcance
             fireCooldown: 450,       // intervalo entre disparos
             projectileSpeed: 950,
@@ -37,6 +39,8 @@ export const BALANCE = {
             description: 'Lenta e cara.\nDano em área, disparo em arco.',
             cost: 135,
             damage: 40,              // dano no centro da explosão
+            damageType: 'explosivo',
+            canHit: ['terrestre'],
             edgeDamageFactor: 0.5,   // fração do dano na borda da área
             splashRadius: 80,
             range: 215,
@@ -70,7 +74,29 @@ export const BALANCE = {
             health: 60,
             speed: 62,
             reward: 9,               // éter ganho ao derrotar
-            coreDamage: 1            // vida que tira do Núcleo ao chegar
+            coreDamage: 1,           // vida que tira do Núcleo ao chegar
+            traits: ['terrestre'],   // características (ver traitRules)
+            resist: {}               // multiplicador de dano por tipo (ausente = 1.0)
+        }
+    },
+
+    // ------------------------------------------------------ tipos de dano e traits
+    // Cada torre tem `damageType` e `canHit`; cada inimigo tem `traits` e `resist`.
+    // Dano recebido = dano × resist do inimigo × resist das traits (ver src/combat/damage.js).
+    // Upgrades futuros mudam capacidades da torre com modificadores (Tower.addCapabilityMod),
+    // ex.: { damageType: 'explosivo' } ou { addCanHit: ['voador'] }.
+    damageTypes: ['perfurante', 'explosivo'],
+
+    // Efeito de cada trait. `layer` = camada em que o inimigo anda: a torre só o acerta se a camada
+    // estiver no seu `canHit`. Definidas para a Fase 2; nenhum inimigo usa blindado/voador/escudo ainda.
+    traitRules: {
+        terrestre: { layer: 'terrestre' },
+        voador: { layer: 'voador' },                     // só torres com 'voador' em canHit acertam
+        blindado: { resist: { perfurante: 0.4 } },
+        escudo: {
+            shield: 40,                                  // dano absorvido antes da vida (placeholder)
+            shieldRegen: 6,                              // escudo recuperado por segundo (placeholder)
+            resistWhileShielded: { explosivo: 0.3 }      // só enquanto o escudo existir
         }
     },
 

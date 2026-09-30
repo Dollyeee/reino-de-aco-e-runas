@@ -3,6 +3,7 @@ import { BALANCE } from '../config/balance.js';
 import { BUILD_FX, COLORS, DEPTH, SHADOW } from '../config/visual.js';
 import { SHADOWS } from '../config/art.js';
 import { addArt, makeArt } from '../world/art.js';
+import { canHit } from '../combat/damage.js';
 
 const ADD_BLEND = Phaser.BlendModes.ADD;
 
@@ -55,6 +56,10 @@ export default class Tower extends Phaser.GameObjects.Container {
         this.target = null;
         this.ready = false;
         this.pieces = [];
+
+        // capacidades de ataque (tipo de dano, camadas que acerta) = BALANCE + modificadores
+        this.capabilityMods = [];
+        this.refreshCapabilities();
 
         this.rig = new Phaser.GameObjects.Container(scene, 0, 0);
         this.add(this.rig);
@@ -246,11 +251,35 @@ export default class Tower extends Phaser.GameObjects.Container {
         this.scene.tweens.add({ targets: this, scaleX: 1, scaleY: 1, duration, ease: 'Elastic.easeOut', easeParams: [1.1, 0.4] });
     }
 
-    // Alvo = inimigo mais avançado no caminho dentro do alcance.
+    // ------------------------------------------------ capacidades de ataque
+    // Hook para upgrades futuros: um modificador pode trocar o tipo de dano ou adicionar camadas,
+    // ex.: addCapabilityMod({ damageType: 'explosivo' }) ou addCapabilityMod({ addCanHit: ['voador'] }).
+    addCapabilityMod (mod) {
+        this.capabilityMods.push(mod);
+        this.refreshCapabilities();
+    }
+
+    refreshCapabilities () {
+        let damageType = this.stats.damageType;
+        const layers = new Set(this.stats.canHit);
+        for (const m of this.capabilityMods) {
+            if (m.damageType) { damageType = m.damageType; }
+            for (const l of m.addCanHit || []) { layers.add(l); }
+        }
+        this.damageType = damageType;
+        this.canHit = [...layers];
+    }
+
+    // Ataque com o dano informado e as capacidades atuais da torre (para os projéteis).
+    attack (damage) {
+        return { damage, damageType: this.damageType, canHit: this.canHit };
+    }
+
+    // Alvo = inimigo mais avançado no caminho dentro do alcance (só os que a torre consegue acertar).
     acquireTarget (range, minRange = 0) {
         let best = null;
         for (const e of this.scene.enemies) {
-            if (!e.alive) { continue; }
+            if (!e.alive || !canHit(this, e)) { continue; }
             const d = Math.hypot(e.x - this.x, e.y - this.y);
             if (d <= range && d >= minRange && (!best || e.distance > best.distance)) {
                 best = e;

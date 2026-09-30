@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { COLORS, DEPTH, LIGHTING } from '../config/visual.js';
 import { SHADOWS } from '../config/art.js';
 import ShadowLayer from '../effects/Shadow.js';
+import { canHit } from '../combat/damage.js';
 import { addArt } from '../world/art.js';
 
 // Bola de plasma: voa em arco (parábola) até um ponto do chão e explode em área.
@@ -16,7 +17,7 @@ export default class PlasmaBall {
         this.ty = opts.targetY;
         this.flightTime = opts.flightTime;
         this.arcHeight = opts.arcHeight;
-        this.damage = opts.damage;
+        this.attack = opts.attack;      // { damage, damageType, canHit }
         this.edgeFactor = opts.edgeDamageFactor;
         this.radius = opts.splashRadius;
         this.t = 0;
@@ -71,13 +72,14 @@ export default class PlasmaBall {
     explode () {
         const scene = this.scene;
         const r = this.radius;
+        const a = this.attack;
         for (const e of scene.enemies) {
-            if (!e.alive) { continue; }
+            if (!e.alive || !canHit(a, e)) { continue; }
             const d = Math.hypot(e.x - this.tx, e.y - this.ty);
             if (d <= r) {
                 const k = d / r;
-                const dmg = this.damage * (1 - k * (1 - this.edgeFactor));
-                e.takeDamage(Math.round(dmg), '#7afcff');
+                const dmg = a.damage * (1 - k * (1 - this.edgeFactor));
+                e.receiveAttack(dmg, a.damageType, '#7afcff');
             }
         }
         scene.effects.plasmaExplosion(this.tx, this.ty, r);

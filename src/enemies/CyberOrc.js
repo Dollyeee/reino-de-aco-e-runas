@@ -9,7 +9,9 @@ export default class CyberOrc extends Enemy {
             health: Math.round(base.health * (mods.healthMult || 1)),
             speed: base.speed * (mods.speedMult || 1),
             reward: Math.round(base.reward * (mods.rewardMult || 1)),
-            coreDamage: base.coreDamage
+            coreDamage: base.coreDamage,
+            traits: base.traits,
+            resist: base.resist
         };
         super(scene, stats, 'enemy-cyber-orc');
     }

@@ -76,7 +76,7 @@ export default class LaserCrossbow extends Tower {
         const mx = this.x + this.mount.x + muzzle.x * cos;
         const my = this.y + this.mount.y + muzzle.x * sin;
 
-        const bolt = new LaserBolt(this.scene, mx, this.y, this.y - my, this.target, s.damage, s.projectileSpeed);
+        const bolt = new LaserBolt(this.scene, mx, this.y, this.y - my, this.target, this.attack(s.damage), s.projectileSpeed);
         this.scene.projectiles.push(bolt);
         this.scene.effects.muzzleFlash(mx, my);
 

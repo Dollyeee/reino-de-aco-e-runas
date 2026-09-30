@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { COLORS, DEPTH, ENEMY_ANIM, PIXEL_SCALE } from '../config/visual.js';
 import { ART, SHADOWS } from '../config/art.js';
+import { BALANCE } from '../config/balance.js';
+import { finalDamage, layerOf } from '../combat/damage.js';
 import ShadowLayer from '../effects/Shadow.js';
 import { animKey, anchor, makeArt, makeSprite } from '../world/art.js';
 
@@ -27,6 +29,15 @@ export default class Enemy extends Phaser.GameObjects.Container {
         this.speed = stats.speed;
         this.reward = stats.reward;
         this.coreDamage = stats.coreDamage;
+
+        // características (BALANCE.traitRules) e resistências por tipo de dano
+        this.traits = stats.traits || ['terrestre'];
+        this.resist = stats.resist || {};
+        this.layer = layerOf(this.traits);
+        const shieldRule = this.traits.includes('escudo') ? BALANCE.traitRules.escudo : null;
+        this.maxShield = shieldRule ? shieldRule.shield : 0;
+        this.shield = this.maxShield;
+        this.shieldRegen = shieldRule ? shieldRule.shieldRegen : 0;
 
         this.distance = 0;
         this.alive = true;
@@ -100,6 +111,9 @@ export default class Enemy extends Phaser.GameObjects.Container {
         const track = this.scene.track;
         const step = this.speed * dt;
         this.distance += step;
+        if (this.shield < this.maxShield) {
+            this.shield = Math.min(this.maxShield, this.shield + this.shieldRegen * dt);
+        }
         const p = track.getPointAt(this.distance, this._pt);
         if (this.pixel) {
             // alinhado à grade de pixels da arte (deslocamentos inteiros)
@@ -199,6 +213,19 @@ export default class Enemy extends Phaser.GameObjects.Container {
             this.scene.effects.landingDust(this.x + this.facing * 8, this.y + 2, 1);
         }
         return lift;
+    }
+
+    // Recebe um ataque bruto: aplica resistências (tipo de dano × traits) e o escudo, depois o dano.
+    receiveAttack (amount, damageType, color) {
+        if (!this.alive) { return; }
+        let dmg = finalDamage(this, amount, damageType);
+        if (this.shield > 0) {
+            const absorbed = Math.min(this.shield, dmg);
+            this.shield -= absorbed;
+            dmg -= absorbed;
+            if (dmg <= 0) { return; }
+        }
+        this.takeDamage(dmg, color);
     }
 
     takeDamage (amount, color = '#ffffff') {

@@ -238,7 +238,14 @@ Depois:
 
 ---
 
-## [ ] T11 — Estrutura de tipos de dano e características de inimigos
+## [x] T11 — Estrutura de tipos de dano e características de inimigos
+
+**Concluída em 2026-09-30.** Resultado:
+- `balance.js`: torres com `damageType` (Besta 'perfurante', Catapulta 'explosivo') e `canHit: ['terrestre']`; Orc com `traits: ['terrestre']` e `resist: {}`; `BALANCE.traitRules` com terrestre/voador (camada), blindado (perfurante 0.4) e escudo (absorve 40, regenera 6/s — placeholders —, explosivo 0.3 enquanto houver escudo), sem inimigo usando.
+- Novo `src/combat/damage.js` (`canHit`, `resistFor`, `finalDamage`); `Enemy.receiveAttack(dano, tipo)` aplica resist + escudo; escolha de alvo da torre e o splash da Catapulta respeitam `canHit`. Hook de upgrades: `Tower.addCapabilityMod({ damageType } | { addCanHit })`.
+- Comportamento idêntico: nova simulação determinística `tools/sim/simulacao.js` (a da T07 não estava no repositório) deu a **mesma assinatura antes e depois** nas 3 estratégias (mista d97b03d9, só Bestas 714fe679, só Catapultas b3934d63).
+- **Atenção:** o robô novo não é o da T07 e os números dele diferem muito: mista perde na onda 5 (núcleo 17 17 11 6 0), só Bestas 20/20, só Catapultas perde. Vale revisar o balanceamento com essa ferramenta (não mexido nesta tarefa).
+- CLAUDE.md: tabela de design inimigos × tipos de dano + regras, convenção de dano/traits e a pasta `combat/`.
 
 Preparar a estrutura de tipos de dano e características de inimigos (sem criar conteúdo novo — Fase 1 continua com 2 torres e 1 inimigo).
 
