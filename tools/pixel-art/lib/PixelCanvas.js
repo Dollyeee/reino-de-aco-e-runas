@@ -21,18 +21,21 @@ import { TEXTURES, rust, seedOf } from './textures.js';
 // ------------------------------------------------------------------ máscaras
 
 export class Mask {
-    constructor (w, h) {
+    // origin: deslocamento base de todas as formas (permite reenquadrar um sprite sem mudar coordenadas)
+    constructor (w, h, origin = [0, 0]) {
         this.w = w;
         this.h = h;
         this.data = new Uint8Array(w * h);
-        this.dx = 0;
-        this.dy = 0;
+        this.ox = origin[0];
+        this.oy = origin[1];
+        this.dx = this.ox;
+        this.dy = this.oy;
     }
 
     // deslocamento inteiro aplicado às formas seguintes (usado na animação)
     offset (dx, dy) {
-        this.dx = Math.round(dx);
-        this.dy = Math.round(dy);
+        this.dx = Math.round(dx) + this.ox;
+        this.dy = Math.round(dy) + this.oy;
         return this;
     }
 
@@ -152,10 +155,12 @@ const METALS = new Set(['aco', 'acoClaro']);
 
 export class PixelCanvas {
     // opts.darkRatio (padrão 0.3): fração máxima de cada parte nos tons escuros (0 e 1).
+    // opts.origin [x, y]: deslocamento base de todas as formas.
     constructor (w, h, opts = {}) {
         this.w = w;
         this.h = h;
         this.darkRatio = opts.darkRatio ?? 0.3;
+        this.origin = opts.origin || [0, 0];
         this.color = new Array(w * h).fill(null);      // '#rrggbb' ou null
         this.owner = new Int32Array(w * h).fill(-1);   // parte dona do pixel
         this.mat = new Array(w * h).fill(null);        // material do pixel (para rim light)
@@ -166,7 +171,7 @@ export class PixelCanvas {
     }
 
     mask () {
-        return new Mask(this.w, this.h);
+        return new Mask(this.w, this.h, this.origin);
     }
 
     filled (x, y) {

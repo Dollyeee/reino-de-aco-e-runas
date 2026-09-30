@@ -187,3 +187,28 @@ Pixel art em ALTA RESOLUÇÃO com mais detalhe, a partir do orc já ajustado (pr
 - Caminhada com o mesmo ritmo, deslocamentos dobrados (pernas ±10, quique 2, braço/clava ±6). Checagens: sombreamento máx. 30% ✓, pernas com diferença mínima de 453 px entre quadros ✓.
 - Versão 2× congelada em `tools/pixel-art/legacy/` só para o comparativo "2× antigo × 1× novo" do `preview.html` (tamanho real e 4×); `orc-v1.js` removido.
 - `CLAUDE.md` (Direção de arte) e `ART_SPEC.md` atualizados. `npm run pixel` e `npm run build` OK; no jogo: 8 quadros, escala 1, brilho do olho acompanha o quadro, sombra de pixels 56×16, sem avisos de `[arte]`.
+
+---
+
+## [x] T09 — Três versões do Orc Cibernético para escolha
+
+Criar 3 versões TOTALMENTE diferentes do Orc Cibernético em pixel art 1×, para o usuário escolher. NÃO substituir o orc atual no jogo; ele continua como padrão até a decisão.
+
+Mesmo gerador (tools/pixel-art), mesma paleta base e técnicas (rampas de 5 tons, contorno seletivo, texturas com semente fixa, emissivos), ~100 px de altura, olhando para a direita, câmera 3/4. Cada versão em `sprites/orc-a.js`, `orc-b.js`, `orc-c.js`, com parado + caminhada de 8 quadros gerada pelas partes. Diferentes em SILHUETA, tipo de corpo, arma e jeito de andar — não variações de cor.
+
+- **A — "Brutamontes"**: muito largo e curvado, cabeça pequena e baixa entre os ombros, braços enormes, armadura pesada de placas com rebites, pele verde-oliva escura. Martelo de guerra de duas mãos com cabeça de plasma ciano, APOIADO NO OMBRO. Caminhada lenta e pesada, balançando o corpo de um lado para o outro.
+- **B — "Saqueador"**: mais alto e magro, inclinado para frente como quem vai atacar, pouca armadura (couro, faixas, uma ombreira pequena), moicano, pele verde mais clara. Braço da frente INTEIRO mecânico, com lâmina de plasma ciano saindo do antebraço. Caminhada rápida e agressiva, passos longos.
+- **C — "Ciborgue de guerra"**: mais máquina que orc. Pernas mecânicas com articulação invertida (tipo pássaro), cabos expostos, reator ciano no peito, capacete cobrindo metade do rosto com visor vermelho horizontal, presas por baixo. Braço da frente é um canhão de plasma. Pele verde-acinzentada só nos ombros e no maxilar. Caminhada mecânica, passos marcados, leve "tranco" no pouso do pé.
+
+Entregáveis:
+1. `tools/pixel-art/escolha-orc.html`: as 3 versões + o orc atual lado a lado, parados e andando em loop, no tamanho real sobre grama e terra, e ampliados 4×; também 2 orcs de cada versão sobrepostos no caminho (como numa onda).
+2. Seletor `ORC_VARIANT` em `src/config/art.js` (`'atual' | 'a' | 'b' | 'c'`), padrão `'atual'`.
+3. `npm run pixel` e `npm run build` sem erros. Descrever em 2 linhas o ponto forte e o ponto fraco de cada versão.
+
+**Resultado:**
+- `tools/pixel-art/sprites/orc-a.js` (Brutamontes, 128×110), `orc-b.js` (Saqueador, 128×110), `orc-c.js` (Ciborgue de guerra, 128×106): parado + caminhada de 8 quadros gerada pelas partes, cada uma com seu jeito de andar. Checagens: sombreamento máx. 30% em todas; pernas com diferença mínima de 441 / 543 / 772 px entre quadros.
+- Paleta: novas rampas de pele `peleOliva` (A), `peleClara` (B), `peleCinza` (C) e `borracha` (cabos), com a mesma textura de pele. `PixelCanvas` ganhou `origin` (reenquadrar um sprite sem mudar coordenadas).
+- `tools/pixel-art/escolha-orc.html` (gerado por `npm run pixel`, código em `tools/pixel-art/escolha.js`): atual + A + B + C parados e andando no tamanho real (grama e terra), ampliados 4×, e 2 de cada versão andando juntos no caminho na velocidade do jogo.
+- Seletor `ORC_VARIANT` em `src/config/art.js` (padrão `'atual'`) + `?orc=a|b|c|atual` na URL; `ORC_VARIANTS` guarda quadro, pivot, olho, hit, topo, sombra e `walkCycle` de cada versão. `Enemy` usa o `walkCycle` do manifesto quando existe.
+- Testado no jogo com as 4 versões: sprite no tamanho certo, brilho do olho acompanhando o quadro, sombra de pixels, cadência própria, dano (recuo 2 px) e morte; sem avisos de `[arte]`. O orc atual continua idêntico e é o padrão. `npm run pixel` e `npm run build` OK.
+- Pendente: o usuário escolher a versão (depois, trocar o padrão de `ORC_VARIANT` ou remover as candidatas não usadas).

@@ -132,8 +132,8 @@ export default class Enemy extends Phaser.GameObjects.Container {
 
     // Sprite sheet: a caminhada vem dos quadros; o código só ajusta a velocidade e o recuo (inteiro).
     updateSheet (dt) {
-        // quadros por segundo proporcionais à velocidade: um ciclo completo a cada A.walkCycle px andados
-        const fps = this.walkFrames * this.speed / A.walkCycle;
+        // quadros por segundo proporcionais à velocidade: um ciclo completo a cada walkCycle px andados
+        const fps = this.walkFrames * this.speed / (this.def.walkCycle || A.walkCycle);
         this.sprite.anims.timeScale = fps / this.walkBaseRate;
 
         this.knockMs = Math.max(0, this.knockMs - dt * 1000);

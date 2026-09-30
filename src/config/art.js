@@ -14,10 +14,41 @@
 //   frame [w, h]   (sprite sheet) tamanho de UM quadro em pixels do arquivo; os quadros ficam lado a lado.
 //   anims          (sprite sheet) animações: { nome: { start, end, frameRate, repeat } }
 //   meta           (sprite sheet) JSON gerado por `npm run pixel` com dados por quadro (ex.: posição do olho)
+//   walkCycle      (inimigos com caminhada) px do mundo andados por ciclo; padrão ENEMY_ANIM.walkCycle
 //   demais pontos  (headMount, muzzle, cup, eye...) são deslocamentos em pixels lógicos a partir do pivot.
 //
 // Trocar SVG por PNG: mude só `file` (e `scale`, se o arquivo for em alta resolução). Mantendo `size`
 // e `pivot`, todo o encaixe continua igual.
+
+// ---------------------------------------------------------------------------------------------------------
+// Versão do Orc Cibernético usada no jogo: 'atual' | 'a' | 'b' | 'c'  (T09 — candidatas para escolha)
+//   atual = orc da T08 · a = "Brutamontes" · b = "Saqueador" · c = "Ciborgue de guerra"
+// Para testar sem editar este arquivo: abra o jogo com ?orc=a (ou b, c, atual) no fim da URL.
+export const ORC_VARIANT = 'atual';
+
+// Arquivos (gerados por `npm run pixel`, tools/pixel-art/sprites/) e pontos de encaixe de cada versão.
+export const ORC_VARIANTS = {
+    atual: { label: 'Atual (T08)', prefix: 'orc', frame: [116, 104], pivot: [58, 104],
+             eye: { x: 39, y: -66 }, hit: { x: 0, y: -54 }, top: -96, shadow: [56, 16], walkCycle: 44 },
+    a:     { label: 'A — Brutamontes', prefix: 'orc-a', frame: [128, 110], pivot: [70, 110],
+             eye: { x: 34, y: -52 }, hit: { x: 0, y: -50 }, top: -104, shadow: [80, 18], walkCycle: 52 },
+    b:     { label: 'B — Saqueador', prefix: 'orc-b', frame: [128, 110], pivot: [61, 110],
+             eye: { x: 33, y: -86 }, hit: { x: 0, y: -60 }, top: -106, shadow: [52, 14], walkCycle: 44 },
+    c:     { label: 'C — Ciborgue de guerra', prefix: 'orc-c', frame: [128, 106], pivot: [65, 106],
+             eye: { x: 41, y: -80 }, hit: { x: 0, y: -52 }, top: -92, shadow: [64, 16], walkCycle: 42 }
+};
+
+function pickOrcVariant () {
+    let v = ORC_VARIANT;
+    try {
+        const q = new URLSearchParams(globalThis.location ? globalThis.location.search : '').get('orc');
+        if (q && ORC_VARIANTS[q]) { v = q; }
+    } catch (e) { /* fora do navegador (gerador): usa ORC_VARIANT */ }
+    return v;
+}
+
+export const ORC_ACTIVE = pickOrcVariant();
+const ORC = ORC_VARIANTS[ORC_ACTIVE];
 
 export const ART = {
     'build-slot':           { file: 'build-slot.svg', size: [100, 60], pivot: [50, 25] },
@@ -32,12 +63,12 @@ export const ART = {
     'tower-catapult-arm':   { file: 'tower-catapult-arm.svg', size: [52, 108], pivot: [26, 100],
                               cup: { x: 0, y: -88 }, orb: { x: 0, y: -94 } },
 
-    // pixel art 1× (tools/pixel-art/sprites/orc.js): quadro 116×104 = tamanho no mundo
-    'enemy-cyber-orc':      { file: 'orc-walk.png', pixel: true, frame: [116, 104], size: [116, 104], pivot: [58, 104],
+    // pixel art 1× (tools/pixel-art/sprites/): quadro = tamanho no mundo; versão escolhida em ORC_VARIANT
+    'enemy-cyber-orc':      { file: `${ORC.prefix}-walk.png`, pixel: true, frame: ORC.frame, size: ORC.frame, pivot: ORC.pivot,
                               anims: { walk: { start: 0, end: 7, frameRate: 10, repeat: -1 } },
-                              meta: 'orc-walk.json', idle: 'enemy-cyber-orc-idle',
-                              eye: { x: 39, y: -66 }, hit: { x: 0, y: -54 }, top: -96 },
-    'enemy-cyber-orc-idle': { file: 'orc.png', pixel: true, size: [116, 104], pivot: [58, 104] },
+                              meta: `${ORC.prefix}-walk.json`, idle: 'enemy-cyber-orc-idle', walkCycle: ORC.walkCycle,
+                              eye: ORC.eye, hit: ORC.hit, top: ORC.top },
+    'enemy-cyber-orc-idle': { file: `${ORC.prefix}.png`, pixel: true, size: ORC.frame, pivot: ORC.pivot },
 
     'castle':               { file: 'castle.svg', size: [260, 272], pivot: [130, 272],
                               core: { x: 0, y: -178 }, pedestal: { x: 0, y: -122 } },
@@ -65,7 +96,7 @@ export const SHADOWS = {
     'build-slot': [96, 34],
     'tower-crossbow': [84, 30],
     'tower-catapult': [124, 38],
-    'enemy-cyber-orc': [56, 16],   // pixel art: elipse de pixels
+    'enemy-cyber-orc': ORC.shadow,   // pixel art: elipse de pixels (depende da versão do orc)
     'castle': [270, 60],
     'tree': [80, 26],
     'rock': [66, 20],

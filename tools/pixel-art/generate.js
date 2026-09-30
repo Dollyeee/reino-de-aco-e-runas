@@ -1,12 +1,19 @@
 // Gerador de pixel art: `npm run pixel`
 // Desenha cada sprite de tools/pixel-art/sprites/ e exporta PNGs para public/assets/,
-// além de tools/pixel-art/preview.html (animação em loop, ampliada 4× e no tamanho real do jogo).
+// além de tools/pixel-art/preview.html (animação em loop, ampliada 4× e no tamanho real do jogo) e
+// tools/pixel-art/escolha-orc.html (comparação das versões do orc para escolha).
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PNG } from 'pngjs';
 import orc from './sprites/orc.js';
+import orcA from './sprites/orc-a.js';
+import orcB from './sprites/orc-b.js';
+import orcC from './sprites/orc-c.js';
+import { escolhaHtml } from './escolha.js';
+import { ORC_VARIANTS } from '../../src/config/art.js';
+import { BALANCE } from '../../src/config/balance.js';
 import { V2_WALK, V2_FRAME } from './legacy/orc-v2.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -18,7 +25,15 @@ const PIXEL_SCALE = 1;
 const GRASS = '#677444';
 const DIRT = '#96795a';
 
-const SPRITES = [orc];
+const SPRITES = [orc, orcA, orcB, orcC];
+
+// Página de escolha das versões do orc (ORC_VARIANT em src/config/art.js)
+const ORC_CHOICE = [
+    { id: 'atual', sprite: orc, note: 'Versão da T08: clava de plasma, tronco curvado, proporções médias.' },
+    { id: 'a', sprite: orcA, note: 'Largo e curvado, cabeça baixa entre os ombros, martelo de plasma no ombro. Passo curto e pesado, balança o corpo.' },
+    { id: 'b', sprite: orcB, note: 'Alto e magro, inclinado para o ataque, moicano, braço mecânico com lâmina de plasma. Passos longos.' },
+    { id: 'c', sprite: orcC, note: 'Mais máquina: pernas de pássaro, reator no peito, visor vermelho, braço-canhão. Passo mecânico com tranco.' }
+];
 
 // "Antes × depois" no preview (versões antigas congeladas; não vão para o jogo)
 const COMPARE = [
@@ -200,3 +215,22 @@ const compares = COMPARE.map((c, i) => {
 });
 fs.writeFileSync(path.join(HERE, 'preview.html'), previewHtml(entries, compares));
 console.log('✓ tools/pixel-art/preview.html');
+
+const choice = ORC_CHOICE.map((c) => {
+    const V = ORC_VARIANTS[c.id];
+    const [walk, idle] = c.sprite.sheets;
+    if (V.frame[0] !== c.sprite.frame.w || V.frame[1] !== c.sprite.frame.h) {
+        console.log(`  ⚠️ ORC_VARIANTS.${c.id}.frame (${V.frame}) difere do sprite (${c.sprite.frame.w}×${c.sprite.frame.h})`);
+    }
+    return {
+        id: c.id, label: V.label, note: c.note, fw: c.sprite.frame.w, fh: c.sprite.frame.h,
+        pivot: V.pivot, walkCycle: V.walkCycle, shadow: V.shadow,
+        walk: { base64: encodeSheet(walk.frames, c.sprite.frame).toString('base64'), frames: walk.frames.length },
+        idle: { base64: encodeSheet(idle.frames, c.sprite.frame).toString('base64') }
+    };
+});
+fs.writeFileSync(path.join(HERE, 'escolha-orc.html'), escolhaHtml({
+    title: 'Orc Cibernético — escolha da versão', variants: choice,
+    speed: BALANCE.enemies.cyberOrc.speed, grass: GRASS, dirt: DIRT
+}));
+console.log('✓ tools/pixel-art/escolha-orc.html');

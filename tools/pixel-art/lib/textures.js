@@ -49,6 +49,11 @@ export const TEXTURES = {
     }
 };
 
+// variações de pele usam a mesma textura
+TEXTURES.peleOliva = TEXTURES.pele;
+TEXTURES.peleClara = TEXTURES.pele;
+TEXTURES.peleCinza = TEXTURES.pele;
+
 // Ferrugem: manchas nas bordas das placas de aço.
 export function rust (p, amount = 0.12) {
     if (p.edge <= 1 && hash(p.lx * 3, p.ly * 5, p.seed + 11) < amount) {

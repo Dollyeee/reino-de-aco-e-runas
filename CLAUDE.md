@@ -22,6 +22,9 @@ cada personagem **em partes** numa grade pequena. Não se edita PNG à mão: mud
 
 > Transição em andamento: o **Orc Cibernético** já é pixel art 1× (com caminhada). Torres, castelo, cenário,
 > projéteis e ícones ainda são os SVGs antigos (placeholders) e serão refeitos no mesmo gerador.
+> Há 3 versões candidatas do orc (`sprites/orc-a.js`, `orc-b.js`, `orc-c.js`), comparadas em
+> `tools/pixel-art/escolha-orc.html`; o jogo usa a escolhida em `ORC_VARIANT` (`src/config/art.js`, padrão `'atual'`,
+> ou `?orc=a|b|c|atual` na URL para testar).
 
 ### Resolução
 - **Pixel art 1×**: 1 pixel da arte = **1 pixel do mundo** 1280×720 (`PIXEL_SCALE` = 1). Vale para TODA a arte nova.
@@ -98,7 +101,7 @@ Personalidade vem do **peso**, não da elasticidade. Nada fica 100% parado, mas 
 
 ```
 index.html
-tools/pixel-art/          gerador de pixel art (`npm run pixel`): palette.js, lib/PixelCanvas.js, sprites/*.js, preview.html
+tools/pixel-art/          gerador de pixel art (`npm run pixel`): palette.js, lib/PixelCanvas.js, sprites/*.js, preview.html, escolha-orc.html
 public/assets/            SVGs substituíveis (torres, inimigos, castelo, cristais, cenário, ícones)
 src/
   main.js                 configuração do Phaser.Game
@@ -147,7 +150,7 @@ Convenções:
 
 - `npm install` — instala dependências
 - `npm run dev` — servidor de desenvolvimento (Vite) em http://localhost:5173
-- `npm run pixel` — gera os sprites de pixel art em `public/assets/` e o `tools/pixel-art/preview.html`
+- `npm run pixel` — gera os sprites de pixel art em `public/assets/`, o `tools/pixel-art/preview.html` e o `tools/pixel-art/escolha-orc.html`
 - `npm run build` — build de produção em `dist/`
 - `npm run preview` — serve o build de produção
 

@@ -83,6 +83,27 @@ serão refeitos no gerador seguindo as mesmas regras; as medidas deles continuam
 - **No jogo**: animação "walk" em loop com velocidade proporcional ao passo; dano = flash branco + recuo de 2 px;
   morte = quadro parado, pisca, afunda e vira faíscas. Sombra: elipse de pixels 56×16.
 
+### Orc Cibernético — versões candidatas (T09, pixel art 1×)
+Escolhidas por `ORC_VARIANT` em `src/config/art.js` (`'atual' | 'a' | 'b' | 'c'`; teste rápido com `?orc=` na URL).
+Pontos de encaixe, sombra e `walkCycle` de cada uma ficam em `ORC_VARIANTS`. Comparação lado a lado, andando e no
+caminho: `tools/pixel-art/escolha-orc.html`.
+
+| Versão | Arquivos | Quadro | Pivot | Olho (parado) | Hit | Top | Sombra | walkCycle |
+|---|---|---|---|---|---|---|---|---|
+| A "Brutamontes" (`sprites/orc-a.js`) | `orc-a-walk.png/json`, `orc-a.png` | 128×110 | 70,110 | +34,−52 | 0,−50 | −104 | 80×18 | 52 |
+| B "Saqueador" (`sprites/orc-b.js`) | `orc-b-walk.png/json`, `orc-b.png` | 128×110 | 61,110 | +33,−86 | 0,−60 | −106 | 52×14 | 44 |
+| C "Ciborgue de guerra" (`sprites/orc-c.js`) | `orc-c-walk.png/json`, `orc-c.png` | 128×106 | 65,106 | +41,−80 | 0,−52 | −92 | 64×16 | 42 |
+
+- **A**: muito largo e curvado, cabeça pequena e baixa entre os ombros, braços enormes, placas rebitadas, pele oliva
+  escura, martelo de duas mãos com cabeça de plasma apoiado no ombro. Caminhada: passo curto (±8 px), corpo afunda
+  2 px no apoio, tronco balança ±2 px e o ombro do martelo sobe/desce 2 px a cada passo.
+- **B**: alto e magro, inclinado para frente, colete de couro, faixas, ombreira pequena, moicano, pele verde clara,
+  braço da frente inteiro mecânico com lâmina de plasma. Caminhada: passos longos (±14 px, pé sobe 8 px), bote de
+  2 px à frente no contato, braço de carne balança ±8 px.
+- **C**: pernas de pássaro (joelho para frente, jarrete alto para trás), cabos, reator ciano no peito, capacete com
+  visor vermelho horizontal, presas por baixo, braço-canhão; pele verde-acinzentada só nos ombros e no maxilar.
+  Caminhada mecânica: pé anda em linha reta no apoio, afunda 3 px no pouso ("tranco") e o canhão atrasa 1 quadro.
+
 ### Besta Laser — base `tower-crossbow-base` + cabeça `tower-crossbow-head`
 - **Base**: 88×88 · pivot 44,88 · simétrica (não espelha).
   - `headMount` (0, −61): onde fica o eixo de giro da cabeça (centro do topo da base).
