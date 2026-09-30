@@ -269,9 +269,23 @@ animada em `tools/pixel-art/escolha-torres.html`; no jogo: `TOWER_VARIANT` em `s
 - **Upgrades**: cada versão declara em `upgrades` onde entram as peças dos níveis 3 e 4 (caminhos do DESIGN.md).
 - **Ciano forte só nas partes de energia** (cordas, cristal-mira, trilho de plasma, runas do contrapeso, reator).
 
+#### Receita de acabamento das torres (T20, piloto na Besta A — aplicar nas outras depois de aprovada)
+1. **3/4 de verdade**: todo volume mostra o TOPO (topo da pedra, piso da plataforma, tampo da arma) no tom 3/4, além da
+   frente no tom 2 — mesma perspectiva do orc e das árvores.
+2. **Robustez**: vigas de 4–6 px, estrutura baixa e larga, peça de cima grande (~30% maior que na T19); silhueta simples.
+3. **Materiais**: madeira com veio (textura própria por parte) e pontas de tábua (cerne), pregos e cantoneiras de ferro;
+   pedra em blocos com rejunte (tom 0) e musgo nas frestas; metal com especular de 1–2 px.
+4. **Luz forte**: topos claros, frente média escurecendo à direita, **sombra de oclusão** (linha no tom 0) sob pisos,
+   vigas e onde uma peça entra na outra; rim light de 1 px na borda direita.
+5. **Detalhes de vida** que não mudam a silhueta: corda nas amarrações, caixa de virotes, bandeira, runa ciano na pedra.
+6. **Chão embutido** na base: sombra de contato escura + terra + tufos de capim, **sem contorno** e atrás da torre
+   (`groundDecal` em `tools/pixel-art/sprites/torres/comum.js`); o pivot sobe alguns px no quadro para caber o chão da frente.
+7. **Idle**: base com quadros em loop (`base.frames`/`fps`: bandeira 3 poses, runa pulsando) e peça de cima com fases
+   (`head.phases`: brilho correndo pela corda); quadro da cabeça = fase × nº de ângulos + ângulo.
+
 | Versão | Besta Laser | Catapulta de Plasma |
 |---|---|---|
-| A | torre de vigia de madeira e pedra, besta com cordas de energia | catapulta de madeira sobre rodas com aro de ferro |
+| A | torre de vigia de madeira e pedra, besta com cordas de energia (**T20: acabamento completo, idle**) | catapulta de madeira sobre rodas com aro de ferro |
 | B | pedestal de pedra flutuante com runas, besta escura com cristal-mira | trabuco alto, contrapeso de pedra rúnica |
 | C | bunker de aço rebitado, trilho de plasma, visor ciano | morteiro-forja: pedra e ferro, braço hidráulico, reator |
 

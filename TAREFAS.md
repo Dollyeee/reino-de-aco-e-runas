@@ -431,3 +431,26 @@ Entregáveis:
 1. tools/pixel-art/escolha-torres.html: as 3 versões de cada torre paradas, a animação de disparo (recuo + rotação) e a materialização rúnica rodando; no tamanho real sobre o chão do mapa, ao lado de orcs e árvores do kit escolhido; e ampliadas 4×.
 2. Seletores TOWER_VARIANT.laserCrossbow e TOWER_VARIANT.plasmaCatapult em src/config/art.js ('atual' | 'a' | 'b' | 'c') para eu testar no jogo; padrão 'atual'.
 3. npm run pixel e npm run build sem erros. Me diga em 2 linhas o ponto forte e o ponto fraco de cada versão.
+
+---
+
+## [x] T20 — Acabamento da Besta Laser A (piloto)
+
+**Concluída em 2026-09-30.** Resultado:
+- Besta A redesenhada em `tools/pixel-art/sprites/torres/besta-a.js` (a da T19 congelada em `legacy/besta-a-t19.js`): 3/4 com topo da pedra, piso de tábuas e tampo da besta visíveis; pernas de 5–6 px, estrutura mais baixa (piso em −46/−58 em vez de −57/−64) e mais larga (70 px de pedra); besta ~30% maior (quadro 84×84); veio na madeira, pontas de tábua, cantoneiras e pregos; pedra em 2 fiadas com rejunte e musgo; oclusão sob o piso e na entrada das pernas; corda nas amarrações, caixa de virotes, bandeira, runa ciano; terra + sombra de contato + capim embutidos na base (sem contorno).
+- Idle: base com 4 quadros (bandeira em 3 poses, runa apagada/acesa/com halo) e cabeça com 3 fases do brilho correndo pela corda (39 quadros = 3 × 13 ângulos). `towerArt.js`: base 100×98 com pivot (50, 92), `frames: 4`, `fps: 6`; cabeça 84×84 com `phases: 3`; `headMount` (0, −64), `muzzle` (36, 0), `crystal` (−10, 0), sombra 60×16.
+- Jogo: base vira sprite com animação `idle` (manifesto com `anims`), cabeça alterna fases; holograma da materialização usa o quadro atual; prévia usa o quadro 0. Mira, recuo e materialização testados no jogo (`?besta=a`).
+- `escolha-torres.html` ganhou "Besta A — antes × depois" (tamanho real sobre o chão com orc e árvore do kit A, e 4×, com idle, materialização e disparo). Receita registrada no ART_SPEC para aplicar na Catapulta após aprovação.
+
+Passada de acabamento na Besta Laser versão A (piloto). As torres estão com aparência "crua" comparadas ao orc e à decoração. Refaça o desenho da Besta A com estas melhorias, sem mudar o conceito (torre de vigia de madeira e pedra com besta no topo). Depois que eu aprovar, a mesma receita vai para a Catapulta.
+
+1. Câmera 3/4 de verdade: mostrar o TOPO das superfícies (topo da base de pedra, piso da plataforma de madeira, tampo da besta), não só a frente. Mesma perspectiva do orc e das árvores.
+2. Robustez: vigas mais grossas (4–6 px), estrutura mais baixa e larga, besta ~30% maior no topo. Silhueta forte e simples.
+3. Materiais com textura (rampas de 5 tons do ART_SPEC): madeira com veio e pontas de tábua, pregos/cintas de ferro; base de pedra em blocos com rejunte e musgo nas frestas; metal da besta com brilho especular de 1–2 px.
+4. Luz forte do canto superior esquerdo: lado iluminado claramente mais claro, lado da sombra mais escuro, sombra de oclusão onde as peças se encontram, rim light de 1 px na borda direita.
+5. Detalhes de "vida" (sem poluir a silhueta): corda amarrando as vigas, uma aljava ou caixa de virotes na plataforma, uma pequena bandeira do reino, uma runa ciano acesa na pedra da base.
+6. Integração com o chão: sombra de contato escura sob a base + alguns pixels de terra e tufos de capim em volta (parte do sprite da base).
+7. Vida parada: animação de idle leve em loop (bandeira balançando 2–3 quadros, runa pulsando, brilho percorrendo a corda de energia do arco). Nada fica 100% parado.
+8. Mantenha pontos de encaixe, ângulos de mira, recuo e materialização funcionando; atualize towerArt.js se as medidas mudarem.
+
+Entregável: no escolha-torres.html, "Besta A antes × depois" no tamanho real sobre o chão (ao lado do orc e de uma árvore do kit A) e ampliado 4×, com o idle e o disparo rodando. npm run pixel e npm run build. Descreva o que mudou.

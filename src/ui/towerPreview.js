@@ -13,7 +13,7 @@ export function towerPreview (scene, type, x, y, scale = 1, breathe = true) {
     if (px && type === 'laserCrossbow') {
         const m = px.headMount;
         box.add([
-            makeArt(scene, 0, 0, px.baseKey, k),
+            makeArt(scene, 0, 0, px.baseKey, k).setFrame(0),
             makeSprite(scene, m.x * k, m.y * k, px.pieceKey, k).setFrame(headFrameFor(PREVIEW_ANGLE).frame)
         ]);
     } else if (px) {

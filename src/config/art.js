@@ -143,7 +143,11 @@ for (const [tower, [file, piece, pieceFile]] of Object.entries(TOWER_FILES)) {
     const v = TOWER_ACTIVE[tower];
     if (v === 'atual') { continue; }
     const d = TOWER_ART[tower][v];
-    ART[`torre-${file}-${v}-base`] = { file: `torre-${file}-${v}-base.png`, pixel: true, size: d.base.frame, pivot: d.base.pivot };
+    ART[`torre-${file}-${v}-base`] = d.base.frames > 1
+        // base com idle (folha de quadros em loop)
+        ? { file: `torre-${file}-${v}-base.png`, pixel: true, frame: d.base.frame, size: d.base.frame, pivot: d.base.pivot,
+            anims: { idle: { start: 0, end: d.base.frames - 1, frameRate: d.base.fps || 6, repeat: -1 } } }
+        : { file: `torre-${file}-${v}-base.png`, pixel: true, size: d.base.frame, pivot: d.base.pivot };
     const P = d[piece];
     ART[`torre-${file}-${v}-${pieceFile}`] = { file: `torre-${file}-${v}-${pieceFile}.png`, pixel: true, frame: P.frame, size: P.frame, pivot: P.pivot };
 }

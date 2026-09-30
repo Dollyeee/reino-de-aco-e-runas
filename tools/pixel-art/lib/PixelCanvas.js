@@ -237,7 +237,7 @@ export class PixelCanvas {
     // Desenha uma parte com um material.
     //   opts.name     nome (relatórios e semente da textura)
     //   opts.outline  (padrão true) contorno interno seletivo sobre as partes de trás
-    //   opts.texture  (padrão true) textura do material
+    //   opts.texture  (padrão true) textura do material; false = sem textura; função = textura própria (mesma assinatura)
     //   opts.rust     fração de manchas de ferrugem nas bordas (metais), ex.: 0.12
     //   opts.specular número de pixels especulares (padrão 2 em metais, 0 no resto)
     part (material, build, opts = {}) {
@@ -284,7 +284,7 @@ export class PixelCanvas {
         });
 
         let dark = 0;
-        const texFn = opts.texture === false ? null : TEXTURES[material];
+        const texFn = opts.texture === false ? null : (typeof opts.texture === 'function' ? opts.texture : TEXTURES[material]);
         for (const p of pixels) {
             let t = tones.has(p) ? tones.get(p) : (edgeUL(p.x, p.y) || diag(p.x, p.y) < 0.4 ? 3 : 2);
             const lx = p.x - b.x0, ly = p.y - b.y0;

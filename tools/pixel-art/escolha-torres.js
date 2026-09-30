@@ -16,41 +16,53 @@ const SCENE = {
     tower: { x: 150, y: 142 }, orcIdle: { x: 238 }
 };
 
-export function escolhaTorresHtml ({ towerArt, headAngles, armAngles, buildFx, orc, decor }) {
-    const towers = {};
-    const cols = { laserCrossbow: [], plasmaCatapult: [] };
-    const DEG = Math.PI / 180;
-    const kinds = [['laserCrossbow', 'besta', 'head', 'cabeca', 'besta'], ['plasmaCatapult', 'catapulta', 'arm', 'braco', 'catapulta']];
-    for (const [tower, file, pieceName, pieceFile, kind] of kinds) {
-        for (const [v, d] of Object.entries(towerArt[tower])) {
-            const id = `${file}-${v}`;
-            const P = d[pieceName];
-            const topY = kind === 'besta' ? d.headMount.y - 26 : d.armPivot.y + d.orb.y * Math.cos(20 * DEG) - 10;
-            const h = Math.max(d.base.frame[1], -Math.round(topY)) + 14;
-            const w = kind === 'besta' ? 100 : 150;
-            towers[id] = {
-                kind, name: d.name,
-                base: { src: `${A}torre-${file}-${v}-base.png`, w: d.base.frame[0], h: d.base.frame[1], px: d.base.pivot[0], py: d.base.pivot[1] },
-                piece: { src: `${A}torre-${file}-${v}-${pieceFile}.png`, w: P.frame[0], h: P.frame[1], px: P.pivot[0], py: P.pivot[1] },
-                mount: d.headMount || d.armPivot, muzzle: d.muzzle, crystal: d.crystal, cup: d.cup, orb: d.orb,
-                shadow: d.shadow, float: d.float || 0,
-                rest: -0.35, windup: -0.85, throwA: 1.05,
-                crop: { x: Math.round(SCENE.tower.x - w / 2), y: Math.max(0, SCENE.tower.y - h + 10), w, h: Math.min(h, SCENE.tower.y + 10) }
-            };
-            cols[tower].push(`
+// uma célula (4 canvases) de uma versão de torre
+function cell (id, title, d, kind) {
+    return `
         <div class="col">
-          <h3>${v.toUpperCase()} — ${d.name}</h3>
-          <p class="note">${d.note}</p>
-          <p class="up"><b>Nível 3:</b> ${d.upgrades[3]}<br><b>Nível 4:</b> ${d.upgrades[4]}</p>
+          <h3>${title}</h3>
+          <p class="note">${d.note || ''}</p>
+          ${d.upgrades ? `<p class="up"><b>Nível 3:</b> ${d.upgrades[3]}<br><b>Nível 4:</b> ${d.upgrades[4]}</p>` : ''}
           <div class="row">
-            <figure><canvas data-tw="${id}" data-zoom="1" data-mode="still"></canvas><figcaption>parada · tamanho real</figcaption></figure>
+            <figure><canvas data-tw="${id}" data-zoom="1" data-mode="still"></canvas><figcaption>parada (idle) · tamanho real</figcaption></figure>
             <figure><canvas data-tw="${id}" data-zoom="1" data-mode="anim"></canvas><figcaption>materialização + ${kind === 'besta' ? 'mira e recuo' : 'arremesso'} · tamanho real</figcaption></figure>
           </div>
           <div class="row">
             <figure><canvas data-tw="${id}" data-zoom="4" data-mode="anim"></canvas><figcaption>animada · 4×</figcaption></figure>
-            <figure><canvas data-tw="${id}" data-zoom="4" data-mode="still"></canvas><figcaption>parada · 4×</figcaption></figure>
+            <figure><canvas data-tw="${id}" data-zoom="4" data-mode="still"></canvas><figcaption>parada (idle) · 4×</figcaption></figure>
           </div>
-        </div>`);
+        </div>`;
+}
+
+export function escolhaTorresHtml ({ towerArt, bestaAntes, headAngles, armAngles, buildFx, orc, decor }) {
+    const towers = {};
+    const cols = { laserCrossbow: [], plasmaCatapult: [] };
+    const DEG = Math.PI / 180;
+    const kinds = [['laserCrossbow', 'besta', 'head', 'cabeca', 'besta'], ['plasmaCatapult', 'catapulta', 'arm', 'braco', 'catapulta']];
+    const entry = (d, kind, baseSrc, pieceSrc, pieceName) => {
+        const P = d[pieceName];
+        const topY = kind === 'besta' ? d.headMount.y - 30 : d.armPivot.y + d.orb.y * Math.cos(20 * DEG) - 10;
+        const h = Math.max(d.base.frame[1], -Math.round(topY)) + 14;
+        const w = kind === 'besta' ? 110 : 150;
+        return {
+            kind, name: d.name,
+            base: { src: baseSrc, w: d.base.frame[0], h: d.base.frame[1], px: d.base.pivot[0], py: d.base.pivot[1], frames: d.base.frames || 1, fps: d.base.fps || 6 },
+            piece: { src: pieceSrc, w: P.frame[0], h: P.frame[1], px: P.pivot[0], py: P.pivot[1], phases: P.phases || 1 },
+            mount: d.headMount || d.armPivot, muzzle: d.muzzle, crystal: d.crystal, cup: d.cup, orb: d.orb,
+            shadow: d.shadow, float: d.float || 0,
+            rest: -0.35, windup: -0.85, throwA: 1.05,
+            crop: { x: Math.round(SCENE.tower.x - w / 2), y: Math.max(0, SCENE.tower.y - h + 12), w, h: Math.min(h, SCENE.tower.y + 12) }
+        };
+    };
+    // "Besta A antes × depois" (T20)
+    towers['besta-a0'] = entry(bestaAntes, 'besta', 'torres/besta-a-antes-base.png', 'torres/besta-a-antes-cabeca.png', 'head');
+    const antesDepois = cell('besta-a0', 'Antes (T19)', bestaAntes, 'besta') +
+        cell('besta-a', 'Depois (T20) — passada de acabamento', towerArt.laserCrossbow.a, 'besta');
+    for (const [tower, file, pieceName, pieceFile, kind] of kinds) {
+        for (const [v, d] of Object.entries(towerArt[tower])) {
+            const id = `${file}-${v}`;
+            towers[id] = entry(d, kind, `${A}torre-${file}-${v}-base.png`, `${A}torre-${file}-${v}-${pieceFile}.png`, pieceName);
+            cols[tower].push(cell(id, `${v.toUpperCase()} — ${d.name}`, d, kind));
         }
     }
     const data = {
@@ -81,6 +93,9 @@ export function escolhaTorresHtml ({ towerArt, headAngles, armAngles, buildFx, o
 <p>Gerado por <code>npm run pixel</code>. Cenário real do mapa 1 (chão, kit A, orc Saqueador). A animação repete a cada 9 s: materialização rúnica,
 depois combate. A peça de cima é redesenhada em cada ângulo (sem rotação de imagem) e o recuo é em pixels inteiros.
 Para testar no jogo: <code>TOWER_VARIANT</code> em <code>src/config/art.js</code> ou <code>?besta=a&amp;catapulta=c</code> na URL (padrão <code>'atual'</code> = SVGs).</p>
+<h2>Besta A — antes × depois (T20, passada de acabamento)</h2>
+<div class="cols">${antesDepois}
+</div>
 <h2>Besta Laser</h2>
 <div class="cols">${cols.laserCrossbow.join('')}
 </div>

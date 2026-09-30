@@ -2,9 +2,11 @@
 // (tools/pixel-art/sprites/torres/) → public/assets/torre-<torre>-<versão>-base.png e -cabeca.png / -braco.png.
 //
 // Fonte única dos encaixes (o gerador desenha nestes quadros e confere os pontos; o jogo usa os mesmos números):
-//   base   { frame, pivot }        pivot = centro do chão da base (borda de baixo do quadro)
-//   head   { frame, pivot, angles } (Besta) cabeça redesenhada em cada ângulo de mira (rad, 0 = direita, + = para baixo);
-//                                  ângulos para a esquerda usam o quadro espelhado. pivot = eixo de giro (centro do quadro)
+//   base   { frame, pivot, frames?, fps? }  pivot = centro do chão da base (borda de baixo do quadro, ou acima dela
+//                                  quando o sprite traz terra/capim em volta); frames > 1 = idle em loop (folha)
+//   head   { frame, pivot, angles, phases? } (Besta) cabeça redesenhada em cada ângulo de mira (rad, 0 = direita,
+//                                  + = para baixo); ângulos para a esquerda usam o quadro espelhado. pivot = eixo de giro
+//                                  (centro do quadro). phases > 1 = idle da cabeça: quadro = fase × nº de ângulos + ângulo
 //   arm    { frame, pivot, angles } (Catapulta) braço redesenhado em cada ângulo (0 = em pé; + = para a frente/direita);
 //                                  pivot = eixo do braço (centro do quadro)
 //   headMount / armPivot  {x, y}   eixo da peça de cima, em px a partir do pivot da base
@@ -28,11 +30,11 @@ export const TOWER_ART = {
     laserCrossbow: {
         a: {
             name: 'Torre de vigia',
-            note: 'Madeira e pedra, besta mecânica no topo, arco com cordas de energia ciano.',
-            base: { frame: [80, 74], pivot: [40, 74] },
-            head: { frame: [66, 66], pivot: [33, 33], angles: HEAD_ANGLES },
-            headMount: { x: 0, y: -64 }, muzzle: { x: 28, y: 0 }, crystal: { x: -7, y: 0 },
-            shadow: [72, 22],
+            note: 'Madeira e pedra, besta mecânica no topo, arco com cordas de energia ciano. (T20: passada de acabamento — 3/4, texturas, idle.)',
+            base: { frame: [100, 98], pivot: [50, 92], frames: 4, fps: 6 },
+            head: { frame: [84, 84], pivot: [42, 42], angles: HEAD_ANGLES, phases: 3 },
+            headMount: { x: 0, y: -64 }, muzzle: { x: 36, y: 0 }, crystal: { x: -10, y: 0 },
+            shadow: [60, 16],
             upgrades: {
                 3: 'Rajada: segundo arco sobreposto; Perfurante: ponta de arpão de aço no trilho; Sentinela: luneta sobre a coronha',
                 4: 'telhado de tábuas vira ninho coberto com bandeira; arco duplo (Rajada) / balestra pesada (Perfurante) / farol ciano no mastro (Sentinela)'

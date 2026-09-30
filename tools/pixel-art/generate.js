@@ -26,6 +26,7 @@ import { DECOR_KIT } from '../../src/config/art.js';
 import { escolhaDecoracaoHtml } from './escolha-decoracao.js';
 import { TOWER_ART, HEAD_ANGLES, ARM_ANGLES } from '../../src/config/towerArt.js';
 import { escolhaTorresHtml } from './escolha-torres.js';
+import { BESTA_A_T19, baseT19, headT19 } from './legacy/besta-a-t19.js';
 import { BUILD_FX } from '../../src/config/visual.js';
 import bestaArt from './sprites/torres/besta.js';
 import catapultaArt from './sprites/torres/catapulta.js';
@@ -338,11 +339,20 @@ for (const [tower, T] of Object.entries(TOWER_DRAW)) {
     towers[tower] = {};
     for (const [v, def] of Object.entries(TOWER_ART[tower])) {
         const [bw, bh] = def.base.frame;
-        const base = T.art[v].base();
-        if (base.w !== bw || base.h !== bh) { throw new Error(`[pixel] torre ${tower}/${v}: base ${base.w}×${base.h} ≠ frame ${def.base.frame}`); }
+        // base: 1 quadro, ou folha de idle (def.base.frames)
+        const nBase = def.base.frames || 1;
+        const baseFrames = Array.from({ length: nBase }, (_, i) => T.art[v].base(i));
+        baseFrames.forEach((cv) => { if (cv.w !== bw || cv.h !== bh) { throw new Error(`[pixel] torre ${tower}/${v}: base ${cv.w}×${cv.h} ≠ frame ${def.base.frame}`); } });
+        const base = baseFrames[0];
         const baseRGBA = base.toRGBA();
-        const bottom = [...Array(bw).keys()].some((x) => baseRGBA[((bh - 1) * bw + x) * 4 + 3]);
-        if (!bottom) { console.log(`  ⚠️ torre ${tower}/${v}: a base não encosta na borda de baixo do quadro`); }
+        const groundRow = def.base.pivot[1] - 1;   // linha do contorno que encosta no chão
+        const touches = [...Array(bw).keys()].some((x) => baseRGBA[(groundRow * bw + x) * 4 + 3]);
+        if (!touches) { console.log(`  ⚠️ torre ${tower}/${v}: a base não encosta no chão (linha ${groundRow})`); }
+        if (edgeHits(baseRGBA, bw, bh) && def.base.pivot[1] === bh) {
+            // base sem chão embutido: só a linha de baixo pode encostar na borda
+            const top = [...Array(bw).keys()].some((x) => baseRGBA[x * 4 + 3]);
+            if (top) { console.log(`  ⚠️ torre ${tower}/${v}: base encostando na borda de cima`); }
+        }
         const mountName = def.headMount ? 'headMount' : 'armPivot';
         checkPoint(`TOWER_ART.${tower}.${v}.${mountName}`, { x: def.base.pivot[0] + def[mountName].x, y: def.base.pivot[1] + def[mountName].y }, bw, bh);
         const P = def[T.piece];
@@ -350,17 +360,29 @@ for (const [tower, T] of Object.entries(TOWER_DRAW)) {
         for (const name of (T.piece === 'head' ? ['muzzle', 'crystal'] : ['cup', 'orb'])) {
             checkPoint(`TOWER_ART.${tower}.${v}.${name}`, { x: P.pivot[0] + def[name].x, y: P.pivot[1] + def[name].y }, pw, ph);
         }
-        const frames = P.angles.map((a) => T.art[v][T.draw](a));
+        // peça de cima: um quadro por ângulo; com fases de idle (P.phases), quadro = fase × nº de ângulos + ângulo
+        const phases = P.phases || 1;
+        const frames = [];
+        for (let ph2 = 0; ph2 < phases; ph2++) { for (const a of P.angles) { frames.push(T.art[v][T.draw](a, ph2)); } }
         frames.forEach((cv, i) => {
             if (cv.w !== pw || cv.h !== ph) { throw new Error(`[pixel] torre ${tower}/${v}: peça ${cv.w}×${cv.h} ≠ frame ${P.frame}`); }
-            if (edgeHits(cv.toRGBA(), pw, ph)) { console.log(`  ⚠️ torre ${tower}/${v}: peça encostando na borda no ângulo ${Math.round(P.angles[i] * 180 / Math.PI)}°`); }
+            if (edgeHits(cv.toRGBA(), pw, ph)) { console.log(`  ⚠️ torre ${tower}/${v}: peça encostando na borda (quadro ${i})`); }
         });
-        fs.writeFileSync(path.join(ASSETS, `torre-${T.file}-${v}-base.png`), encodeRGBA(baseRGBA, bw, bh));
+        fs.writeFileSync(path.join(ASSETS, `torre-${T.file}-${v}-base.png`), nBase > 1 ? encodeSheet(baseFrames, { w: bw, h: bh }) : encodeRGBA(baseRGBA, bw, bh));
         fs.writeFileSync(path.join(ASSETS, `torre-${T.file}-${v}-${T.pieceFile}.png`), encodeSheet(frames, { w: pw, h: ph }));
         towers[tower][v] = { base, baseRGBA, frames, def };
-        checkShading(`torre ${tower} ${v}`, [base, ...frames]);
+        checkShading(`torre ${tower} ${v}`, [...baseFrames, ...frames.slice(0, P.angles.length)]);
     }
     console.log(`✓ public/assets/torre-${T.file}-a|b|c-*.png  (${Object.keys(TOWER_ART[tower]).length} versões)`);
+}
+
+// Besta A como estava na T19 (congelada) para o comparativo "antes × depois" da T20 — fora do jogo
+fs.mkdirSync(path.join(HERE, 'torres'), { recursive: true });
+{
+    const d = BESTA_A_T19;
+    fs.writeFileSync(path.join(HERE, 'torres', 'besta-a-antes-base.png'), encodeRGBA(baseT19().toRGBA(), d.base.frame[0], d.base.frame[1]));
+    fs.writeFileSync(path.join(HERE, 'torres', 'besta-a-antes-cabeca.png'), encodeSheet(d.head.angles.map((a) => headT19(a)), { w: d.head.frame[0], h: d.head.frame[1] }));
+    console.log('✓ tools/pixel-art/torres/besta-a-antes-*.png  (Besta A da T19, para comparação)');
 }
 
 // ---------------------------------------------------------------- cenário (T12)
@@ -398,7 +420,7 @@ console.log('✓ tools/pixel-art/escolha-decoracao.html  (+ decoracao/mapa-a|b|c
 const dA = DECOR_KITS.a.items;
 const decorRef = (file, item, x, y) => ({ file, x, y, w: dA[item].frame[0], h: dA[item].frame[1], px: dA[item].pivot[0], py: dA[item].pivot[1], shadow: dA[item].shadow });
 fs.writeFileSync(path.join(HERE, 'escolha-torres.html'), escolhaTorresHtml({
-    towerArt: TOWER_ART, headAngles: HEAD_ANGLES, armAngles: ARM_ANGLES, buildFx: BUILD_FX,
+    towerArt: TOWER_ART, bestaAntes: BESTA_A_T19, headAngles: HEAD_ANGLES, armAngles: ARM_ANGLES, buildFx: BUILD_FX,
     orc: { w: orcB.frame.w, h: orcB.frame.h, px: orcV.pivot[0], py: orcV.pivot[1], shadow: orcV.shadow },
     decor: [decorRef('decor-a-arvore3.png', 'arvore3', 34, 154), decorRef('decor-a-pedraM.png', 'pedraM', 262, 138)]
 }));

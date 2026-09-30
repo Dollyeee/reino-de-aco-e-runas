@@ -109,9 +109,11 @@ function drawTower (ctx, tw, sim, T, still) {
     const lag = F.scanLag / B.h;
     const solid = b <= 0 ? 0 : (b >= 1 ? 1 : Math.max(0, b - lag));
     const kick = sim.kick > 0 ? 1 : 0;
-    sprite(ctx, imgB, 0, B.w, B.h, B.px, B.py, X, Y + kick, flip, 1, [0, solid]);
+    // idle da base (bandeira, runa): quadros em loop — também na torre "parada"
+    const bsx = (B.frames > 1 ? Math.floor(T * B.fps) % B.frames : 0) * B.w;
+    sprite(ctx, imgB, bsx, B.w, B.h, B.px, B.py, X, Y + kick, flip, 1, [0, solid]);
     if (b > 0 && b < 1) {
-        sprite(ctx, holo(imgB), 0, B.w, B.h, B.px, B.py, X, Y, flip, 0.6, [solid, b]);
+        sprite(ctx, holo(imgB), bsx, B.w, B.h, B.px, B.py, X, Y, flip, 0.6, [solid, b]);
         ctx.fillStyle = 'rgba(232,254,255,0.9)';
         ctx.fillRect(X - B.w * 0.55, Math.round(Y - B.h * b), B.w * 1.1, 2);
     }
@@ -125,7 +127,9 @@ function drawTower (ctx, tw, sim, T, still) {
     const alpha = snapped ? 1 : Math.min(1, sp * 4) * 0.6;
     if (tw.kind === 'besta') {
         const hf = headFrame(sim.aim);
-        sprite(ctx, pimg, hf.i * P.w, P.w, P.h, P.px, P.py, mx + sim.recoil.x, my + sim.recoil.y, hf.flip, alpha);
+        // idle da cabeça: quadro = fase × nº de ângulos + ângulo
+        const phase = P.phases > 1 ? Math.floor(T * 8) % P.phases : 0;
+        sprite(ctx, pimg, (phase * DATA.headAngles.length + hf.i) * P.w, P.w, P.h, P.px, P.py, mx + sim.recoil.x, my + sim.recoil.y, hf.flip, alpha);
         // brilho do cristal
         const c = rot(tw.crystal, hf.angle);
         const gx = mx + (hf.flip ? -c.x : c.x) + sim.recoil.x, gy = my + c.y + sim.recoil.y;

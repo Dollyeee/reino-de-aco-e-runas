@@ -119,7 +119,7 @@ export default class Tower extends Phaser.GameObjects.Container {
 
         // base: arte sólida + cópia em holograma por cima, as duas recortadas de baixo para cima
         const parent = base.parentContainer;
-        this.holoBase = makeArt(scene, base.x, base.y, base.texture.key).setScale(base.scaleX, base.scaleY);
+        this.holoBase = makeArt(scene, base.x, base.y, base.texture.key).setScale(base.scaleX, base.scaleY).setFrame(base.frame.name);
         setHologram(this.holoBase, true);
         this.scanLine = scene.make.image({ x: 0, y: 0, key: 'dot' }, false).setBlendMode('ADD').setTint(0xe8feff);
         parent.addAt(this.holoBase, parent.getIndex(base) + 1);

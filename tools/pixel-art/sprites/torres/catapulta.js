@@ -4,7 +4,7 @@
 // Quadros e encaixes em src/config/towerArt.js (TOWER_ART.plasmaCatapult).
 
 import { TOWER_ART } from '../../../../src/config/towerArt.js';
-import { baseCanvas, spinCanvas } from './besta.js';
+import { baseCanvas, spinCanvas } from './comum.js';
 
 const T = TOWER_ART.plasmaCatapult;
 

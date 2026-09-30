@@ -5,10 +5,11 @@ import { BALANCE } from '../config/balance.js';
 import { COLORS } from '../config/visual.js';
 import { towerPixel } from '../config/art.js';
 import { HEAD_ANGLES, headFrameFor } from '../config/towerArt.js';
-import { makeArt, makeSprite, anchor } from '../world/art.js';
+import { animKey, makeArt, makeSprite, anchor } from '../world/art.js';
 
 const TURN_SPEED = 14;          // quão rápido a besta gira (rad/s, suavizado)
 const RECOIL_PX = 3;            // recuo da cabeça em pixel art (px inteiros, na direção oposta ao tiro)
+const HEAD_IDLE_FPS = 8;        // fases do idle da cabeça (brilho correndo pela corda), quando a versão tem
 
 // Besta Laser: torre rápida e barata. Gira para mirar e dispara virotes em linha reta.
 // Arte atual (SVG): a cabeça gira (rotation) e dá um tranco elástico.
@@ -21,7 +22,10 @@ export default class LaserCrossbow extends Tower {
         this.px = px;
 
         if (px) {
-            this.baseImg = makeArt(scene, 0, 0, px.baseKey).setLighting(true);
+            // base: imagem, ou sprite com idle em loop (bandeira, runa) quando a versão tem quadros
+            this.baseImg = px.base.frames > 1
+                ? makeSprite(scene, 0, 0, px.baseKey).setLighting(true).play(animKey(px.baseKey, 'idle'))
+                : makeArt(scene, 0, 0, px.baseKey).setLighting(true);
             this.mount = px.headMount;
             this.muzzle = px.muzzle;
             this.crystal = px.crystal;
@@ -68,7 +72,10 @@ export default class LaserCrossbow extends Tower {
             return;
         }
         const f = headFrameFor(this.aim);
-        this.head.setFrame(f.frame).setFlipX(f.flip);
+        // idle da cabeça: quadro = fase × nº de ângulos + ângulo
+        const phases = this.px.head.phases || 1;
+        const phase = phases > 1 ? Math.floor(this.pulseT * HEAD_IDLE_FPS) % phases : 0;
+        this.head.setFrame(phase * HEAD_ANGLES.length + f.frame).setFlipX(f.flip);
         this.head.x = this.recoil.x;
         this.head.y = this.recoil.y;
         // o brilho do cristal acompanha o quadro desenhado (ângulo do quadro, espelhado se for o caso)
@@ -84,6 +91,7 @@ export default class LaserCrossbow extends Tower {
         this.pulseT += dt;
         const pulse = 0.7 + 0.3 * Math.sin(this.pulseT * 4);
         this.crystalGlow.setAlpha(pulse * (this.cooldown > 0 ? 0.6 : 1));
+        if (this.px && this.px.head.phases > 1) { this.applyAim(); }   // idle da cabeça corre sempre
         if (!this.ready) { return; }
         if (this.px && this.px.float) {
             // pedestal flutuante: a cabeça sobe e desce em pixels inteiros
