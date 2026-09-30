@@ -14,6 +14,10 @@ escudos de energia. O jogador defende o **Núcleo Arcano** (um cristal flutuando
 de inimigos que seguem um caminho fixo. Derrotar inimigos rende **éter**, gasto para construir torres em
 qualquer ponto válido do mapa (estilo Bloons TD); cada torre surge sobre uma plataforma rúnica.
 
+**Documento de design: `DESIGN.md`** — pilares, elenco da versão 1.0 (8 torres, 10 inimigos + 2 chefes), matriz
+inimigo × torre, caminhos de upgrade das 8 torres, ordem de introdução por mapa e o marco "versão 0.5". Consulte-o antes
+de criar qualquer torre, inimigo ou mapa; ele é revisado a cada fase do plano de produção.
+
 ## Direção de arte
 
 **Pixel art desenhada em código** (substitui as direções anteriores "cartoon sério" e "pintada estilizada").
@@ -210,22 +214,24 @@ Tudo em **pixel art 1×**, seguindo o guia de estilo do `ART_SPEC.md`:
 
 ### Fase D — Conteúdo em pacotes completos
 Cada pacote entra **completo**: arte + animação + som + efeitos + upgrades + balanceamento validado no simulador.
-- **Inimigos**: Saqueador (orc atual, pacote finalizado), **Brutamontes** (blindado e lento — assume o papel do antigo
-  "Golem de Sucata"), **Ciborgue** (escudo, elite mecânico), **Gárgula** (voadora, só algumas torres acertam);
-  **Enxame** (muitos, pouca vida) segue planejado na tabela de fraquezas.
-- **Torres**: **Torre de Estase** (desacelera inimigos), **Ninho do Dragão** (Dragão Mecânico, fogo em linha).
-- **Chefe**: **Dragão Ancestral**, reconstruído com peças de metal.
+Elenco completo, regras de cada item e ordem por mapa: **`DESIGN.md`** (o marco "versão 0.5" vem antes da 1.0).
+- **Inimigos**: Saqueador (orc atual), Lobo de Sucata, **Brutamontes** (blindado), **Ciborgue** (escudo),
+  **Gárgula-Drone** (voa), **Enxame de Drones**, Xamã Rúnico, Espectro, Carcaça Divisora, **Golem de Sucata** (tanque
+  lento — inimigo diferente do Brutamontes, decidido na T17).
+- **Torres**: Torre de Estase, Ninho do Dragão Mecânico, Bobina Rúnica, Balista de Longo Alcance, Forja de Éter,
+  Obelisco de Comando.
+- **Chefes**: mini-chefe Chefe de Guerra Orc; chefe final **Dragão Ancestral** (com fases), reconstruído com peças de metal.
 
-**Design de inimigos × tipos de dano** (estrutura pronta desde a T11: `damageType`, `canHit`, `traits`, `resist`,
-`BALANCE.traitRules`):
+**Resumo inimigos × tipos de dano** (estrutura pronta desde a T11: `damageType`, `canHit`, `traits`, `resist`,
+`BALANCE.traitRules`; matriz completa inimigo × torre no `DESIGN.md`):
 
 | Inimigo | Traits | Fraqueza / resistência |
 |---|---|---|
 | Saqueador (orc atual) | terrestre | rápido, sem resistências |
 | Brutamontes | terrestre, blindado | resiste a perfurante, fraco a explosivo |
 | Ciborgue | terrestre, escudo | fraco a perfurante, resiste a plasma/explosivo enquanto tem escudo |
-| Gárgula | voador | a Catapulta não acerta |
-| Enxame | terrestre (muitos, pouca vida) | fraco a dano em área |
+| Gárgula-Drone | voador | a Catapulta não acerta |
+| Enxame de Drones | terrestre (voam rente ao chão; muitos, pouca vida) | fraco a dano em área |
 
 Regras de design:
 - Preferir **resistências** a imunidades (a única "imunidade" é de camada: voador × `canHit`).

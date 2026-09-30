@@ -361,7 +361,12 @@ Registrar no CLAUDE.md (plano de produção, Fase C — estrutura de upgrades) a
 
 ---
 
-## [ ] T17 — Criar DESIGN.md do jogo
+## [x] T17 — Criar DESIGN.md do jogo
+
+**Concluída em 2026-09-30.** Resultado:
+- `DESIGN.md` na raiz: pilares; 8 torres (papel, tipo de dano, camadas, o que resolve e o que não resolve); 10 inimigos + 2 chefes (regra, traits, contra-ataque); matriz inimigo × torre (F/N/f/✕/D — nenhuma torre forte contra tudo, todo inimigo com pelo menos um F); pendências técnicas (danos `fogo`/`energia`, traits `invisivel`/`cura`/`divide`/`aura`/`enxame`/`pesado`, detecção, status, cadeia, buffs, economia, chefe em fases); caminhos de upgrade das 8 torres; ordem de introdução em 6 mapas; marco "versão 0.5" (3 mapas, 4 torres, 5 inimigos, Chefe de Guerra Orc); seção "Em aberto".
+- Decisões para resolver contradições: **Brutamontes (blindado) e Golem de Sucata (tanque lento) são inimigos diferentes** (o CLAUDE.md dizia que o Brutamontes substituía o Golem — corrigido); o **Enxame de Drones voa rente ao chão (camada terrestre)** para manter a fraqueza a dano em área.
+- CLAUDE.md: referência ao DESIGN.md no Conceito e na Fase D (elenco atualizado). Só documentação.
 
 Criar DESIGN.md na raiz (documento de design do jogo) e referenciá-lo no CLAUDE.md. Só documentação, sem implementar nada.
 
