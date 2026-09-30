@@ -347,3 +347,18 @@ Registrar no CLAUDE.md (plano de produção, Fase C — estrutura de upgrades) a
 - Visual por peças: cada nível troca ou adiciona peças no gerador de pixel art, sem redesenhar a torre inteira.
 - Todo caminho e combinação precisa passar pelo simulador de balanceamento (Fase B) antes de entrar no jogo.
 - Esboço inicial dos caminhos: Besta Laser = Perfurante (anti-blindado) / Rajada (cadência, tiro triplo) / Sentinela (alcance + acerta voadores). Catapulta de Plasma = Devastação (área) / Fragmentação (sub-bombas) / Corrosão (derrete armadura e escudo, dano contínuo).
+
+---
+
+## [ ] T17 — Criar DESIGN.md do jogo
+
+Criar DESIGN.md na raiz (documento de design do jogo) e referenciá-lo no CLAUDE.md. Só documentação, sem implementar nada.
+
+Conteúdo:
+1. Pilares de design: cada inimigo traz uma regra nova; cada torre resolve um problema claro; nenhuma torre resolve tudo; resistências são preferidas a imunidades; toda fraqueza é visível; cada mapa introduz no máximo 1–2 inimigos novos, ensinando antes de cobrar.
+2. Elenco da versão 1.0 — 8 torres com papel: Besta Laser (dano rápido em alvo único), Catapulta de Plasma (área), Torre de Estase (controle/lentidão), Ninho do Dragão Mecânico (fogo em linha, dano contínuo), Bobina Rúnica (raio em cadeia, bom contra enxame e escudo), Balista de Longo Alcance (alcance enorme, dano alto, detecta invisíveis), Forja de Éter (economia: gera éter por onda), Obelisco de Comando (suporte: fortalece torres próximas).
+3. Elenco da versão 1.0 — 10 inimigos + 2 chefes, cada um com sua regra e contra-ataques: Saqueador (básico), Lobo de Sucata (rápido), Brutamontes (blindado), Ciborgue (escudo de energia), Gárgula-Drone (voa), Enxame de Drones (muitos e pequenos), Xamã Rúnico (cura/protege aliados), Espectro (invisível até ser detectado), Carcaça Divisora (divide-se em 3 ao morrer), Golem de Sucata (tanque lento); mini-chefe Chefe de Guerra Orc (acelera orcs próximos); chefe final Dragão Ancestral (com fases).
+4. Matriz "inimigo × torre" (forte / normal / fraco) derivada das regras acima, usando os tipos de dano e traits da T11 — e novos traits necessários (invisivel, cura, divide, aura) listados como pendências técnicas.
+5. Esboço dos caminhos de upgrade das 8 torres (3 caminhos cada, só nomes e ideia), seguindo a regra de caminhos cruzados já registrada.
+6. Ordem sugerida de introdução ao longo dos mapas (qual torre e qual inimigo aparece em qual mapa) e um escopo reduzido "versão 0.5" (4 torres, 5 inimigos, 1 chefe) como marco intermediário.
+7. Seção "Em aberto": números, custos e visuais são definidos na produção de cada item; o documento é revisado a cada fase.
