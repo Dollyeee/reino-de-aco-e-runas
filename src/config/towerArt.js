@@ -14,6 +14,8 @@
 //   cup / orb             {x, y}   (Catapulta) no braço em pé, a partir do eixo do braço
 //   shadow [w, h]                 elipse de pixels no chão
 //   float                         (opcional) px que a cabeça sobe/desce (pedestal flutuante)
+//   head.foreshorten              (opcional, T26) escorço 3/4 da cabeça: ver groundAngle/headPoint
+//   footprintRadius               (opcional, T26) raio ocupado no chão por esta arte (troca o de BALANCE quando ativa)
 //   upgrades                      onde entram as peças dos níveis 3 e 4 (caminhos do DESIGN.md) — ainda não desenhadas
 //
 // Versão usada no jogo: TOWER_VARIANT em src/config/art.js ('atual' = SVGs | 'a' | 'b' | 'c') ou ?besta=a&catapulta=b.
@@ -100,6 +102,21 @@ export const TOWER_ART = {
             headMount: { x: 0, y: -57 }, muzzle: { x: 31, y: 0 }, crystal: { x: -9, y: 0 },
             shadow: [60, 16],
             upgrades: { 3: 'cristais maiores nos cantos (Sentinela) / quarto degrau (Perfurante) / anel rúnico flutuando sobre o altar (Rajada)', 4: 'obelisco rúnico no lugar do pedestal, cristais em volta' }
+        },
+        s: {
+            name: 'Besta solo',
+            note: 'T26: sem corpo de torre — a besta mecânica grande sobre um apoio baixo (pedestal de pedra com runa); não esconde os orcs atrás.',
+            base: { frame: [84, 52], pivot: [42, 46], frames: 2, fps: 3 },
+            // foreshorten: escorço 3/4 — a besta deitada no plano do chão encurta quando mira para cima/baixo
+            head: { frame: [84, 84], pivot: [42, 42], angles: HEAD_ANGLES, phases: 3, foreshorten: 0.7 },
+            headMount: { x: 0, y: -29 }, muzzle: { x: 35, y: 0 }, crystal: { x: -10, y: 0 },
+            shadow: [52, 14],
+            // raio ocupado no chão por ESTA arte (menor que o da torre: substitui BALANCE…footprintRadius quando ativa)
+            footprintRadius: 30,
+            upgrades: {
+                3: 'a arma ganha peças: arco duplo (Rajada), trilho de plasma sob o virote (Perfurante) ou luneta sobre o tampo (Sentinela); o apoio ganha placas de aço rebitadas',
+                4: 'besta pesada com dois arcos e carregador (Rajada) / canhão de trilho com bobinas (Perfurante) / luneta rúnica com antena (Sentinela); o apoio se tecnifica: pistões hidráulicos e um anel rúnico girando em volta'
+            }
         }
     },
     plasmaCatapult: {
@@ -143,6 +160,17 @@ export const TOWER_ART = {
 };
 
 // Quadro da peça que gira para um ângulo: índice do ângulo mais próximo (e se usa o espelho).
+// Escorço 3/4 da cabeça (head.foreshorten = sy, T26): o quadro de ângulo `a` (direção na tela) é a besta girada no
+// plano do chão pelo ângulo φ = groundAngle(a, sy) e achatada em y por sy. headPoint dá onde um ponto da cabeça
+// (muzzle, crystal: medidos com a besta apontando para a direita) cai na tela nesse quadro. Sem escorço = rotação simples.
+export function groundAngle (a, sy = 1) {
+    return sy === 1 ? a : Math.atan2(Math.sin(a) / sy, Math.cos(a));
+}
+export function headPoint (p, a, sy = 1) {
+    const f = groundAngle(a, sy), c = Math.cos(f), s = Math.sin(f);
+    return { x: p.x * c - p.y * s, y: (p.x * s + p.y * c) * sy };
+}
+
 export function headFrameFor (aim) {
     let a = Math.atan2(Math.sin(aim), Math.cos(aim));
     let flip = false;

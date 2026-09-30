@@ -22,6 +22,7 @@
 
 import { DECOR_ITEMS, DECOR_KITS } from './decor.js';
 import { TOWER_ART } from './towerArt.js';
+import { BALANCE } from './balance.js';
 
 // ---------------------------------------------------------------------------------------------------------
 // Versão das torres (T19): 'atual' (SVGs, padrão até a escolha) | 'a' | 'b' | 'c' (pixel art, src/config/towerArt.js).
@@ -52,6 +53,11 @@ export function towerPixel (tower) {
     if (!v || v === 'atual') { return null; }
     const [file, , pieceFile] = TOWER_FILES[tower];
     return { variant: v, ...TOWER_ART[tower][v], baseKey: `torre-${file}-${v}-base`, pieceKey: `torre-${file}-${v}-${pieceFile}` };
+}
+
+// raio ocupado no chão pela torre: o da arte ativa (TOWER_ART…footprintRadius, ex.: Besta solo) ou o de BALANCE
+export function towerFootprint (tower) {
+    return towerPixel(tower)?.footprintRadius ?? BALANCE.towers[tower].footprintRadius;
 }
 
 // ---------------------------------------------------------------------------------------------------------

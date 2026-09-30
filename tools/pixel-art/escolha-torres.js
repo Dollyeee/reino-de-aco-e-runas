@@ -47,7 +47,7 @@ export function escolhaTorresHtml ({ towerArt, bestaAntes, headAngles, armAngles
         return {
             kind, name: d.name,
             base: { src: baseSrc, w: d.base.frame[0], h: d.base.frame[1], px: d.base.pivot[0], py: d.base.pivot[1], frames: d.base.frames || 1, fps: d.base.fps || 6 },
-            piece: { src: pieceSrc, w: P.frame[0], h: P.frame[1], px: P.pivot[0], py: P.pivot[1], phases: P.phases || 1 },
+            piece: { src: pieceSrc, w: P.frame[0], h: P.frame[1], px: P.pivot[0], py: P.pivot[1], phases: P.phases || 1, fs: P.foreshorten || 1 },
             mount: d.headMount || d.armPivot, muzzle: d.muzzle, crystal: d.crystal, cup: d.cup, orb: d.orb,
             shadow: d.shadow, float: d.float || 0,
             rest: -0.35, windup: -0.85, throwA: 1.05,
@@ -69,6 +69,17 @@ export function escolhaTorresHtml ({ towerArt, bestaAntes, headAngles, armAngles
         towers[`base-${v}`] = entry(towerArt.laserCrossbow[v], 'besta', `${A}torre-besta-${v}-base.png`, `${A}torre-besta-${v}-cabeca.png`, 'head');
     }
     const basesNovas = basesIds.map((v) => cell(`base-${v}`, `${v.toUpperCase()} — ${towerArt.laserCrossbow[v].name}${v === 'n' ? ' (base atual no jogo)' : ''}`, towerArt.laserCrossbow[v], 'besta')).join('');
+    // T26: Besta atual no jogo (N) × Besta solo (S)
+    towers['solo-n'] = entry(towerArt.laserCrossbow.n, 'besta', `${A}torre-besta-n-base.png`, `${A}torre-besta-n-cabeca.png`, 'head');
+    towers['solo-s'] = entry(towerArt.laserCrossbow.s, 'besta', `${A}torre-besta-s-base.png`, `${A}torre-besta-s-cabeca.png`, 'head');
+    const soloVs = cell('solo-n', 'Besta atual no jogo (N)', towerArt.laserCrossbow.n, 'besta') +
+        cell('solo-s', 'Besta solo (T26) — sem corpo de torre, apoio baixo', towerArt.laserCrossbow.s, 'besta');
+    const rodadasSolo = [
+        ['besta-solo-apoios.png', '0 · conceito: 3 apoios (tripé · pedestal de pedra, escolhido · plataforma giratória)'],
+        ['besta-solo-r1.png', 'R1 · blocagem + luz e volume (etapas 1–2)'],
+        ['besta-solo-r2.png', 'R2 · materiais (etapa 3) + escorço 3/4 da besta + correções da R1'],
+        ['besta-solo-r3.png', 'R3 · limpeza (etapa 4) + espessura da besta — final']
+    ].map(([f, cap]) => `<figure><img class="rod" src="rodadas/${f}" alt="${cap}"><figcaption>${cap}</figcaption></figure>`).join('');
     const rodadasBases = [
         ['bases-conceitos.png', '0 · conceito: 3 silhuetas (torreão · paliçada · altar)'],
         ['bases-r1.png', 'R1 · blocagem + luz e volume'],
@@ -117,6 +128,12 @@ export function escolhaTorresHtml ({ towerArt, bestaAntes, headAngles, armAngles
 <p>Gerado por <code>npm run pixel</code>. Cenário real do mapa 1 (chão, kit A, orc Saqueador). A animação repete a cada 9 s: materialização rúnica,
 depois combate. A peça de cima é redesenhada em cada ângulo (sem rotação de imagem) e o recuo é em pixels inteiros.
 Para testar no jogo: <code>TOWER_VARIANT</code> em <code>src/config/art.js</code> ou <code>?besta=a&amp;catapulta=c</code> na URL (padrão <code>'atual'</code> = SVGs).</p>
+<h2>Besta atual × Besta solo (T26) — não trocada no jogo; teste com <code>?besta=s</code></h2>
+<div class="cols">${soloVs}
+</div>
+<h2>Rodadas da Besta solo (autocrítica em <code>tools/pixel-art/rodadas/besta-solo-autocritica.md</code>)</h2>
+<div class="rodadas">${rodadasSolo}
+</div>
 <h2>Base da Besta — atual × 3 opções novas (T24)</h2>
 <div class="cols">${basesNovas}
 </div>

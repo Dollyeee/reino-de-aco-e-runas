@@ -7,6 +7,7 @@ import { baseCanvas, spinCanvas } from './comum.js';
 import bestaA from './besta-a.js';
 import bestaNova from './besta-nova.js';
 import { bestaBases } from './besta-bases.js';
+import bestaSolo from './besta-solo.js';
 
 const T = TOWER_ART.laserCrossbow;
 
@@ -19,6 +20,9 @@ export default {
 
     // N1–N3 — três bases novas (T24): torreão, paliçada e altar rúnico, em besta-bases.js (mesma arma da N)
     ...bestaBases,
+
+    // S — Besta solo (T26): sem corpo de torre, a besta grande sobre um pedestal baixo, em besta-solo.js
+    s: bestaSolo,
 
     // B — pedestal rúnico flutuante; besta de metal escuro com cristal-mira ciano
     b: {

@@ -333,6 +333,12 @@ animada em `tools/pixel-art/escolha-torres.html`; no jogo: `TOWER_VARIANT` em `s
 
 - **Versão N (T22, nova técnica)**: Besta composta com a biblioteca de materiais em 4 etapas (seção 10) — base 112×104 com
   4 quadros de idle (runas e janela pulsando, estandarte balançando 1 px), arma 72×72 com 3 fases; `?besta=n` no jogo.
+- **Versão S — Besta solo (T26)**: sem corpo de torre; a besta grande (72 px de ponta a ponta) sobre um pedestal baixo de
+  pedra com runa e disco giratório (apoio 84×52, 2 quadros de idle da runa; eixo a 29 px do chão; `footprintRadius` 30,
+  sombra 52×14). **Escorço 3/4 da peça que gira** (`head.foreshorten: 0.7`): a besta fica deitada no plano do chão — o
+  desenho gira pelo ângulo no chão e o eixo vertical da tela é achatado ×0,7 (mirando para cima/baixo ela encurta, as
+  asas do arco aparecem de frente); a face de lado (3 px) aparece embaixo da coronha e do mecanismo. `muzzle`/`crystal`
+  seguem o quadro com `headPoint` (towerArt.js). Autocrítica: `tools/pixel-art/rodadas/besta-solo-autocritica.md`.
 
 | Versão | Besta Laser | Catapulta de Plasma |
 |---|---|---|

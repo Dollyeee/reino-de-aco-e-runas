@@ -109,6 +109,16 @@ bloqueado. Níveis 1–2 detalhes pequenos, 3 mudança visível, 4 mudança gran
 | **Forja de Éter** | **Veio Profundo** — mais éter por onda | **Juros** — bônus sobre o éter guardado | **Tributo** — éter extra por abate perto da forja |
 | **Obelisco de Comando** | **Estandarte** — mais cadência para torres próximas | **Farol** — alcance e detecção para torres próximas | **Comando** — dano e redução de armadura para torres próximas |
 
+**Besta solo (T26, aguardando aprovação — `?besta=s`)**: sem corpo de torre, a progressão visual acontece **na própria
+arma e no apoio** (pedestal baixo de pedra com runa), sem crescer para cima (a besta nunca passa de ~60 px do chão):
+- **Níveis 1–2**: detalhes pequenos — rebites e cintas extras na coronha, a runa do pedestal mais acesa.
+- **Nível 3**: a arma ganha uma peça por caminho — **Rajada**: arco duplo; **Perfurante**: trilho de plasma sob o virote;
+  **Sentinela**: luneta sobre o tampo. O apoio ganha **placas de aço rebitadas** nas faces da pedra.
+- **Nível 4**: **Rajada**: besta pesada com dois arcos e carregador; **Perfurante**: canhão de trilho com bobinas;
+  **Sentinela**: luneta rúnica com antena. O apoio se **tecnifica**: pistões hidráulicos segurando o disco e um **anel
+  rúnico** girando em volta do pedestal.
+Fonte única dos textos: `upgrades` de `TOWER_ART.laserCrossbow.s` em `src/config/towerArt.js`.
+
 ---
 
 ## 6. Mapas e ordem de introdução

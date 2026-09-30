@@ -4,6 +4,7 @@ import { COLORS, DEPTH } from '../config/visual.js';
 import { EVT } from '../config/events.js';
 import { addArt, textStyle } from '../world/art.js';
 import { towerPreview, tintPreview } from '../ui/towerPreview.js';
+import { towerFootprint } from '../config/art.js';
 import { PLATFORM_OFFSET } from './Tower.js';
 
 const DRAG_THRESHOLD = 16;       // px que o ponteiro precisa andar para contar como "arrastar e soltar"
@@ -86,7 +87,7 @@ export default class TowerPlacer {
         }
         this.valid = ok;
         this.reasonText.setPosition(x, y + 26);
-        this.drawRange(x, y, stats.range, stats.footprintRadius, ok);
+        this.drawRange(x, y, stats.range, towerFootprint(this.type), ok);
     }
 
     drawRange (x, y, radius, footprint, ok) {

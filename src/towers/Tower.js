@@ -51,7 +51,8 @@ export default class Tower extends Phaser.GameObjects.Container {
 
         this.placeX = x;
         this.placeY = y;
-        this.footprint = stats.footprintRadius;
+        // a arte ativa pode ocupar menos chão que a torre padrão (ex.: Besta solo, T26)
+        this.footprint = pixelDef?.footprintRadius ?? stats.footprintRadius;
         this.type = type;
         this.stats = stats;
         this.cooldown = 0;

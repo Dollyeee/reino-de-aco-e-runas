@@ -559,3 +559,23 @@ a base da torre eu achei muito estranha, faça 3 design completamente diferentes
 - Testado: 2 cliques de roda → 3× com o ponto sob o cursor fixo (384, 288); `−` → 2×; `0` → 1× e centralizado; construção e onda rodando com zoom.
 
 quer poder da zoom in e zoom out dentro do jogo por enquanto
+
+---
+
+## [x] T26 — Besta solo sobre apoio baixo
+
+**Concluída em 2026-09-30.** Resultado:
+- Versão `s` da Besta (`tools/pixel-art/sprites/torres/besta-solo.js`): besta de 72 px sobre pedestal baixo de pedra com runa (apoio escolhido entre tripé, pedestal e plataforma — `rodadas/besta-solo-apoios.png`); topo ≤ ~55 px do chão; `footprintRadius` 30 e sombra 52×14; idle das cordas + runa; recuo de 3 px; materialização rúnica OK.
+- Novo **escorço 3/4** da peça que gira (`head.foreshorten`, `rotate.sy` no PixelCanvas, `headPoint` no towerArt): a besta fica deitada no plano do chão em todos os ângulos. As outras versões não mudam (mesmos PNGs).
+- Footprint por arte (`towerFootprint` em art.js; Tower/PlacementRules/TowerPlacer). Upgrades da solo no DESIGN.md e em `towerArt.js`; nota no ART_SPEC.
+- 3 rodadas + autocrítica em `tools/pixel-art/rodadas/besta-solo-*`; comparação "Besta atual × Besta solo" no topo de `escolha-torres.html`; sprites em destaque no revisor (`npm run revisor`).
+- **Não trocada no jogo** (padrão continua `n`): teste com `?besta=s`. Aguarda sua aprovação.
+
+Mudança de conceito da Besta Laser: tirar o corpo da torre e fazer a BESTA SOLO, montada num apoio baixo. A torre estava competindo com a arma e escondendo inimigos atrás dela.
+
+1. Conceito: a peça principal é a própria besta mecânica (madeira escura, ferro rebitado, arco com cordas de energia ciano, virote de aço), grande e bem legível, sobre um apoio BAIXO que a prende ao chão — faça 3 opções de apoio em miniatura antes de detalhar: (a) tripé de madeira reforçado com ferro, (b) pedestal curto de pedra com uma runa ciano, (c) plataforma giratória rente ao chão (roda de madeira e ferro). Escolha a mais legível e robusta ao lado do orc e mostre as 3 em tools/pixel-art/rodadas/besta-solo-apoios.png.
+2. Tamanho: conjunto com ~64–72 px de largura e altura baixa (a besta no topo não deve passar de ~60 px acima do chão), para não esconder orcs atrás. Ajuste footprintRadius e sombra.
+3. Peças: apoio (fixo) + besta (gira para mirar, ângulos redesenhados pela grade, nunca rotação de imagem). Idle: cordas de energia pulsando; recuo de 2–3 px ao disparar; materialização rúnica funcionando.
+4. Upgrades (registre no DESIGN.md e no towerArt.js): a progressão visual acontece na própria arma e no apoio — níveis 3–4 adicionam peças à besta (arco duplo, trilho de plasma, luneta) e "tecnificam" o apoio (placas de aço, pistões, anel rúnico).
+5. Siga o processo de 4 etapas + autocrítica do ART_SPEC.md (mínimo de 3 rodadas salvas em rodadas/besta-solo-r1..r3.png) e deixe o resultado pronto na ferramenta de revisão (se ela já existir) para eu revisar.
+6. NÃO troque no jogo até eu aprovar; mostre no escolha-torres.html: Besta atual × Besta solo, no tamanho real sobre o chão, ao lado do orc, com idle e disparo. npm run pixel e npm run build.

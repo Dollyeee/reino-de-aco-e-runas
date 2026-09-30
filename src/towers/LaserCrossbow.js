@@ -4,7 +4,7 @@ import LaserBolt from '../projectiles/LaserBolt.js';
 import { BALANCE } from '../config/balance.js';
 import { COLORS } from '../config/visual.js';
 import { towerPixel } from '../config/art.js';
-import { HEAD_ANGLES, headFrameFor } from '../config/towerArt.js';
+import { HEAD_ANGLES, headFrameFor, headPoint } from '../config/towerArt.js';
 import { animKey, makeArt, makeSprite, anchor } from '../world/art.js';
 
 const TURN_SPEED = 14;          // quão rápido a besta gira (rad/s, suavizado)
@@ -79,10 +79,8 @@ export default class LaserCrossbow extends Tower {
         this.head.x = this.recoil.x;
         this.head.y = this.recoil.y;
         // o brilho do cristal acompanha o quadro desenhado (ângulo do quadro, espelhado se for o caso)
-        const a = HEAD_ANGLES[f.frame], c = this.crystal;
-        const gx = c.x * Math.cos(a) - c.y * Math.sin(a);
-        const gy = c.x * Math.sin(a) + c.y * Math.cos(a);
-        this.crystalGlow.setPosition(Math.round(f.flip ? -gx : gx) + this.recoil.x, Math.round(gy) + this.recoil.y);
+        const g = headPoint(this.crystal, HEAD_ANGLES[f.frame], this.px.head.foreshorten);
+        this.crystalGlow.setPosition(Math.round(f.flip ? -g.x : g.x) + this.recoil.x, Math.round(g.y) + this.recoil.y);
         this.shownAngle = f.angle;
     }
 
@@ -119,8 +117,14 @@ export default class LaserCrossbow extends Tower {
 
         const muzzle = this.muzzle;
         const cos = Math.cos(this.aim), sin = Math.sin(this.aim);
-        const mx = this.x + this.mount.x + muzzle.x * cos;
-        const my = this.y + this.mount.y + muzzle.x * sin;
+        let mx = this.x + this.mount.x + muzzle.x * cos;
+        let my = this.y + this.mount.y + muzzle.x * sin;
+        if (this.px?.head.foreshorten) {
+            // besta com escorço 3/4: a ponta do virote é a do quadro desenhado
+            const f = headFrameFor(this.aim), m = headPoint(muzzle, HEAD_ANGLES[f.frame], this.px.head.foreshorten);
+            mx = this.x + this.mount.x + (f.flip ? -m.x : m.x);
+            my = this.y + this.mount.y + m.y;
+        }
 
         const bolt = new LaserBolt(this.scene, mx, this.y, this.y - my, this.target, this.attack(s.damage), s.projectileSpeed);
         this.scene.projectiles.push(bolt);

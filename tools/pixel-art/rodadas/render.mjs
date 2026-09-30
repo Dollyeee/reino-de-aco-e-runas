@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { PNG } from 'pngjs';
 import { base, conceito, head, CONCEITOS } from '../sprites/torres/besta-nova.js';
 import { BASES } from '../sprites/torres/besta-bases.js';
+import { APOIOS, APOIO_ESCOLHIDO, head as headSolo } from '../sprites/torres/besta-solo.js';
 import { TOWER_ART, headFrameFor } from '../../../src/config/towerArt.js';
 import { DECOR_KITS } from '../../../src/config/decor.js';
 import { ORC_VARIANTS } from '../../../src/config/art.js';
@@ -81,6 +82,52 @@ function zoom (img, cx, cy, w, h, s) {
     const out = canvas(w * s, h * s);
     blit(out, img, Math.max(0, cx - w / 2), Math.max(0, cy - h), w, h, 0, 0, s);
     return out;
+}
+
+// T26: Besta solo — node tools/pixel-art/rodadas/render.mjs solo apoios        (3 apoios, estágio 2, com a besta)
+//                    node tools/pixel-art/rodadas/render.mjs solo r1 <estágio>  (apoio escolhido: rodada)
+if (mode === 'solo') {
+    const [rodada, st] = process.argv.slice(3);
+    const S = TOWER_ART.laserCrossbow.s;
+    const ids = rodada === 'apoios' ? Object.keys(APOIOS) : [APOIO_ESCOLHIDO];
+    const stage = rodada === 'apoios' ? 2 : (+st || 4);
+    const W = rodada === 'apoios' ? 360 : 260, H = 150;
+    const out = canvas(W, H);
+    blit(out, ground, 300, 440, W, H, 0, 0);
+    blit(out, tree, 0, 0, tree.width, tree.height, 22 - treeD.pivot[0], 100 - treeD.pivot[1]);
+    const items = [];
+    ids.forEach((id, i) => {
+        const x = 95 + i * 95, y = 120;
+        const { g, mountY } = APOIOS[id].draw(1, stage);
+        items.push({ y, draw: () => {
+            blit(out, rgbaImg(g), 0, 0, g.w, g.h, x - S.base.pivot[0], y - S.base.pivot[1]);
+            const hc = headSolo(headFrameFor(-0.35).angle, 0);
+            blit(out, { width: hc.w, height: hc.h, data: hc.toRGBA() }, 0, 0, hc.w, hc.h, x - S.head.pivot[0], y + mountY - S.head.pivot[1]);
+        } });
+    });
+    // orc logo atrás/ao lado, para conferir que a besta não o esconde
+    items.push({ y: 112, draw: () => blit(out, orc, 0, 0, orc.width, orc.height, W - 40 - orcV.pivot[0], 112 - orcV.pivot[1]) });
+    items.sort((a, b) => a.y - b.y).forEach((it) => it.draw());
+    const big = zoom(out, W / 2, 140, W, 120, 3);
+    const panels = [out, big];
+    if (rodada !== 'apoios') {
+        // tira de ângulos (cima → frente → baixo), cada um redesenhado pela grade, 3× sobre fundo de terra
+        const angs = [-90, -45, 0, 45, 90].map((d) => d * Math.PI / 180), cw = 84, ch = 96;
+        const strip = canvas(cw * angs.length, ch);
+        blit(strip, ground, 330, 470, strip.width, ch, 0, 0);
+        const { g, mountY } = APOIOS[APOIO_ESCOLHIDO].draw(1, stage);
+        angs.forEach((ang, i) => {
+            const x = cw * i + cw / 2, y = ch - 14;
+            blit(strip, rgbaImg(g), 0, 0, g.w, g.h, x - S.base.pivot[0], y - S.base.pivot[1]);
+            const hc = headSolo(ang, 1);
+            blit(strip, { width: hc.w, height: hc.h, data: hc.toRGBA() }, 0, 0, hc.w, hc.h, x - S.head.pivot[0], y + mountY - S.head.pivot[1]);
+        });
+        panels.push(zoom(strip, strip.width / 2, ch, strip.width, ch, 2));
+    }
+    const nome = rodada === 'apoios' ? 'besta-solo-apoios' : `besta-solo-${rodada}`;
+    fs.writeFileSync(path.join(HERE, `${nome}.png`), PNG.sync.write(compose(panels)));
+    console.log(`✓ rodadas/${nome}.png  (estágio ${stage}: ${ids.map((i) => APOIOS[i].nome).join(' | ')})`);
+    process.exit(0);
 }
 
 // T24: as 3 bases novas lado a lado — node tools/pixel-art/rodadas/render.mjs bases <rodada> <estágio>

@@ -22,6 +22,8 @@
 // Rotação de grade (opts.rotate = { angle, cx, cy }, T19): as coordenadas do desenho giram em volta de (cx, cy) ANTES
 // de rasterizar — peças que giram no jogo (cabeça da besta, braço da catapulta) são redesenhadas em cada ângulo, com
 // contorno de 1 px e luz do canto superior esquerdo aplicada depois (a luz não gira junto). Nunca se gira a imagem pronta.
+// rotate.sy (T26, opcional): escorço 3/4 — a peça deitada no plano do chão tem o eixo vertical da tela achatado por sy
+// DEPOIS de girar (apontando para cima/baixo ela encurta, como vista de cima em 3/4).
 
 import { MATERIALS, OUTLINE } from '../palette.js';
 import { TEXTURES, rust, seedOf } from './textures.js';
@@ -35,7 +37,8 @@ export class Mask {
         this.w = w;
         this.h = h;
         this.k = k;
-        this.rot = rot && rot.angle ? { c: Math.cos(rot.angle), s: Math.sin(rot.angle), cx: rot.cx || 0, cy: rot.cy || 0 } : null;
+        const sy = rot?.sy ?? 1;
+        this.rot = rot && (rot.angle || sy !== 1) ? { c: Math.cos(rot.angle), s: Math.sin(rot.angle), cx: rot.cx || 0, cy: rot.cy || 0, sy } : null;
         this.data = new Uint8Array(w * h);
         this.ox = origin[0];
         this.oy = origin[1];
@@ -56,7 +59,7 @@ export class Mask {
         if (r) {
             const dx = x - r.cx, dy = y - r.cy;
             x = r.cx + dx * r.c - dy * r.s;
-            y = r.cy + dx * r.s + dy * r.c;
+            y = r.cy + (dx * r.s + dy * r.c) * r.sy;
         }
         return [x * this.k + this.dx, y * this.k + this.dy];
     }

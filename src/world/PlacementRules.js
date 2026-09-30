@@ -1,6 +1,6 @@
 import { BALANCE } from '../config/balance.js';
 import { HUD, TOWER_BAR, WORLD } from '../config/visual.js';
-import { DECOR_FORCE, mapDecorKit } from '../config/art.js';
+import { DECOR_FORCE, mapDecorKit, towerFootprint } from '../config/art.js';
 import { decorFor } from '../config/decor.js';
 
 // Retângulo ocupado pela barra de torres (usado pela UI e pelas regras).
@@ -40,7 +40,7 @@ export default class PlacementRules {
 
     check (type, x, y, towers) {
         const P = BALANCE.placement;
-        const r = BALANCE.towers[type].footprintRadius;
+        const r = towerFootprint(type);
 
         // dentro do mundo, com margem
         const m = P.worldMargin;

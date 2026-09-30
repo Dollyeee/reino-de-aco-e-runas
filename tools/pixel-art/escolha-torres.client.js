@@ -44,6 +44,12 @@ function headFrame (aim) {
 }
 const armFrame = (rot) => nearest(DATA.armAngles, rot);
 const rot = (p, a) => ({ x: p.x * Math.cos(a) - p.y * Math.sin(a), y: p.x * Math.sin(a) + p.y * Math.cos(a) });
+// ponto da cabeça no quadro de ângulo a, com escorço 3/4 (sy < 1; T26) — mesma conta de headPoint (towerArt.js)
+const headPt = (p, a, sy = 1) => {
+    const f = sy === 1 ? a : Math.atan2(Math.sin(a) / sy, Math.cos(a));
+    const r = rot(p, f);
+    return { x: r.x, y: r.y * sy };
+};
 
 // sprite com pivot; flip espelha em volta do pivot; clip (0..1) mostra só a faixa de baixo para cima
 function sprite (ctx, img, sx, sw, sh, px, py, x, y, flip = false, alpha = 1, band = null) {
@@ -131,7 +137,7 @@ function drawTower (ctx, tw, sim, T, still) {
         const phase = P.phases > 1 ? Math.floor(T * 8) % P.phases : 0;
         sprite(ctx, pimg, (phase * DATA.headAngles.length + hf.i) * P.w, P.w, P.h, P.px, P.py, mx + sim.recoil.x, my + sim.recoil.y, hf.flip, alpha);
         // brilho do cristal
-        const c = rot(tw.crystal, hf.angle);
+        const c = headPt(tw.crystal, hf.angle, P.fs);
         const gx = mx + (hf.flip ? -c.x : c.x) + sim.recoil.x, gy = my + c.y + sim.recoil.y;
         const g = ctx.createRadialGradient(gx, gy, 0, gx, gy, 9);
         g.addColorStop(0, `rgba(63,245,255,${0.55 * alpha})`); g.addColorStop(1, 'rgba(63,245,255,0)');
@@ -178,7 +184,7 @@ function stepSim (tw, sim, T, dt) {
             if (sim.cooldown <= 0 && Math.abs(diff) < 0.35) {
                 sim.cooldown = 0.45;
                 const hf = headFrame(sim.aim);
-                const m = rot(tw.muzzle, hf.angle);
+                const m = headPt(tw.muzzle, hf.angle, tw.piece.fs);
                 sim.bolts.push({ x0: px + (hf.flip ? -m.x : m.x), y0: py + m.y, t: 0 });
                 sim.recoilT = 0; sim.recoilA = hf.angle * (hf.flip ? -1 : 1) + (hf.flip ? Math.PI : 0);
                 sim.kick = 0.09;
