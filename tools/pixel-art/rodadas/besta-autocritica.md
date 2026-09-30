@@ -35,3 +35,6 @@ Problemas que ainda vejo — candidatos para a primeira revisão na ferramenta (
 3. O emblema do estandarte (3×4) é legível ampliado, mas no tamanho real vira uma mancha clara.
 4. O topo da pedra quase não aparece (o corpo cobre a maior parte).
 5. A lateral direita do piso e do corpo é estreita (4–7 px); pode ganhar 1–2 px para reforçar o volume.
+
+## Revisão do diretor de arte (fluxo da T23)
+- **besta-r3 #1** ("ângulo meio estranho", forma/silhueta, alta) → câmera 3/4 frontal pura: `SKEW = 0` em `besta-nova.js` (topo recua reto, sem lateral oblíqua), lado da sombra por `Grade.shadeRight`, ameia com topo reto, suporte e arma centralizados (`headMount` x 0). A R3 foi regerada; a versão revisada está em `tools/revisor/revisoes/besta-r3.b70b82e7.png`.

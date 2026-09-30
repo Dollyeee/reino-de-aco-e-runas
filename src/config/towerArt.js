@@ -69,7 +69,7 @@ export const TOWER_ART = {
             note: 'T22: composta com peças desenhadas à mão (lib/materiais) em 4 etapas; pedra com rejunte, musgo e runas, corpo de tábuas com postes e cintas, piso com ameias, estandarte azul, janela ciano, suporte com anel rúnico.',
             base: { frame: [112, 104], pivot: [56, 96], frames: 4, fps: 5 },
             head: { frame: [72, 72], pivot: [36, 36], angles: HEAD_ANGLES, phases: 3 },
-            headMount: { x: 4, y: -86 }, muzzle: { x: 31, y: 0 }, crystal: { x: -9, y: 0 },
+            headMount: { x: 0, y: -86 }, muzzle: { x: 31, y: 0 }, crystal: { x: -9, y: 0 },
             shadow: [60, 16],
             upgrades: {
                 3: 'Rajada: segundo arco sobre o suporte; Perfurante: ponta de arpão e cinta dupla na coronha; Sentinela: luneta e bandeirola no suporte',

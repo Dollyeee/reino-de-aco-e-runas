@@ -1,0 +1,32 @@
+{
+  "sprite": "besta-r3",
+  "arquivo": "tools/pixel-art/rodadas/besta-r3.png",
+  "hash": "b70b82e733f98fb96b7173af62eae525e458dd78e762589b597a31816e9e5c4d",
+  "quadro": [
+    804,
+    488
+  ],
+  "atualizado": "2026-09-30T22:40:21.910Z",
+  "marcacoes": [
+    {
+      "id": "muoosp0k",
+      "quadro": 0,
+      "x": 117,
+      "y": 75,
+      "w": 63,
+      "h": 54,
+      "comentario": "angulo esta meio estranho",
+      "categoria": "forma/silhueta",
+      "prioridade": "alta",
+      "status": "corrigida",
+      "criada": "2026-09-30T22:38:37.988Z",
+      "hash": "b70b82e733f98fb96b7173af62eae525e458dd78e762589b597a31816e9e5c4d",
+      "corrigida_em": "2026-09-30T22:41:58.781Z",
+      "resposta": "Li \"ângulo estranho\" como a perspectiva da torre: ela usava uma projeção oblíqua (topo deslocado para a direita + lateral escura) que parecia torta ao lado do orc e das árvores, que são frontais. Agora é 3/4 frontal pura: o topo recua reto para cima, a torre ficou simétrica e o lado da sombra é o escurecimento das últimas colunas da frente. Se você quis dizer o ângulo da besta, me avise."
+    }
+  ],
+  "revisado": {
+    "hash": "9caf346800a67471f77aeef1fb0f64f384b9444115ce2fa1e86f89ef04e1cc0a",
+    "data": "2026-09-30T22:41:58.782Z"
+  }
+}

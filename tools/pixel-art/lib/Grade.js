@@ -88,17 +88,30 @@ export class Grade {
         };
     }
 
-    // Caixa em 3/4 de frente: frente de (x0..x1) × (yb..yt), profundidade d (topo recua d px para cima e d/2 para a
-    // direita). faces = { front, top, side } pintores. Devolve os polígonos das faces.
-    box3q (x0, x1, yb, yt, d, faces) {
-        const s = Math.round(d / 2);
+    // Caixa em 3/4 de frente: frente de (x0..x1) × (yb..yt), profundidade d. faces = { front, top, side } pintores.
+    // skew = quanto o topo anda para a direita por px de profundidade (padrão 0.5 = oblíqua com lateral visível;
+    // 0 = 3/4 frontal pura, igual ao orc e às árvores — o topo recua reto para cima e não há lateral).
+    box3q (x0, x1, yb, yt, d, faces, skew = 0.5) {
+        const s = Math.round(d * skew);
         const front = { rect: [x0, yt, x1 - x0, yb - yt] };
         const top = { poly: [[x0, yt], [x1, yt], [x1 + s, yt - d], [x0 + s, yt - d]] };
         const side = { poly: [[x1, yb], [x1, yt], [x1 + s, yt - d], [x1 + s, yb - d]] };
-        if (faces.side) { this.fill(side, faces.side); }
+        if (faces.side && s > 0) { this.fill(side, faces.side); }
         if (faces.top) { this.fill(top, faces.top); }
         if (faces.front) { this.fill(front, faces.front); }
         return { front, top, side, s };
+    }
+
+    // Escurece em 1 tom as últimas `n` colunas de uma face (lado da sombra, com luz do canto superior esquerdo).
+    shadeRight (x1, yt, yb, n = 3) {
+        for (let y = yt; y < yb; y++) {
+            for (let k = 1; k <= n; k++) {
+                const c = this.get(x1 - k, y);
+                if (!c || c.e || c.k || c.m === OUTLINE_M) { continue; }
+                c.t = Math.max(0, c.t - (k <= Math.ceil(n / 2) ? 1 : 0) - (k === 1 ? 1 : 0));
+            }
+        }
+        return this;
     }
 
     filled (X, Y) { return X >= 0 && Y >= 0 && X < this.w && Y < this.h && !!this.cells[Y * this.w + X]; }

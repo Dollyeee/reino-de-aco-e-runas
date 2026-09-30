@@ -1,9 +1,11 @@
 // Besta Laser — nova técnica (T22): torre de vigia composta com peças desenhadas à mão (lib/materiais) numa Grade,
 // em 4 etapas (1 blocagem → 2 luz e volume → 3 materiais e detalhes → 4 limpeza) + conceito (3 silhuetas).
 //
-// Coordenadas: (0, 0) = ponto de chão da base (y negativo para cima). Câmera 3/4 de FRENTE com leve obliquidade:
-// o topo das caixas recua para cima e meio pixel para a direita por pixel de profundidade, o que mostra os TOPOS
-// (claros) e uma lateral direita estreita (escura). Luz do canto superior esquerdo.
+// Coordenadas: (0, 0) = ponto de chão da base (y negativo para cima). Câmera 3/4 de FRENTE pura (igual ao orc e às
+// árvores): o topo das caixas recua reto para cima (SKEW = 0) e mostra os TOPOS claros; o "lado da sombra" é o
+// escurecimento das últimas colunas da frente (Grade.shadeRight). Revisão da besta-r3 ("ângulo meio estranho"): a
+// versão oblíqua (topo deslocado para a direita + lateral) parecia torta ao lado dos personagens frontais.
+const SKEW = 0;
 // Encaixes e quadros em src/config/towerArt.js (TOWER_ART.laserCrossbow.n).
 
 import { Grade } from '../../lib/Grade.js';
@@ -30,8 +32,8 @@ export const GEO = {
     janela: { x: 9, y: -51 },
     estandarte: { x: -29, y: -58 },
     runas: [{ x: -31, y: -15 }, { x: -3, y: -15 }, { x: 23, y: -15 }],
-    pedestal: { x: -1, w: 10, yb: -70, h: 9 },   // R3: pedestal mais alto (a arma não cobre mais o suporte)
-    suporte: { x: 4, y: -83, rx: 11, ry: 4 }
+    pedestal: { x: -5, w: 10, yb: -70, h: 9 },   // R3: pedestal mais alto (a arma não cobre mais o suporte)
+    suporte: { x: 0, y: -83, rx: 11, ry: 4 }
 };
 
 // quadros do idle: nível das runas, janela forte/fraca, estandarte (balanço de 1 px)
@@ -91,7 +93,7 @@ export function base (frame = 0, stage = 4) {
         top: face('pedra', 'top', { top: g.tile(pedraTopo, P.x0 + 3, P.yt - P.d, { offsetRows: 6, pick: (c, r) => Math.floor(hash(c, r, 5) * 2) }) }),
         front: face('pedra', 'front', { front: g.tile(pedraFrente, P.x0, P.yt, { offsetRows: 6, pick: (c, r) => Math.floor(hash(c, r, 3) * 3) }) }),
         side: face('pedra', 'side', { side: g.tile(pedraLado, P.x1, P.yt) })
-    });
+    }, SKEW);
     if (mat) {
         for (const [i, r] of G.runas.entries()) { g.stamp(runas[i % runas.length][idle.runa], r.x, r.y); }
     }
@@ -102,7 +104,7 @@ export function base (frame = 0, stage = 4) {
         top: face('madeira', 'top'),
         front: face('madeira', 'front', { front: g.tile(tabuaV, C.x0, C.yt) }),
         side: face('madeira', 'side')
-    });
+    }, SKEW);
     if (lit) {
         // oclusão: a parede "entra" na pedra (linha escura no pé) e fica sob a sombra do piso (2 linhas no topo)
         g.fill({ rect: [C.x0, C.yb - 1, C.x1 - C.x0, 1] }, flat('madeira', 0));
@@ -125,7 +127,7 @@ export function base (frame = 0, stage = 4) {
         top: face('madeira', 'top', { top: g.tile(tabuaTopo, F.x0, F.yt - F.d) }),
         front: face('madeira', 'front', { front: g.tile(tabuaH, F.x0, F.yt + 1) }),
         side: face('madeira', 'side')
-    });
+    }, SKEW);
     if (mat) {
         for (let x = F.x0 + 5; x < F.x1 - 6; x += 11) { g.stamp(pontaTabua, x, F.yt + 2); }
         g.stamp(cantoneira, F.x0, F.yt + 1);
@@ -133,11 +135,11 @@ export function base (frame = 0, stage = 4) {
     }
 
     // --- ameias de pedra nos cantos (as de trás primeiro)
-    const s = Math.round(F.d / 2);
+    const s = Math.round(F.d * SKEW);
     const merlons = [[F.x0 + s + 1, F.yt - F.d + 2], [F.x1 - 9 + s, F.yt - F.d + 2], [F.x0, F.yt], [F.x1 - 10, F.yt]];
     for (const [x, yBottom] of merlons) {
         if (mat) { g.stamp(ameia, x, yBottom - 11); } else {
-            g.box3q(x, x + 8, yBottom, yBottom - 7, 4, { top: face('pedra', 'top'), front: face('pedra', 'front'), side: face('pedra', 'side') });
+            g.box3q(x, x + 8, yBottom, yBottom - 7, 4, { top: face('pedra', 'top'), front: face('pedra', 'front'), side: face('pedra', 'side') }, SKEW);
         }
     }
 
@@ -145,7 +147,7 @@ export function base (frame = 0, stage = 4) {
     const Pd = G.pedestal;
     g.box3q(Pd.x, Pd.x + Pd.w, Pd.yb, Pd.yb - Pd.h, 4, {
         top: face('madeira', 'top'), front: face('madeira', 'front', { front: g.tile(poste, Pd.x, Pd.yb - Pd.h) }), side: face('madeira', 'side')
-    });
+    }, SKEW);
     if (mat) { g.fill({ rect: [Pd.x, Pd.yb - 2, Pd.w, 1] }, flat('aco', 2)); g.stamp(rebite, Pd.x + 1, Pd.yb - 3); g.stamp(rebite, Pd.x + Pd.w - 2, Pd.yb - 3); }
     const S = G.suporte;
     g.fill({ rect: [S.x - S.rx, S.y, S.rx * 2 + 1, 3] }, lit ? flat('aco', 1) : flat('aco', 2));
@@ -164,6 +166,8 @@ export function base (frame = 0, stage = 4) {
         g.fill({ rect: [G.estandarte.x + 1, G.estandarte.y + 1, 10, 14] }, flat('azul', lit ? 2 : 2));
     }
 
+    // lado da sombra: últimas colunas da frente um tom abaixo (sem lateral oblíqua)
+    if (lit) { g.shadeRight(P.x1, P.yt, P.yb); g.shadeRight(C.x1, C.yt + 3, C.yb, 3); g.shadeRight(F.x1, F.yt, F.yb, 2); }
     if (stage >= 4) { g.cleanup(); }
     if (lit) { g.rim(); }
     g.outline();

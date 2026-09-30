@@ -77,18 +77,18 @@ export const pedraLado = [
     ], key: key('pedra') }
 ];
 
-// Ameia de pedra (merlão) com o topo visível: 10×11.
+// Ameia de pedra (merlão) com o topo visível, câmera 3/4 frontal (topo reto sobre a frente — revisão da besta-r3): 10×11.
 export const ameia = { rows: [
-    '..bbbbbbd.',
-    '.abbbbbbdd',
-    'abbbbbbbdd',
+    'abbbbbbbbd',
+    'bbbbbbbbbd',
     'bbbbbbbbdd',
     'dddddddddd',
-    'bcccccccdd',
+    'bccccccccd',
+    'bccccccccd',
+    'bccdccccdd',
     'bcccccccde',
-    'bccdcccdde',
-    'bcccccccde',
-    'cddddddddE',
+    'bccccccdde',
+    'cdddddddde',
     'eeeeeeeeee'
 ], key: key('pedra', MUSGO) };
 
