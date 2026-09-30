@@ -22,22 +22,7 @@ export const MAP01 = {
     // Castelo e Núcleo Arcano (ponto de contato com o chão)
     castle: { x: 1165, y: 522 },
 
-    // Plataformas rúnicas onde é possível construir
-    buildSlots: [
-        { id: 's1', x: 175, y: 285 },
-        { id: 's2', x: 420, y: 175 },
-        { id: 's3', x: 410, y: 360 },
-        { id: 's4', x: 185, y: 470 },
-        { id: 's5', x: 470, y: 470 },
-        { id: 's6', x: 460, y: 655 },
-        { id: 's7', x: 760, y: 170 },
-        { id: 's8', x: 755, y: 385 },
-        { id: 's9', x: 990, y: 430 },
-        { id: 's10', x: 760, y: 580 },
-        { id: 's11', x: 1035, y: 560 }
-    ],
-
-    // Decoração (tipo = nome do SVG em public/assets/)
+    // Decoração (tipo = nome do SVG em public/assets/). Também bloqueia a construção de torres.
     decorations: [
         { type: 'tree', x: 60, y: 110, scale: 1.0 },
         { type: 'tree', x: 120, y: 90, scale: 0.8 },

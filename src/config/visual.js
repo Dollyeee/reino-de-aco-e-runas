@@ -108,8 +108,12 @@ export const SHADOW = { offsetX: 7, offsetY: 4, alpha: 0.28 };
 
 // Posições fixas do HUD (coordenadas do mundo; a UIScene usa a mesma câmera).
 export const HUD = {
+    panel: { x: 14, y: 12, w: 470, h: 60 },
     ether: { x: 50, y: 42 },
     core: { x: 178, y: 42 },
     wave: { x: 356, y: 42 },
-    waveButton: { x: 1138, y: 44 }
+    waveButton: { x: 1138, y: 44, w: 236, h: 54 }
 };
+
+// Barra de torres fixa na parte de baixo da tela.
+export const TOWER_BAR = { x: 640, y: 670, cardW: 172, cardH: 76, gap: 12, pad: 10 };

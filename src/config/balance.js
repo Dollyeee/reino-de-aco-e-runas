@@ -28,7 +28,8 @@ export const BALANCE = {
             damage: 11,
             range: 150,              // raio de alcance
             fireCooldown: 450,       // intervalo entre disparos
-            projectileSpeed: 950
+            projectileSpeed: 950,
+            footprintRadius: 38      // raio ocupado no chão (posicionamento)
         },
         plasmaCatapult: {
             name: 'Catapulta de Plasma',
@@ -41,8 +42,24 @@ export const BALANCE = {
             minRange: 50,            // não atira em quem está colado nela
             fireCooldown: 2000,
             flightTime: 900,         // tempo de voo do projétil
-            arcHeight: 170           // altura máxima do arco
+            arcHeight: 170,          // altura máxima do arco
+            footprintRadius: 46      // raio ocupado no chão (posicionamento)
         }
+    },
+
+    // ------------------------------------------------------------ posicionamento
+    // Regras de área válida para construir torres em qualquer ponto do mapa.
+    placement: {
+        pathClearance: 4,            // folga além de (largura do caminho / 2 + raio da torre)
+        worldMargin: 16,             // distância mínima das bordas do mundo
+        uiPadding: 10,               // folga em volta do HUD e da barra de torres
+        towerHeight: 95,             // altura aproximada da torre acima do centro (não pode invadir o HUD)
+        decorationRadius: {          // raio de bloqueio por tipo de decoração (× escala da decoração)
+            tree: 26,
+            rock: 24,
+            'crystal-cluster': 28
+        },
+        castle: { halfWidth: 140, above: 250, below: 26 }   // retângulo bloqueado em volta do castelo
     },
 
     // ---------------------------------------------------------------- inimigos

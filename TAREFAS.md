@@ -9,7 +9,14 @@ Status: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloque
 
 ---
 
-## [ ] T01 — Posicionamento livre de torres
+## [x] T01 — Posicionamento livre de torres
+
+**Concluída em 2026-09-30.** Resultado:
+- Construção livre: barra de torres (`src/ui/TowerBar.js`, teclas 1/2), modo posicionamento com prévia e alcance ciano/vermelho + motivo da recusa (`src/towers/TowerPlacer.js`), clique/Shift/botão direito/Esc e arrastar a carta até o mapa.
+- Regras de área válida em `src/world/PlacementRules.js`; valores em `BALANCE.placement` e `footprintRadius` por torre. Plataformas fixas e `buildSlots` removidos; `Tower` usa (x, y) e cria a própria plataforma rúnica com animação.
+- `BuildMenu` substituído por `TowerInfoPanel` (painel da torre) + `towerPreview` (miniaturas).
+- Simulação com torres nas curvas em U: mista 19/20, só Bestas 13/20, só Catapultas 20/20 — ficou mais fácil que com plataformas fixas. Sugestão (NÃO aplicada): onda 4 healthMult 2.8, onda 5 healthMult 3.5, Catapulta custo 135 → mista 11/20, só Catapultas 12/20, só Bestas perde.
+- Teste manual pendente: arrastar a carta com toque num celular/tablet de verdade.
 
 Quero trocar as plataformas fixas por posicionamento LIVRE de torres (estilo Bloons TD). Hoje as torres só podem ser construídas nos 11 buildSlots de src/data/map01.js, via BuildMenu que abre sobre a plataforma. Leia GameScene.js (createSlots, selectSlot, onBuildRequest, onBuildPreview), ui/BuildMenu.js, world/PathTrack.js e config/balance.js antes de começar.
 

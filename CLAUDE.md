@@ -12,7 +12,7 @@ Bloom/Shine agora são `Phaser.Actions.AddEffectBloom` / `Phaser.Actions.AddEffe
 Medieval fundido com futurista. Runas funcionam como circuitos, cavaleiros usam armas de plasma, o castelo tem
 escudos de energia. O jogador defende o **Núcleo Arcano** (um cristal flutuando no centro do castelo) contra ondas
 de inimigos que seguem um caminho fixo. Derrotar inimigos rende **éter**, gasto para construir torres em
-plataformas rúnicas ao lado do caminho.
+qualquer ponto válido do mapa (estilo Bloons TD); cada torre surge sobre uma plataforma rúnica.
 
 ## Estilo visual
 
@@ -79,15 +79,15 @@ src/
   main.js                 configuração do Phaser.Game
   config/balance.js       TODOS os valores de balanceamento (dano, alcance, custo, vida, velocidade, ondas, economia)
   config/visual.js        cores, profundidades, luzes, bloom, escala de renderização
-  data/map01.js           caminho, plataformas de construção e decoração do mapa 1
+  data/map01.js           caminho, castelo e decoração do mapa 1 (decorações também bloqueiam construção)
   scenes/                 BootScene (carregamento), GameScene (mundo), UIScene (HUD), ResultScene (vitória/derrota)
-  world/                  desenho do mapa, caminho (PathTrack), castelo + Núcleo Arcano
-  towers/                 Tower (base), LaserCrossbow, PlasmaCatapult
+  world/                  desenho do mapa, caminho (PathTrack), castelo + Núcleo Arcano, PlacementRules (área válida)
+  towers/                 Tower (base, com plataforma rúnica), LaserCrossbow, PlasmaCatapult, TowerPlacer (modo posicionamento)
   enemies/                Enemy (base), CyberOrc
   projectiles/            LaserBolt, PlasmaBall
   waves/                  WaveManager
   effects/                Effects (explosões, números de dano, flashes, luzes temporárias), Shadow
-  ui/                     BuildMenu, Button, helpers de texto
+  ui/                     TowerBar (barra de torres), TowerInfoPanel, towerPreview (miniaturas), Button
 ```
 
 Convenções:
@@ -98,7 +98,11 @@ Convenções:
 
 ## Escopo — Fase 1 (atual)
 
-- 1 mapa com caminho fixo e plataformas para construir torres
+- 1 mapa com caminho fixo e **posicionamento livre de torres, com regras de área válida**
+  (fora do caminho, de outras torres, das decorações, do castelo, do HUD e da barra de torres — valores em
+  `BALANCE.placement` e `footprintRadius` de cada torre). Barra de torres embaixo (teclas 1/2), prévia
+  translúcida com alcance (ciano = válido, vermelho = inválido), clique constrói, Shift constrói várias,
+  botão direito/Esc cancela, no toque arraste a carta até o mapa.
 - 2 torres: **Besta Laser** (rápida, barata, disparo em linha reta) e **Catapulta de Plasma** (dano em área, mais cara, disparo em arco)
 - 1 inimigo: **Orc Cibernético** (armadura metálica, olho robótico vermelho)
 - 5 ondas com dificuldade crescente

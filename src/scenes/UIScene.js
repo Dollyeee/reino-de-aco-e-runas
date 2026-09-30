@@ -4,9 +4,11 @@ import { COLORS, HUD, WORLD } from '../config/visual.js';
 import { EVT } from '../config/events.js';
 import { addArt, numberStyle, setupWorldCamera, textStyle } from '../world/art.js';
 import Button from '../ui/Button.js';
-import BuildMenu from '../ui/BuildMenu.js';
+import TowerBar from '../ui/TowerBar.js';
+import TowerInfoPanel from '../ui/TowerInfoPanel.js';
+import { towerBarRect } from '../world/PlacementRules.js';
 
-// HUD: éter, vida do Núcleo, onda atual, botão de iniciar onda, menus e avisos.
+// HUD: éter, vida do Núcleo, onda atual, botão de iniciar onda, barra de torres, painel de torre e avisos.
 // Roda por cima da GameScene, sem Bloom (textos ficam limpos).
 export default class UIScene extends Phaser.Scene {
     constructor () {
@@ -19,12 +21,15 @@ export default class UIScene extends Phaser.Scene {
         this.displayEther = BALANCE.economy.startingEther;
 
         this.buildHud();
-        this.buildMenu = new BuildMenu(this);
+        this.infoPanel = new TowerInfoPanel(this);
+        this.towerBar = new TowerBar(this);
+        this.input.keyboard.on('keydown-ONE', () => this.towerBar.select(0));
+        this.input.keyboard.on('keydown-TWO', () => this.towerBar.select(1));
 
         const b = HUD.waveButton;
         this.buttonGlow = this.add.image(b.x, b.y + 4, 'dot').setBlendMode('ADD').setTint(COLORS.cyan)
             .setDisplaySize(300, 110).setAlpha(0);
-        this.waveButton = new Button(this, b.x, b.y, 236, 54, 'Iniciar Onda 1', () => {
+        this.waveButton = new Button(this, b.x, b.y, b.w, b.h, 'Iniciar Onda 1', () => {
             this.game.events.emit(EVT.START_WAVE);
         }, { fontSize: 24 });
         this.glowTween = this.tweens.add({
@@ -36,9 +41,9 @@ export default class UIScene extends Phaser.Scene {
             ease: 'Sine.easeInOut'
         });
 
-        this.hint = this.add.text(WORLD.width / 2, WORLD.height - 24,
-            'Clique numa plataforma rúnica para construir  •  Espaço inicia a onda',
-            textStyle(18, '#fff6e6', { strokeThickness: 5 })).setOrigin(0.5).setAlpha(0.95);
+        this.hint = this.add.text(WORLD.width / 2, towerBarRect().y - 16,
+            '1/2 escolhe a torre  •  clique constrói  •  Shift constrói várias  •  Esc cancela  •  Espaço inicia a onda',
+            textStyle(14, '#fff6e6', { strokeThickness: 4 })).setOrigin(0.5).setAlpha(0.95);
         this.tweens.add({ targets: this.hint, y: this.hint.y - 4, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
 
         const on = (evt, fn) => {
@@ -47,9 +52,9 @@ export default class UIScene extends Phaser.Scene {
             this.events.once('shutdown', () => this.game.events.off(evt, bound));
         };
         on(EVT.STATE_CHANGED, this.onState);
-        on(EVT.SLOT_SELECTED, (slot) => this.buildMenu.open(slot, this.state ? this.state.ether : 0));
-        on(EVT.TOWER_SELECTED, (slot) => this.buildMenu.openInfo(slot));
-        on(EVT.SELECTION_CLEARED, () => this.buildMenu.close());
+        on(EVT.TOWER_SELECTED, (info) => this.infoPanel.open(info));
+        on(EVT.SELECTION_CLEARED, () => this.infoPanel.close());
+        on(EVT.PLACEMENT_CHANGED, (type) => this.towerBar.setActive(type));
         on(EVT.WAVE_STARTED, this.onWaveStarted);
         on(EVT.WAVE_CLEARED, this.onWaveCleared);
         on(EVT.NOT_ENOUGH_ETHER, this.onNotEnoughEther);
@@ -62,7 +67,7 @@ export default class UIScene extends Phaser.Scene {
 
     buildHud () {
         const g = this.add.graphics();
-        const x = 14, y = 12, w = 470, h = 60;
+        const { x, y, w, h } = HUD.panel;
         g.fillStyle(COLORS.outline, 1);
         g.fillRoundedRect(x - 4, y - 4, w + 8, h + 14, 22);
         g.fillStyle(0x3a2850, 1);
@@ -143,7 +148,7 @@ export default class UIScene extends Phaser.Scene {
             this.buttonGlow.setVisible(state.canStartWave);
         }
 
-        if (this.buildMenu.isOpen) { this.buildMenu.updateAffordability(state.ether); }
+        this.towerBar.setEther(state.ether);
     }
 
     update () {
@@ -203,7 +208,6 @@ export default class UIScene extends Phaser.Scene {
         const w = BALANCE.waves[n - 1];
         const name = BALANCE.enemies[w.enemy].name;
         this.banner(`Onda ${n}!`, '#ffd34d', `${w.count} × ${name}`);
-        this.buildMenu.close();
         if (this.hint.visible) {
             this.tweens.add({ targets: this.hint, alpha: 0, duration: 400, onComplete: () => this.hint.setVisible(false) });
         }
@@ -228,7 +232,8 @@ export default class UIScene extends Phaser.Scene {
     }
 
     onGameOver () {
-        this.buildMenu.close(true);
+        this.infoPanel.close(true);
+        this.towerBar.setEnabled(false);
         this.hint.setVisible(false);
     }
 }

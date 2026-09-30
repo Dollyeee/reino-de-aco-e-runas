@@ -13,8 +13,8 @@ const THROW_MS = 110;
 
 // Catapulta de Plasma: lenta e cara, arremessa bolas de plasma em arco com dano em área.
 export default class PlasmaCatapult extends Tower {
-    constructor (scene, slot) {
-        super(scene, slot, 'plasmaCatapult', BALANCE.towers.plasmaCatapult, 'tower-catapult');
+    constructor (scene, x, y) {
+        super(scene, x, y, 'plasmaCatapult', BALANCE.towers.plasmaCatapult, 'tower-catapult');
 
         this.baseImg = makeArt(scene, 0, 0, 'tower-catapult-base').setLighting(true);
         const pivot = anchor('tower-catapult-base', 'armPivot');

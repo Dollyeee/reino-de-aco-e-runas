@@ -10,7 +10,9 @@ import ShadowLayer from '../effects/Shadow.js';
 import Effects from '../effects/Effects.js';
 import WaveManager from '../waves/WaveManager.js';
 import { TOWER_TYPES } from '../towers/index.js';
-import { addArt, setupWorldCamera } from '../world/art.js';
+import TowerPlacer from '../towers/TowerPlacer.js';
+import PlacementRules from '../world/PlacementRules.js';
+import { setupWorldCamera } from '../world/art.js';
 
 // Cena principal: mundo, torres, inimigos, projéteis e regras da partida.
 export default class GameScene extends Phaser.Scene {
@@ -50,17 +52,23 @@ export default class GameScene extends Phaser.Scene {
         this.waves = new WaveManager(this, BALANCE.waves);
 
         this.rangeGfx = this.add.graphics().setDepth(DEPTH.RANGE);
-        this.createSlots();
+        this.placer = new TowerPlacer(this, new PlacementRules(this.map, this.track));
 
-        // clicar no "nada" fecha menus/seleção
+        // botão direito cancela o posicionamento (sem abrir o menu do navegador)
+        if (this.input.mouse) { this.input.mouse.disableContextMenu(); }
         this.input.on('pointerdown', (pointer, over) => {
-            if (over.length === 0) { this.clearSelection(); }
+            if (this.placer.active) { this.placer.onPointerDown(pointer); return; }
+            if (over.length === 0) { this.clearSelection(); }   // clicar no "nada" fecha o painel/seleção
         });
+        this.input.on('pointerup', (pointer) => this.placer.onPointerUp(pointer));
         this.input.keyboard.on('keydown-SPACE', () => this.startWave());
-        this.input.keyboard.on('keydown-ESC', () => this.clearSelection());
+        this.input.keyboard.on('keydown-ESC', () => {
+            if (this.placer.active) { this.placer.cancel(); } else { this.clearSelection(); }
+        });
 
-        this.listen(EVT.BUILD_REQUEST, this.onBuildRequest);
-        this.listen(EVT.BUILD_PREVIEW, this.onBuildPreview);
+        this.listen(EVT.PLACEMENT_START, this.onPlacementStart);
+        this.listen(EVT.PLACEMENT_RELEASE, ({ moved }) => this.placer.onReleaseOnBar(moved));
+        this.listen(EVT.PLACEMENT_CANCEL, () => this.placer.cancel());
         this.listen(EVT.START_WAVE, this.startWave);
         this.listen(EVT.SELECTION_CLEARED, this.onSelectionCleared);
         this.listen(EVT.RESTART, this.restartGame);
@@ -87,72 +95,38 @@ export default class GameScene extends Phaser.Scene {
         return this.state.phase === 'build' && this.waves.hasNext;
     }
 
-    // ------------------------------------------------------------ plataformas
+    // ---------------------------------------------------------- construção
 
-    createSlots () {
-        this.slots = this.map.buildSlots.map((s) => {
-            this.add.image(s.x + 6, s.y + 16, 'shadow').setDisplaySize(108, 38).setAlpha(0.3).setDepth(DEPTH.DECAL);
-            const img = addArt(this, s.x, s.y, 'build-slot').setLighting(true).setDepth(DEPTH.DECAL + 1);
-            const glow = this.add.image(s.x, s.y, 'ring')
-                .setBlendMode('ADD').setTint(COLORS.cyan).setDisplaySize(66, 24).setAlpha(0.4)
-                .setDepth(DEPTH.DECAL + 2);
-            this.tweens.add({
-                targets: glow,
-                alpha: { from: 0.25, to: 0.7 },
-                duration: 1100 + Math.random() * 400,
-                yoyo: true,
-                repeat: -1,
-                ease: 'Sine.easeInOut'
-            });
-
-            const zone = this.add.zone(s.x, s.y, 100, 44);
-            zone.setInteractive({
-                hitArea: new Phaser.Geom.Ellipse(50, 22, 100, 44),
-                hitAreaCallback: Phaser.Geom.Ellipse.Contains,
-                useHandCursor: true
-            });
-
-            const slot = { ...s, img, glow, zone, tower: null };
-            zone.on('pointerover', () => this.hoverSlot(slot, true));
-            zone.on('pointerout', () => this.hoverSlot(slot, false));
-            zone.on('pointerdown', () => this.selectSlot(slot));
-            return slot;
-        });
+    get isOver () {
+        return this.state.phase === 'victory' || this.state.phase === 'defeat';
     }
 
-    hoverSlot (slot, over) {
-        if (slot.tower) { return; }
-        const bs = slot.img.baseScale;
-        this.tweens.killTweensOf(slot.img);
-        this.tweens.add({
-            targets: slot.img,
-            scaleX: bs * (over ? 1.1 : 1),
-            scaleY: bs * (over ? 1.1 : 1),
-            duration: over ? 260 : 180,
-            ease: over ? 'Back.easeOut' : 'Quad.easeOut'
-        });
-    }
-
-    selectSlot (slot) {
-        if (this.state.phase === 'victory' || this.state.phase === 'defeat') { return; }
-
-        if (slot.tower) {
-            this.selected = slot;
-            this.showRange(slot.tower.x, slot.tower.y, slot.tower.stats.range);
-            this.game.events.emit(EVT.TOWER_SELECTED, {
-                slotId: slot.id, x: slot.x, y: slot.y, type: slot.tower.type
-            });
-            slot.tower.kick(1.08, 0.92, 400);
+    onPlacementStart ({ type, drag }) {
+        if (this.isOver) { return; }
+        if (this.state.ether < BALANCE.towers[type].cost) {
+            this.game.events.emit(EVT.NOT_ENOUGH_ETHER);
             return;
         }
+        this.clearSelection();
+        this.placer.start(type, drag);
+    }
 
-        this.selected = slot;
-        this.rangeGfx.clear();
-        const bs = slot.img.baseScale;
-        this.tweens.killTweensOf(slot.img);
-        slot.img.setScale(bs * 1.25, bs * 0.8);
-        this.tweens.add({ targets: slot.img, scaleX: bs * 1.1, scaleY: bs * 1.1, duration: 420, ease: 'Elastic.easeOut' });
-        this.game.events.emit(EVT.SLOT_SELECTED, { slotId: slot.id, x: slot.x, y: slot.y });
+    // Constrói de fato (o TowerPlacer já validou o local e o éter).
+    buildTower (type, x, y) {
+        this.state.ether -= BALANCE.towers[type].cost;
+        const tower = new TOWER_TYPES[type](this, x, y);
+        tower.playBuildAnimation();
+        this.towers.push(tower);
+        this.emitState();
+        return tower;
+    }
+
+    onTowerClicked (tower) {
+        if (this.placer.active || this.isOver) { return; }   // no modo posicionamento o clique é tratado pelo TowerPlacer
+        this.selected = tower;
+        this.showRange(tower.x, tower.y, tower.stats.range);
+        this.game.events.emit(EVT.TOWER_SELECTED, { x: tower.placeX, y: tower.placeY, type: tower.type });
+        tower.kick(1.08, 0.92, 400);
     }
 
     clearSelection () {
@@ -161,10 +135,8 @@ export default class GameScene extends Phaser.Scene {
     }
 
     onSelectionCleared () {
-        const slot = this.selected;
         this.selected = null;
         this.hideRange();
-        if (slot && !slot.tower) { this.hoverSlot(slot, false); }
     }
 
     showRange (x, y, r) {
@@ -187,44 +159,6 @@ export default class GameScene extends Phaser.Scene {
         const g = this.rangeGfx;
         this.tweens.killTweensOf(g);
         this.tweens.add({ targets: g, alpha: 0, scale: 0.9, duration: 140, onComplete: () => g.clear() });
-    }
-
-    onBuildPreview ({ slotId, type }) {
-        const slot = this.slots.find((s) => s.id === slotId);
-        if (!slot || slot.tower) { return; }
-        if (type) {
-            this.showRange(slot.x, slot.y, BALANCE.towers[type].range);
-        } else {
-            this.hideRange();
-        }
-    }
-
-    onBuildRequest ({ slotId, type }) {
-        const slot = this.slots.find((s) => s.id === slotId);
-        if (!slot || slot.tower) { return; }
-        const cost = BALANCE.towers[type].cost;
-        if (this.state.ether < cost) {
-            this.game.events.emit(EVT.NOT_ENOUGH_ETHER);
-            return;
-        }
-        this.state.ether -= cost;
-
-        const tower = new TOWER_TYPES[type](this, slot);
-        tower.playBuildAnimation();
-        slot.tower = tower;
-        this.towers.push(tower);
-
-        // a plataforma fica ocupada: some o brilho e a área de clique passa a cobrir a torre
-        this.tweens.killTweensOf(slot.glow);
-        this.tweens.add({ targets: slot.glow, alpha: 0, duration: 200 });
-        slot.img.setScale(slot.img.baseScale);
-        slot.zone.setSize(100, 130);
-        slot.zone.y = slot.y - 43;
-        slot.zone.input.hitArea = new Phaser.Geom.Rectangle(0, 0, 100, 130);
-        slot.zone.input.hitAreaCallback = Phaser.Geom.Rectangle.Contains;
-
-        this.clearSelection();
-        this.emitState();
     }
 
     // ----------------------------------------------------------------- ondas
@@ -275,6 +209,7 @@ export default class GameScene extends Phaser.Scene {
 
     victory () {
         this.state.phase = 'victory';
+        this.placer.cancel();
         this.clearSelection();
         this.emitState();
         // fogos de plasma sobre o castelo
@@ -291,6 +226,7 @@ export default class GameScene extends Phaser.Scene {
 
     defeat () {
         this.state.phase = 'defeat';
+        this.placer.cancel();
         this.clearSelection();
         this.castle.shatter();
         this.emitState();
@@ -331,5 +267,6 @@ export default class GameScene extends Phaser.Scene {
         this.projectiles = this.projectiles.filter((p) => !p.done);
 
         this.castle.update(dt);
+        this.placer.update();
     }
 }

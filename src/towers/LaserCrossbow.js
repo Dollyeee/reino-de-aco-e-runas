@@ -10,8 +10,8 @@ const CRYSTAL_OFFSET = { x: -21, y: 0 };
 
 // Besta Laser: torre rápida e barata. Gira para mirar e dispara virotes em linha reta.
 export default class LaserCrossbow extends Tower {
-    constructor (scene, slot) {
-        super(scene, slot, 'laserCrossbow', BALANCE.towers.laserCrossbow, 'tower-crossbow');
+    constructor (scene, x, y) {
+        super(scene, x, y, 'laserCrossbow', BALANCE.towers.laserCrossbow, 'tower-crossbow');
 
         this.baseImg = makeArt(scene, 0, 0, 'tower-crossbow-base').setLighting(true);
         const mount = anchor('tower-crossbow-base', 'headMount');
