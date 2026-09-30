@@ -280,3 +280,14 @@ Início da conversão do jogo inteiro para pixel art 1×. Etapa 1: guia de estil
 3. Cena de referência: gerar tools/pixel-art/cena-referencia.png com o mapa inteiro (chão novo + orc B em alguns pontos do caminho + retângulos placeholder no lugar das torres e do castelo), no tamanho real 1280×720.
 4. Integrar o chão novo no jogo (substituindo o desenho atual do MapRenderer), mantendo sombras, profundidade e iluminação. Torres, castelo, decoração e UI continuam como estão nesta etapa.
 5. npm run pixel e npm run build. Mostrar ao usuário a cena de referência e um print do jogo rodando.
+
+---
+
+## [ ] T13 — Ajustes do chão e escala do orc
+
+Ajustes da etapa 1 do pixel art (chão) + escala dos personagens:
+
+1. Manchas de musgo: hoje parecem buracos/poças. Reduza o tamanho (~40%), clareie (no máximo 1–2 tons abaixo da grama base), bordas quebradas em pixels (não arredondadas/moles) e com textura de folhinhas por dentro. Nenhuma mancha perto das curvas do caminho nem sob o castelo.
+2. Variação sutil de tom da grama por região (manchas grandes e suaves de ±1 tom, quase imperceptíveis) para o gramado não parecer um tapete uniforme.
+3. Escala: reduza o Orc Saqueador para ~80 px de altura no mundo (redesenhe na grade menor se necessário para manter pixel 1× — não escale o sprite com fator fracionado) e registre no ART_SPEC.md a nova referência de tamanho (inimigo comum ~80 px). Confira que 20 orcs em fila no caminho não viram uma massa contínua.
+4. Regere a cena de referência e mostre antes × depois. npm run pixel e npm run build.

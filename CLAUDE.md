@@ -137,7 +137,9 @@ Convenções:
 - Coordenadas de mundo fixas em 1280×720; a renderização usa `RENDER_SCALE` (câmeras com zoom) para ficar nítida.
 - Todas as entidades do mundo são `Container`s posicionados no **ponto de contato com o chão**.
 
-## Escopo — Fase 1 (atual)
+## Escopo — base jogável (concluída)
+
+O que o jogo já tem. A produção daqui em diante segue o **Plano de produção** abaixo (fase atual: **A**).
 
 - 1 mapa com caminho fixo e **posicionamento livre de torres, com regras de área válida**
   (fora do caminho, de outras torres, das decorações, do castelo, do HUD e da barra de torres — valores em
@@ -151,13 +153,46 @@ Convenções:
 - Vida do Núcleo Arcano, telas de vitória e derrota
 - Interface: éter, vida do Núcleo, onda atual, botão para iniciar a próxima onda
 
-## Roadmap (NÃO implementar ainda)
+## Plano de produção (NÃO implementar antes da hora)
 
-- **Fase 2**: upgrades das torres (2 a 3 níveis cada); **Torre de Estase** (desacelera inimigos);
-  **Gárgula-Drone** (voadora, só algumas torres acertam); **Golem de Sucata** (blindado e lento).
-- **Fase 3**: **Ninho do Dragão Mecânico** (fogo em linha); chefe **Dragão Ancestral** reconstruído com peças
-  de metal; trilha sonora e efeitos sonoros.
-- **Fase 4**: mais mapas, menu inicial, seleção de fases e salvamento de progresso.
+**Regra:** não começar uma fase sem a anterior estar **concluída e aprovada pelo usuário**, exceto quando ele pedir
+explicitamente. Dentro de uma fase, o trabalho continua passando pela fila (`TAREFAS.md`).
+
+### Fase A — Vertical slice visual (atual)
+Tudo em **pixel art 1×**, seguindo o guia de estilo do `ART_SPEC.md`:
+- [x] Orc Cibernético "Saqueador" (orc B) com caminhada (T05–T10)
+- [x] Chão e caminho do mapa 1 + guia de estilo (T12)
+- [ ] Torres (Besta Laser, Catapulta de Plasma) e plataforma rúnica
+- [ ] Castelo + Núcleo Arcano
+- [ ] Decoração (árvores, pedras, cristais)
+- [ ] Projéteis e efeitos
+- [ ] UI com fonte pixel
+
+### Fase B — Fundação técnica
+1. **Conteúdo como dados**: torres, inimigos e ondas em definições de dados; criar uma torre = ficha + sprite, sem classe nova.
+2. **Simulador de balanceamento permanente**: `npm run sim`, headless, várias estratégias, taxa de vitória por onda
+   (ponto de partida: `tools/sim/simulacao.js`, da T11, que hoje roda no navegador).
+3. **Testes automáticos da lógica central** (Vitest): dano, resistências, alvo, economia, ondas.
+4. **Desempenho**: object pooling (projéteis, partículas, inimigos, textos de dano), limite de luzes, teste de estresse
+   (200 inimigos a 60 FPS).
+5. **Painel de desenvolvedor** (tecla F1, só em modo dev): spawn de inimigos, éter infinito, pular onda, mostrar
+   hitboxes/alcances/FPS.
+
+### Fase C — Sistemas do gênero
+- Pausar e velocidade 2×/3×
+- Vender torre (reembolso)
+- Prioridade de alvo (primeiro / último / mais forte / mais perto)
+- Estrutura de upgrades com capacidades (2 a 3 níveis por torre; upgrades trocam `damageType` ou ampliam `canHit`
+  via `Tower.addCapabilityMod`, hook pronto desde a T11)
+- Aviso da próxima onda
+
+### Fase D — Conteúdo em pacotes completos
+Cada pacote entra **completo**: arte + animação + som + efeitos + upgrades + balanceamento validado no simulador.
+- **Inimigos**: Saqueador (orc atual, pacote finalizado), **Brutamontes** (blindado e lento — assume o papel do antigo
+  "Golem de Sucata"), **Ciborgue** (escudo, elite mecânico), **Gárgula** (voadora, só algumas torres acertam);
+  **Enxame** (muitos, pouca vida) segue planejado na tabela de fraquezas.
+- **Torres**: **Torre de Estase** (desacelera inimigos), **Ninho do Dragão** (Dragão Mecânico, fogo em linha).
+- **Chefe**: **Dragão Ancestral**, reconstruído com peças de metal.
 
 **Design de inimigos × tipos de dano** (estrutura pronta desde a T11: `damageType`, `canHit`, `traits`, `resist`,
 `BALANCE.traitRules`):
@@ -175,12 +210,14 @@ Regras de design:
 - Toda fraqueza precisa ser **visível** (arte, cor, efeito ao acertar), nunca só um número escondido.
 - **Upgrades desbloqueiam capacidades** (trocar `damageType`, adicionar 'voador' ao `canHit`) via `Tower.addCapabilityMod`.
 
-**Arte pronta para inimigos futuros** (pixel art 1×, em `tools/pixel-art/sprites/futuros/`, gerada por `npm run pixel`
+**Arte pronta para inimigos da Fase D** (pixel art 1×, em `tools/pixel-art/sprites/futuros/`, gerada por `npm run pixel`
 mas fora do jogo; detalhes em `ART_SPEC.md`):
-- **Brutamontes** (`futuros/brutamontes.js`): orc largo e blindado com martelo de plasma no ombro, passo curto e
-  pesado — candidato ao **inimigo blindado e lento da Fase 2**.
-- **Ciborgue de guerra** (`futuros/ciborgue.js`): pernas mecânicas de pássaro, reator no peito, visor vermelho,
-  braço-canhão — candidato a **inimigo mecânico de elite**.
+- **Brutamontes** (`futuros/brutamontes.js`): orc largo e blindado com martelo de plasma no ombro, passo curto e pesado.
+- **Ciborgue de guerra** (`futuros/ciborgue.js`): pernas mecânicas de pássaro, reator no peito, visor vermelho, braço-canhão.
+
+### Fase E — Jogo completo
+Áudio e música (trilha sonora e efeitos sonoros), menu inicial, seleção de fases, salvamento de progresso, mais mapas,
+polimento e testes com jogadores.
 
 ## Comandos
 
