@@ -32,6 +32,8 @@ function startGame () {
         },
         render: {
             antialias: true,
+            // mipmaps: arte em alta resolução (PNG/WebP 2×/4×) fica nítida quando reduzida na tela
+            mipmapFilter: 'LINEAR_MIPMAP_LINEAR',
             maxLights: LIGHTING.maxLights
         },
         scene: [BootScene, GameScene, UIScene, ResultScene]

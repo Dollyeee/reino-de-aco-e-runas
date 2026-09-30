@@ -1,10 +1,11 @@
 import Phaser from 'phaser';
-import { ART } from '../config/art.js';
+import { ART, artFormat } from '../config/art.js';
 import { RENDER_SCALE, WORLD } from '../config/visual.js';
 import { createProceduralTextures } from '../effects/textures.js';
-import { setupWorldCamera, textStyle } from '../world/art.js';
+import { artPixelFactor, setupWorldCamera, textStyle } from '../world/art.js';
 
-// Carrega os SVGs (rasterizados em RENDER_SCALE para ficarem nítidos) e cria texturas procedurais.
+// Carrega a arte (SVG, PNG ou WebP, pela extensão no manifesto ART) e cria texturas procedurais.
+// SVG é rasterizado já em size × RENDER_SCALE (nítido em qualquer tela); PNG/WebP entram no tamanho nativo.
 export default class BootScene extends Phaser.Scene {
     constructor () {
         super('BootScene');
@@ -21,12 +22,38 @@ export default class BootScene extends Phaser.Scene {
         barBg.setDepth(0);
 
         for (const [key, def] of Object.entries(ART)) {
-            this.load.svg(key, `assets/${def.file}`, { scale: RENDER_SCALE });
+            const url = `assets/${def.file}`;
+            const format = artFormat(key);
+            if (format === 'svg') {
+                this.load.svg(key, url, { width: def.size[0] * RENDER_SCALE, height: def.size[1] * RENDER_SCALE });
+            } else if (format === 'png' || format === 'webp') {
+                this.load.image(key, url);
+            } else {
+                console.error(`[arte] formato não suportado em "${key}": ${def.file} (use .svg, .png ou .webp)`);
+            }
         }
     }
 
     create () {
+        this.checkArtSizes();
         createProceduralTextures(this);
         this.scene.start('GameScene');
+    }
+
+    // Avisa quando um arquivo não corresponde ao tamanho lógico do manifesto (encaixes ficariam errados).
+    checkArtSizes () {
+        for (const [key, def] of Object.entries(ART)) {
+            if (!this.textures.exists(key)) {
+                console.error(`[arte] "${key}" não carregou: public/assets/${def.file}`);
+                continue;
+            }
+            const src = this.textures.get(key).getSourceImage();
+            const k = artPixelFactor(key);
+            const w = src.width * k, h = src.height * k;
+            if (Math.abs(w - def.size[0]) > 1 || Math.abs(h - def.size[1]) > 1) {
+                console.warn(`[arte] "${key}" (${def.file}) tem ${src.width}×${src.height} px → ${w.toFixed(1)}×${h.toFixed(1)} lógicos; ` +
+                    `o manifesto espera ${def.size[0]}×${def.size[1]}. Confira o arquivo ou o campo "scale" em src/config/art.js.`);
+            }
+        }
     }
 }

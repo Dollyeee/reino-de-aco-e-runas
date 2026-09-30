@@ -20,12 +20,13 @@ export default class PlasmaCatapult extends Tower {
         const pivot = anchor('tower-catapult-base', 'armPivot');
         this.pivot = pivot;
         this.cup = anchor('tower-catapult-arm', 'cup');
+        const orb = anchor('tower-catapult-arm', 'orb');
 
         this.armRig = new Phaser.GameObjects.Container(scene, pivot.x, pivot.y);
         this.arm = makeArt(scene, 0, 0, 'tower-catapult-arm').setLighting(true);
-        this.orbGlow = scene.make.image({ x: this.cup.x, y: this.cup.y - 6, key: 'dot' }, false)
+        this.orbGlow = scene.make.image({ x: orb.x, y: orb.y, key: 'dot' }, false)
             .setBlendMode('ADD').setTint(COLORS.cyan).setDisplaySize(56, 56);
-        this.orb = makeArt(scene, this.cup.x, this.cup.y - 6, 'projectile-plasma', 0.9);
+        this.orb = makeArt(scene, orb.x, orb.y, 'projectile-plasma', 0.9);
         this.armRig.add([this.arm, this.orbGlow, this.orb]);
         this.rig.add([this.baseImg, this.armRig]);
 

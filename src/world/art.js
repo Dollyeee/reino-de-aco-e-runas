@@ -1,28 +1,31 @@
-import { ART } from '../config/art.js';
+import { ART, artFormat } from '../config/art.js';
 import { FONT, FONT_NUMBERS, RENDER_SCALE, WORLD } from '../config/visual.js';
 
-// Os SVGs são rasterizados em RENDER_SCALE. Este fator traz a imagem de volta ao tamanho do mundo.
-export const ART_SCALE = 1 / RENDER_SCALE;
+// Fator que converte pixels do ARQUIVO carregado em pixels LÓGICOS do mundo.
+//   SVG: rasterizado em size × RENDER_SCALE → fator 1 / RENDER_SCALE.
+//   PNG/WebP: carregado no tamanho nativo (size × scale) → fator 1 / scale.
+export function artPixelFactor (key) {
+    const def = ART[key];
+    return artFormat(key) === 'svg' ? 1 / RENDER_SCALE : 1 / (def.scale || 1);
+}
+
+function setupArt (img, key, scale) {
+    const def = ART[key];
+    img.setOrigin(def.pivot[0] / def.size[0], def.pivot[1] / def.size[1]);
+    img.baseScale = artPixelFactor(key) * scale;
+    img.setScale(img.baseScale);
+    return img;
+}
 
 // Cria uma imagem de arte com origem e escala corretas.
-// `scale` é a escala visual desejada (1 = tamanho do SVG em pixels do mundo).
+// `scale` é a escala visual desejada (1 = tamanho lógico do asset em pixels do mundo).
 export function addArt (scene, x, y, key, scale = 1) {
-    const def = ART[key];
-    const img = scene.add.image(x, y, key);
-    img.setOrigin(def.origin[0], def.origin[1]);
-    img.setScale(ART_SCALE * scale);
-    img.baseScale = ART_SCALE * scale;
-    return img;
+    return setupArt(scene.add.image(x, y, key), key, scale);
 }
 
 // Mesma coisa, mas sem adicionar à cena (para colocar dentro de Containers).
 export function makeArt (scene, x, y, key, scale = 1) {
-    const def = ART[key];
-    const img = scene.make.image({ x, y, key }, false);
-    img.setOrigin(def.origin[0], def.origin[1]);
-    img.setScale(ART_SCALE * scale);
-    img.baseScale = ART_SCALE * scale;
-    return img;
+    return setupArt(scene.make.image({ x, y, key }, false), key, scale);
 }
 
 // Ponto de encaixe definido no manifesto (ex.: ART['castle'].core).

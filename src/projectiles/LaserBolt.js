@@ -3,14 +3,13 @@ import { SHADOWS } from '../config/art.js';
 import ShadowLayer from '../effects/Shadow.js';
 import { addArt } from '../world/art.js';
 
-const TARGET_HEIGHT = 34;   // altura do "peito" do inimigo
-
 // Virote laser: voa em linha reta (corrigindo levemente a mira) até o alvo.
 // Guarda posição no chão (gx, gy) + altura, para a sombra acompanhar no chão.
 export default class LaserBolt {
     constructor (scene, groundX, groundY, height, target, damage, speed) {
         this.scene = scene;
         this.target = target;
+        this.targetH = target.hitHeight;   // altura do ponto de acerto (manifesto de arte)
         this.damage = damage;
         this.speed = speed;
         this.gx = groundX;
@@ -52,7 +51,7 @@ export default class LaserBolt {
         const prevX = this.image.x, prevY = this.image.y;
         this.gx += dx / dist * move;
         this.gy += dy / dist * move;
-        this.h = TARGET_HEIGHT + (this.h0 - TARGET_HEIGHT) * Math.min(1, dist / this.startDist);
+        this.h = this.targetH + (this.h0 - this.targetH) * Math.min(1, dist / this.startDist);
 
         const vx = this.gx, vy = this.gy - this.h;
         this.image.setPosition(vx, vy);
@@ -67,7 +66,7 @@ export default class LaserBolt {
     }
 
     hit () {
-        const x = this.gx, y = this.gy - TARGET_HEIGHT;
+        const x = this.gx, y = this.gy - this.targetH;
         if (this.target.alive) {
             this.target.takeDamage(this.damage, '#ffffff');
             this.scene.effects.boltHit(x, y);

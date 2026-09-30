@@ -48,10 +48,11 @@ mas com **peso, desgaste e ameaça**. Nada de ar infantil.
   - **Bloom** na câmera do jogo (só brilhos intensos — cristais, lasers, plasma — "vazam" luz).
   - **Shine** no Núcleo Arcano e nos cristais das torres.
   - `PointLight` (game object) para halos visíveis de cristais e projéteis.
-- Arte de personagens e torres fica em **SVG separados em `public/assets/`**, para ser trocada por arte
-  profissional sem mexer no código. Mantenha nomes de arquivo e proporções; os pontos de ancoragem
-  (pés/base) ficam na **borda inferior central** de cada SVG. Pontos de encaixe (olho, topo, montagens) ficam em
-  `src/config/art.js`.
+- Arte de personagens e torres fica em **arquivos separados em `public/assets/`** (SVG, PNG ou WebP), para ser
+  trocada por arte profissional sem mexer no código. O manifesto `src/config/art.js` define para cada asset o
+  **tamanho lógico** (`size`), o **ponto de ancoragem** (`pivot`, em geral a borda inferior central), a densidade
+  de PNG/WebP (`scale`: 2×, 4×) e os pontos de encaixe (olho, acerto, montagens), todos em pixels lógicos.
+  Trocar o formato do arquivo não muda nada no jogo. A especificação para artistas está em **`ART_SPEC.md`**.
 
 ## Regras de animação
 

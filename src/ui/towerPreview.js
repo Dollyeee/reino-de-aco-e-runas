@@ -13,11 +13,11 @@ export function towerPreview (scene, type, x, y, scale = 1, breathe = true) {
     } else {
         const base = makeArt(scene, 0, 0, 'tower-catapult-base', k);
         const p = anchor('tower-catapult-base', 'armPivot');
-        const cup = anchor('tower-catapult-arm', 'cup');
+        const orb = anchor('tower-catapult-arm', 'orb');
         const arm = scene.add.container(p.x * k, p.y * k).setRotation(-0.35);
         arm.add([
             makeArt(scene, 0, 0, 'tower-catapult-arm', k),
-            makeArt(scene, cup.x * k, (cup.y - 6) * k, 'projectile-plasma', k * 0.9)
+            makeArt(scene, orb.x * k, orb.y * k, 'projectile-plasma', k * 0.9)
         ]);
         box.add([base, arm]);
     }

@@ -45,7 +45,8 @@ export default class Enemy extends Phaser.GameObjects.Container {
             this.add(this.eyeGlow);
         }
 
-        // barra de vida
+        // ponto onde os disparos acertam + barra de vida (pontos definidos no manifesto de arte)
+        this.hitOffset = anchor(artKey, 'hit') || { x: 0, y: -34 };
         this.headY = anchor(artKey, 'top') || -90;
         this.hpBar = scene.make.graphics({}, false);
         this.hpBar.setVisible(false);
@@ -65,7 +66,12 @@ export default class Enemy extends Phaser.GameObjects.Container {
     }
 
     get hitY () {
-        return this.y - 34;
+        return this.y + this.hitOffset.y;
+    }
+
+    // Altura do ponto de acerto acima do chão.
+    get hitHeight () {
+        return -this.hitOffset.y;
     }
 
     update (dt) {

@@ -6,7 +6,6 @@ import { COLORS } from '../config/visual.js';
 import { makeArt, anchor } from '../world/art.js';
 
 const TURN_SPEED = 14;          // quão rápido a besta gira (rad/s, suavizado)
-const CRYSTAL_OFFSET = { x: -21, y: 0 };
 
 // Besta Laser: torre rápida e barata. Gira para mirar e dispara virotes em linha reta.
 export default class LaserCrossbow extends Tower {
@@ -19,7 +18,8 @@ export default class LaserCrossbow extends Tower {
 
         this.headRig = new Phaser.GameObjects.Container(scene, mount.x, mount.y);
         this.head = makeArt(scene, 0, 0, 'tower-crossbow-head').setLighting(true);
-        this.crystalGlow = scene.make.image({ x: CRYSTAL_OFFSET.x, y: CRYSTAL_OFFSET.y, key: 'dot' }, false)
+        const crystal = anchor('tower-crossbow-head', 'crystal');
+        this.crystalGlow = scene.make.image({ x: crystal.x, y: crystal.y, key: 'dot' }, false)
             .setBlendMode('ADD').setTint(COLORS.cyan).setDisplaySize(34, 34);
         this.headRig.add([this.head, this.crystalGlow]);
         this.rig.add([this.baseImg, this.headRig]);
