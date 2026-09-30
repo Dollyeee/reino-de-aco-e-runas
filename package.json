@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "pixel": "node tools/pixel-art/generate.js"
+    "pixel": "node tools/pixel-art/generate.js",
+    "revisor": "vite --open /tools/revisor/index.html"
   },
   "dependencies": {
     "phaser": "^4.2.1"

@@ -202,6 +202,17 @@ e ampliado 4× (`node tools/pixel-art/rodadas/render.mjs rN <estágio>`); **olha
 (legibilidade, volume, ruído, proporção, consistência com o orc); corrigir. **Mínimo de 3 rodadas**, salvas como
 `<nome>-r1.png`, `r2`, `r3` em `tools/pixel-art/rodadas/`, com a lista em `<nome>-autocritica.md`.
 
+**Revisão do diretor de arte (T23)** — depois das rodadas, o usuário revisa e o ciclo fecha assim:
+1. **Eu reviso com a ferramenta**: `npm run revisor` abre `tools/revisor/` (só em desenvolvimento). Escolher o sprite (e o
+   quadro, em folhas), ampliar de 4× a 16× com grade e réguas numeradas, clicar num pixel ou arrastar um retângulo,
+   escrever a sensação ("parece colado", "ruidoso"…), categoria e prioridade, e **Salvar** — grava
+   `tools/revisor/revisoes/<sprite>.json` com o hash do PNG e guarda uma cópia do PNG revisado (o "antes").
+2. **`/revisar <sprite>` aplica**: o Claude olha cada área marcada (recortes de `tools/revisor/recorte.mjs`), traduz o
+   comentário para termos de pixel art, corrige no **código-fonte do gerador** (nunca no PNG), regera, confere antes ×
+   depois e marca cada item como *corrigida* (com uma frase) ou *precisa de esclarecimento* (com uma pergunta).
+3. **Eu confiro no modo Comparar**: antes (cópia da revisão) × depois lado a lado, e **Piscar** alterna os dois no mesmo
+   lugar; marcações podem voltar para *aberta* ou ser *recusadas*.
+
 **Peças e animação** — base + peça que gira separada (ângulos redesenhados pela grade, nunca rotação de imagem); idle leve
 (runas/janela pulsando, tecido balançando 1 px); recuo e materialização rúnica funcionando.
 

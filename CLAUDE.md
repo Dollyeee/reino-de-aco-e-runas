@@ -123,6 +123,7 @@ Personalidade vem do **peso**, não da elasticidade. Nada fica 100% parado, mas 
 ```
 index.html
 tools/sim/simulacao.js    simulação determinística de balanceamento (roda no navegador, ver cabeçalho do arquivo)
+tools/revisor/            revisor de pixel art (T23): index.html + revisor.js, plugin.js (endpoints /__revisor/* no dev), recorte.mjs (recortes para o /revisar), revisoes/*.json
 tools/pixel-art/          gerador de pixel art (`npm run pixel`): palette.js, lib/PixelCanvas.js, sprites/*.js (futuros/ = inimigos futuros, decoracao/ = kits A/B/C), cenario/ (chão dos mapas + cena de referência), legacy/, preview.html, escolha-orc.html, escolha-decoracao.html (+ decoracao/mapa-*.png), cena-referencia.png
 public/assets/            SVGs substituíveis (torres, inimigos, castelo, cristais, cenário, ícones)
 src/
@@ -264,6 +265,8 @@ polimento e testes com jogadores.
 - `npm run dev` — servidor de desenvolvimento (Vite) em http://localhost:5173
 - `npm run pixel` — gera os sprites e o chão (`chao-map01.png`) em `public/assets/`, o `tools/pixel-art/preview.html`, o `tools/pixel-art/escolha-orc.html` e a `tools/pixel-art/cena-referencia.png`
 - `npm run build` — build de produção em `dist/`
+- `npm run revisor` — ferramenta de revisão de pixel art (só em desenvolvimento): marcações do diretor de arte em
+  `tools/revisor/revisoes/`; o comando `/revisar <sprite>` aplica as correções no código-fonte do gerador
 - `npm run preview` — serve o build de produção
 
 ## Fluxo de trabalho

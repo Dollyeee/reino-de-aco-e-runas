@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Revisor de pixel art — Reino de Aço e Runas</title>
+<link rel="stylesheet" href="./revisor.css">
+</head>
+<body>
+<header>
+  <h1>Revisor de pixel art</h1>
+  <div class="modos">
+    <button id="modoRevisar" class="ativo">Revisar</button>
+    <button id="modoComparar">Comparar</button>
+  </div>
+  <label>Zoom <input id="zoom" type="range" min="4" max="16" step="1" value="8"> <span id="zoomVal">8×</span></label>
+  <label><input id="grade" type="checkbox" checked> grade</label>
+  <button id="salvar" class="salvar" disabled>Salvar marcações</button>
+  <span id="status"></span>
+</header>
+<main>
+  <aside id="lista">
+    <input id="busca" placeholder="filtrar sprites…">
+    <div id="itens"></div>
+  </aside>
+  <section id="centro">
+    <div id="topo">
+      <strong id="nomeSprite">Escolha um sprite na lista</strong>
+      <span id="infoSprite"></span>
+      <span id="quadroCtl" hidden>
+        <button id="qAnt">◀</button> quadro <input id="quadro" type="number" min="0" value="0"> / <span id="qTotal">1</span> <button id="qProx">▶</button>
+      </span>
+      <div id="aviso" hidden></div>
+    </div>
+    <div id="vistaRevisar" class="vista">
+      <canvas id="tela"></canvas>
+      <p class="dica">Clique num pixel ou arraste um retângulo para marcar. Réguas: coordenadas do quadro (destaque a cada 8).</p>
+    </div>
+    <div id="vistaComparar" class="vista" hidden>
+      <div class="cmpCtl">
+        <label>Antes: <select id="antesSel"></select></label>
+        <button id="piscar">Piscar</button>
+        <span id="piscarInfo"></span>
+      </div>
+      <div class="cmpLado">
+        <figure><figcaption>Antes</figcaption><canvas id="telaAntes"></canvas></figure>
+        <figure><figcaption>Depois (atual)</figcaption><canvas id="telaDepois"></canvas></figure>
+      </div>
+    </div>
+  </section>
+  <aside id="painel">
+    <h2>No jogo (tamanho real)</h2>
+    <canvas id="contexto" width="260" height="170"></canvas>
+    <canvas id="contexto2" width="520" height="340"></canvas>
+    <p class="dica">Sobre o chão do mapa 1, ao lado do orc. Embaixo, ampliado 2×.</p>
+    <h2>Marcações <span id="contagem"></span></h2>
+    <ol id="marcas"></ol>
+  </aside>
+</main>
+
+<dialog id="dlg">
+  <form method="dialog">
+    <h3>Nova marcação <span id="dlgArea"></span></h3>
+    <label>Comentário (descreva a sensação — o que incomoda)
+      <textarea id="dlgTexto" rows="4" required></textarea></label>
+    <label>Categoria
+      <select id="dlgCat">
+        <option>forma/silhueta</option><option>luz e sombra</option><option>cor</option>
+        <option>ruído/sujeira</option><option>proporção</option><option>detalhe</option><option>outro</option>
+      </select></label>
+    <label>Prioridade
+      <select id="dlgPri"><option value="alta">alta</option><option value="média" selected>média</option><option value="baixa">baixa</option></select></label>
+    <menu><button value="cancelar" formnovalidate>Cancelar</button><button value="ok" id="dlgOk">Marcar</button></menu>
+  </form>
+</dialog>
+
+<script type="module" src="./revisor.js"></script>
+</body>
+</html>

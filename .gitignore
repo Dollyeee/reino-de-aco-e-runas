@@ -13,3 +13,6 @@ Claude outputs/
 
 # configuração local de MCP (pode conter chaves de API: nunca versionar)
 .mcp.json
+
+# recortes gerados pelo /revisar (tools/revisor/recorte.mjs)
+tools/revisor/recortes/

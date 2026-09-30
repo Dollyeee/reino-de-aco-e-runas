@@ -511,7 +511,14 @@ ENTREGA: escolha-torres.html com Besta A atual × Besta nova, no tamanho real so
 
 ---
 
-## [ ] T23 — Ferramenta de revisão de pixel art e /revisar
+## [x] T23 — Ferramenta de revisão de pixel art e /revisar
+
+**Concluída em 2026-09-30.** Resultado:
+- T21 cancelada com o motivo (sem serviços pagos) — feito ao registrar esta tarefa.
+- `npm run revisor` abre `tools/revisor/index.html` (plugin `tools/revisor/plugin.js` só no servidor de desenvolvimento, `apply: 'serve'`; o build não muda). Lista `public/assets/*.png` e `tools/pixel-art/rodadas/*.png` com quadro das folhas (JSON irmão ou `towerArt.js`), zoom 4–16× com grade e réguas numeradas nas 4 bordas (todo pixel, destaque a cada 8), contexto no tamanho real e 2× sobre o chão ao lado do orc, marcação por clique/retângulo com comentário, categoria e prioridade, lista numerada com status (aberta / corrigida / recusada / precisa de esclarecimento), modo Comparar lado a lado + Piscar. Salvar grava `tools/revisor/revisoes/<sprite>.json` com o hash sha256 do PNG (e em cada marcação) e copia o PNG revisado como "antes".
+- `/revisar <sprite>` em `.claude/skills/revisar/SKILL.md` (padrão de /fila e /proxima): ordem alta → baixa, recortes com `tools/revisor/recorte.mjs` (lista, recorte ampliado, antes × depois), tabela sprite → código-fonte, tradução de "sensação" para termos de pixel art, correção só no gerador, status corrigida/esclarecimento com resposta, aviso de efeitos colaterais, commit "Revisão <sprite>: N correções".
+- ART_SPEC.md (seção 10): fluxo reviso → /revisar aplica → confiro no Comparar. CLAUDE.md: comando e pasta.
+- Primeiro uso: `tools/revisor/config.json` fixa "torre-besta-a-base" e "torre-besta-a-cabeca" no topo da lista (a ferramenta abre direto na base). Testado no navegador: marcação por arraste, salvar (JSON + cópia "antes"), comparar; dados de teste apagados.
 
 Criar uma ferramenta de revisão de pixel art para eu atuar como diretor de arte, e o comando /revisar para aplicar minhas correções. Antes: cancele a T21 (piloto SpriteCook) — decidi não usar serviços pagos; marque como cancelada com o motivo.
 
