@@ -138,6 +138,44 @@ Mudar a direção de arte para PIXEL ART desenhada em código, começando pelo O
 
 Ajustes no pixel art do Orc (tools/pixel-art/sprites/orc.js): proporções (pernas ~30%, tronco ~40% curvado, cabeça maior), braços grossos e clava 30% maior, placas de aço legíveis (sombra escura ≤ ~1/3 por parte), caminhada com poses-chave (contato ±5 px, passagem, pé levantando 2–3 px, olho acompanhando), orc com ~100 px de altura, preview "antes × depois". (Texto completo enviado pela conversa em 2026-09-30.)
 
-## [ ] T07 — Aplicar balanceamento da sugestão da T01
+## [x] T07 — Aplicar balanceamento da sugestão da T01
+
+**Concluída em 2026-09-30.** Resultado:
+- Aplicado em `src/config/balance.js`: Catapulta de Plasma custo 120 → **135**; onda 5 `healthMult` 3.1 → **3.5**; onda 4 **mantida em 2.5** (aprovado pelo usuário).
+- Simulação (robô construindo nas curvas em U, mesma da T01; Catapulta 135 e onda 5 = 3.5 fixos; determinística):
+
+  | Onda 4 `healthMult` | Mista | Só Catapultas | Só Bestas |
+  |---|---|---|---|
+  | 2.45 | 16/20 | 14/20 | 4/20 |
+  | **2.5 (escolhido)** | **16/20** | **14/20** | **4/20** |
+  | 2.52 | 16/20 | 12/20 | 4/20 |
+  | 2.55 | 16/20 | 10/20 | 5/20 |
+  | 2.6 | 14/20 | 10/20 | 3/20 |
+  | 2.65 | 14/20 | 10/20 | 2/20 |
+  | 2.8 | 12/20 | 9/20 | 5/20 |
+  | 3.2 | 7/20 | 3/20 | 1/20 |
+
+  Referência sem mudanças (Catapulta 120, onda 5 = 3.1): 20/20 nas três estratégias.
+- Alvo pedido (mista ~15, só Catapultas ~13) não é atingível só com a onda 4: a mista fica em 16 até 2.55 e cai direto para 14 em 2.6.
+- **Pendência:** observar nos testes manuais do usuário a força da Besta Laser sozinha (só Bestas vence com apenas 4/20).
 
 Sobre a sugestão de balanceamento da T01: aplique a Catapulta custo 135 e a onda 5 healthMult 3.5, mas ajuste a onda 4 para que a estratégia mista vença ~15/20 e "só Catapultas" ~13/20 na mesma simulação. Me mostre os números antes de commitar.
+
+## [ ] T08 — Pixel art em alta resolução
+
+Pixel art em ALTA RESOLUÇÃO com mais detalhe, a partir do orc já ajustado (proporções e caminhada da tarefa anterior). Isso passa a valer para TODA a arte do jogo.
+
+1. Resolução: PIXEL_SCALE = 1 (1 pixel da arte = 1 pixel do mundo 1280×720). O orc passa a ser desenhado com ~100 px de altura (canvas ~112×104), ocupando o mesmo tamanho de tela de antes. Reescale todas as coordenadas das partes do orc para a nova grade (não amplie o sprite antigo — redesenhe as partes na resolução nova).
+
+2. Técnicas de detalhe no gerador (tools/pixel-art/lib), reutilizáveis para todos os sprites:
+   - Rampas de 5 tons por material com hue shift (sombras puxam para roxo/azul frio, luzes para amarelo quente). Atualize palette.js.
+   - Contorno seletivo: contorno externo #1e1512; contornos internos na cor mais escura do próprio material (não preto).
+   - Dithering/texturas por material: aço escovado (linhas horizontais sutis), ferrugem (manchas nas bordas das placas), couro (ruído leve), pele (poucos pixels de volume muscular). Textura com semente fixa, igual em todos os quadros da animação (não pode "ferver").
+   - Brilho especular: 1–3 pixels claros nas placas voltadas para a luz (canto superior esquerdo) e rim light de 1 px na borda direita da silhueta.
+   - Pixels emissivos: olho, runas e plasma com núcleo claro + halo de 1–2 px nos tons da rampa ciano/vermelha.
+
+3. Detalhes do orc: rebites e arranhões nas placas, costura e fivela no cinto, dentes e presas com volume, veias/músculos nos braços, bota com sola e cadarço de couro, espinhos na clava e runas ciano gravadas nela. Tudo com a hierarquia de leitura mantida: olho e clava continuam sendo os pontos que mais chamam atenção.
+
+4. A caminhada continua gerada pelas partes (8 quadros) e deve ficar igual em ritmo à versão ajustada, só com mais resolução. Deslocamentos continuam inteiros (agora em pixels de 1×, então dobre os valores).
+
+5. Atualize ART_SPEC.md e CLAUDE.md: pixel art 1×, inimigos comuns ~100 px de altura, rampas de 5 tons, contorno seletivo. Rode npm run pixel e npm run build e gere no preview.html o comparativo "2× antigo × 1× novo" no tamanho real e ampliado 4×.

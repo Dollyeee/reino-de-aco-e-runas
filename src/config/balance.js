@@ -35,7 +35,7 @@ export const BALANCE = {
         plasmaCatapult: {
             name: 'Catapulta de Plasma',
             description: 'Lenta e cara.\nDano em área, disparo em arco.',
-            cost: 120,
+            cost: 135,
             damage: 40,              // dano no centro da explosão
             edgeDamageFactor: 0.5,   // fração do dano na borda da área
             splashRadius: 80,
@@ -82,6 +82,6 @@ export const BALANCE = {
         { enemy: 'cyberOrc', count: 12, interval: 950,  healthMult: 1.4, speedMult: 1.05, rewardMult: 1.0 },
         { enemy: 'cyberOrc', count: 16, interval: 820,  healthMult: 1.9, speedMult: 1.10, rewardMult: 1.1 },
         { enemy: 'cyberOrc', count: 22, interval: 700,  healthMult: 2.5, speedMult: 1.15, rewardMult: 1.1 },
-        { enemy: 'cyberOrc', count: 30, interval: 580,  healthMult: 3.1, speedMult: 1.22, rewardMult: 1.2 }
+        { enemy: 'cyberOrc', count: 30, interval: 580,  healthMult: 3.5, speedMult: 1.22, rewardMult: 1.2 }
     ]
 };
