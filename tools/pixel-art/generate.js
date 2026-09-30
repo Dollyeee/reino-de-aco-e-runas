@@ -24,6 +24,11 @@ import { drawScene, drawDecorMap } from './cenario/cena.js';
 import { DECOR_KITS, DECOR_ITEMS, decorFor } from '../../src/config/decor.js';
 import { DECOR_KIT } from '../../src/config/art.js';
 import { escolhaDecoracaoHtml } from './escolha-decoracao.js';
+import { TOWER_ART, HEAD_ANGLES, ARM_ANGLES } from '../../src/config/towerArt.js';
+import { escolhaTorresHtml } from './escolha-torres.js';
+import { BUILD_FX } from '../../src/config/visual.js';
+import bestaArt from './sprites/torres/besta.js';
+import catapultaArt from './sprites/torres/catapulta.js';
 import kitA from './sprites/decoracao/kit-a.js';
 import kitB from './sprites/decoracao/kit-b.js';
 import kitC from './sprites/decoracao/kit-c.js';
@@ -315,6 +320,49 @@ for (const [kit, draw] of Object.entries(KIT_DRAW)) {
     console.log(`✓ public/assets/decor-${kit}-*.png  (kit ${kit.toUpperCase()} "${DECOR_KITS[kit].name}", ${DECOR_ITEMS.length} itens)`);
 }
 
+// ---------------------------------------------------------------- torres (T19)
+// 3 versões de cada torre: base + peça que gira redesenhada em cada ângulo (folha de quadros).
+// public/assets/torre-besta-<v>-base.png, torre-besta-<v>-cabeca.png, torre-catapulta-<v>-base.png, torre-catapulta-<v>-braco.png
+const TOWER_DRAW = {
+    laserCrossbow: { file: 'besta', art: bestaArt, piece: 'head', pieceFile: 'cabeca', draw: 'head' },
+    plasmaCatapult: { file: 'catapulta', art: catapultaArt, piece: 'arm', pieceFile: 'braco', draw: 'arm' }
+};
+const towers = {};
+const edgeHits = (rgba, fw, fh) => {
+    const at = (x, y) => rgba[(y * fw + x) * 4 + 3];
+    for (let i = 0; i < fw; i++) { if (at(i, 0) || at(i, fh - 1)) { return true; } }
+    for (let j = 0; j < fh; j++) { if (at(0, j) || at(fw - 1, j)) { return true; } }
+    return false;
+};
+for (const [tower, T] of Object.entries(TOWER_DRAW)) {
+    towers[tower] = {};
+    for (const [v, def] of Object.entries(TOWER_ART[tower])) {
+        const [bw, bh] = def.base.frame;
+        const base = T.art[v].base();
+        if (base.w !== bw || base.h !== bh) { throw new Error(`[pixel] torre ${tower}/${v}: base ${base.w}×${base.h} ≠ frame ${def.base.frame}`); }
+        const baseRGBA = base.toRGBA();
+        const bottom = [...Array(bw).keys()].some((x) => baseRGBA[((bh - 1) * bw + x) * 4 + 3]);
+        if (!bottom) { console.log(`  ⚠️ torre ${tower}/${v}: a base não encosta na borda de baixo do quadro`); }
+        const mountName = def.headMount ? 'headMount' : 'armPivot';
+        checkPoint(`TOWER_ART.${tower}.${v}.${mountName}`, { x: def.base.pivot[0] + def[mountName].x, y: def.base.pivot[1] + def[mountName].y }, bw, bh);
+        const P = def[T.piece];
+        const [pw, ph] = P.frame;
+        for (const name of (T.piece === 'head' ? ['muzzle', 'crystal'] : ['cup', 'orb'])) {
+            checkPoint(`TOWER_ART.${tower}.${v}.${name}`, { x: P.pivot[0] + def[name].x, y: P.pivot[1] + def[name].y }, pw, ph);
+        }
+        const frames = P.angles.map((a) => T.art[v][T.draw](a));
+        frames.forEach((cv, i) => {
+            if (cv.w !== pw || cv.h !== ph) { throw new Error(`[pixel] torre ${tower}/${v}: peça ${cv.w}×${cv.h} ≠ frame ${P.frame}`); }
+            if (edgeHits(cv.toRGBA(), pw, ph)) { console.log(`  ⚠️ torre ${tower}/${v}: peça encostando na borda no ângulo ${Math.round(P.angles[i] * 180 / Math.PI)}°`); }
+        });
+        fs.writeFileSync(path.join(ASSETS, `torre-${T.file}-${v}-base.png`), encodeRGBA(baseRGBA, bw, bh));
+        fs.writeFileSync(path.join(ASSETS, `torre-${T.file}-${v}-${T.pieceFile}.png`), encodeSheet(frames, { w: pw, h: ph }));
+        towers[tower][v] = { base, baseRGBA, frames, def };
+        checkShading(`torre ${tower} ${v}`, [base, ...frames]);
+    }
+    console.log(`✓ public/assets/torre-${T.file}-a|b|c-*.png  (${Object.keys(TOWER_ART[tower]).length} versões)`);
+}
+
 // ---------------------------------------------------------------- cenário (T12)
 const { img: ground, track, tiles } = drawGround(MAP01);
 fs.writeFileSync(path.join(ASSETS, 'chao-map01.png'), encodeRGBA(ground.toRGBA(), ground.w, ground.h));
@@ -345,6 +393,16 @@ fs.writeFileSync(path.join(HERE, 'escolha-decoracao.html'), escolhaDecoracaoHtml
     kits: Object.keys(KIT_DRAW).map((id) => ({ id, ...DECOR_KITS[id] })), items: DECOR_ITEMS, grass: GRASS
 }));
 console.log('✓ tools/pixel-art/escolha-decoracao.html  (+ decoracao/mapa-a|b|c.png)');
+
+// escolha-torres.html: as 3 versões de cada torre paradas/animadas, na cena do mapa 1 e ampliadas 4×
+const dA = DECOR_KITS.a.items;
+const decorRef = (file, item, x, y) => ({ file, x, y, w: dA[item].frame[0], h: dA[item].frame[1], px: dA[item].pivot[0], py: dA[item].pivot[1], shadow: dA[item].shadow });
+fs.writeFileSync(path.join(HERE, 'escolha-torres.html'), escolhaTorresHtml({
+    towerArt: TOWER_ART, headAngles: HEAD_ANGLES, armAngles: ARM_ANGLES, buildFx: BUILD_FX,
+    orc: { w: orcB.frame.w, h: orcB.frame.h, px: orcV.pivot[0], py: orcV.pivot[1], shadow: orcV.shadow },
+    decor: [decorRef('decor-a-arvore3.png', 'arvore3', 34, 154), decorRef('decor-a-pedraM.png', 'pedraM', 262, 138)]
+}));
+console.log('✓ tools/pixel-art/escolha-torres.html');
 
 // preview: tiles lado a lado, mosaico 8×5 sorteado e recorte do mapa
 const tileStrip = new Uint8Array(tiles.length * TILE * TILE * 4);

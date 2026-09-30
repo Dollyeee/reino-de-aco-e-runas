@@ -1,0 +1,95 @@
+// Página tools/pixel-art/escolha-torres.html (T19) — gerada por `npm run pixel`.
+// As 3 versões de cada torre: paradas e animadas (materialização rúnica → mira com recuo / arremesso), no tamanho real
+// sobre o chão do mapa ao lado de um orc e de peças do kit A, e ampliadas 4×. O script da página está em
+// escolha-torres.client.js (embutido aqui); as imagens são referenciadas por caminho relativo (public/assets/).
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const A = '../../public/assets/';
+
+// cena comum (recorte do chão do mapa 1 onde o caminho passa na horizontal, y = 560)
+const SCENE = {
+    w: 300, h: 230, crop: { x: 330, y: 390 }, pathY: 170, orcSpeed: 62,
+    tower: { x: 150, y: 142 }, orcIdle: { x: 238 }
+};
+
+export function escolhaTorresHtml ({ towerArt, headAngles, armAngles, buildFx, orc, decor }) {
+    const towers = {};
+    const cols = { laserCrossbow: [], plasmaCatapult: [] };
+    const DEG = Math.PI / 180;
+    const kinds = [['laserCrossbow', 'besta', 'head', 'cabeca', 'besta'], ['plasmaCatapult', 'catapulta', 'arm', 'braco', 'catapulta']];
+    for (const [tower, file, pieceName, pieceFile, kind] of kinds) {
+        for (const [v, d] of Object.entries(towerArt[tower])) {
+            const id = `${file}-${v}`;
+            const P = d[pieceName];
+            const topY = kind === 'besta' ? d.headMount.y - 26 : d.armPivot.y + d.orb.y * Math.cos(20 * DEG) - 10;
+            const h = Math.max(d.base.frame[1], -Math.round(topY)) + 14;
+            const w = kind === 'besta' ? 100 : 150;
+            towers[id] = {
+                kind, name: d.name,
+                base: { src: `${A}torre-${file}-${v}-base.png`, w: d.base.frame[0], h: d.base.frame[1], px: d.base.pivot[0], py: d.base.pivot[1] },
+                piece: { src: `${A}torre-${file}-${v}-${pieceFile}.png`, w: P.frame[0], h: P.frame[1], px: P.pivot[0], py: P.pivot[1] },
+                mount: d.headMount || d.armPivot, muzzle: d.muzzle, crystal: d.crystal, cup: d.cup, orb: d.orb,
+                shadow: d.shadow, float: d.float || 0,
+                rest: -0.35, windup: -0.85, throwA: 1.05,
+                crop: { x: Math.round(SCENE.tower.x - w / 2), y: Math.max(0, SCENE.tower.y - h + 10), w, h: Math.min(h, SCENE.tower.y + 10) }
+            };
+            cols[tower].push(`
+        <div class="col">
+          <h3>${v.toUpperCase()} — ${d.name}</h3>
+          <p class="note">${d.note}</p>
+          <p class="up"><b>Nível 3:</b> ${d.upgrades[3]}<br><b>Nível 4:</b> ${d.upgrades[4]}</p>
+          <div class="row">
+            <figure><canvas data-tw="${id}" data-zoom="1" data-mode="still"></canvas><figcaption>parada · tamanho real</figcaption></figure>
+            <figure><canvas data-tw="${id}" data-zoom="1" data-mode="anim"></canvas><figcaption>materialização + ${kind === 'besta' ? 'mira e recuo' : 'arremesso'} · tamanho real</figcaption></figure>
+          </div>
+          <div class="row">
+            <figure><canvas data-tw="${id}" data-zoom="4" data-mode="anim"></canvas><figcaption>animada · 4×</figcaption></figure>
+            <figure><canvas data-tw="${id}" data-zoom="4" data-mode="still"></canvas><figcaption>parada · 4×</figcaption></figure>
+          </div>
+        </div>`);
+        }
+    }
+    const data = {
+        towers, headAngles, armAngles, buildFx,
+        scene: {
+            ...SCENE, ground: `${A}chao-map01.png`,
+            orc: { walk: `${A}orc-b-walk.png`, idle: `${A}orc-b.png`, ...orc },
+            decor: decor.map((d) => ({ ...d, src: `${A}${d.file}` }))
+        }
+    };
+    const client = fs.readFileSync(path.join(HERE, 'escolha-torres.client.js'), 'utf8');
+    return `<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Torres — escolha das versões</title>
+<style>
+  body { margin: 0; padding: 24px; background: #14100d; color: #f1e6cf; font: 14px/1.4 system-ui, sans-serif; }
+  h1 { font-size: 20px; margin: 0 0 4px; } h2 { font-size: 16px; margin: 28px 0 8px; color: #c8fdff; } h3 { font-size: 14px; margin: 0 0 4px; }
+  p { margin: 0 0 10px; color: #b8a8a0; } code { color: #c8fdff; } .note { color: #d8c8b8; } .up { font-size: 12px; }
+  .cols { display: flex; gap: 22px; align-items: flex-start; flex-wrap: wrap; } .col { flex: 0 0 auto; max-width: 1240px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; } figure { margin: 0 0 10px; } figcaption { font-size: 12px; color: #b8a8a0; margin-top: 3px; }
+  canvas { image-rendering: pixelated; display: block; border: 1px solid #2a1f18; }
+</style>
+</head>
+<body>
+<h1>Torres em pixel art — 3 versões de cada</h1>
+<p>Gerado por <code>npm run pixel</code>. Cenário real do mapa 1 (chão, kit A, orc Saqueador). A animação repete a cada 9 s: materialização rúnica,
+depois combate. A peça de cima é redesenhada em cada ângulo (sem rotação de imagem) e o recuo é em pixels inteiros.
+Para testar no jogo: <code>TOWER_VARIANT</code> em <code>src/config/art.js</code> ou <code>?besta=a&amp;catapulta=c</code> na URL (padrão <code>'atual'</code> = SVGs).</p>
+<h2>Besta Laser</h2>
+<div class="cols">${cols.laserCrossbow.join('')}
+</div>
+<h2>Catapulta de Plasma</h2>
+<div class="cols">${cols.plasmaCatapult.join('')}
+</div>
+<script>const DATA = ${JSON.stringify(data)};</script>
+<script>${client}</script>
+</body>
+</html>
+`;
+}

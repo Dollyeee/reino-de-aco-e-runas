@@ -3,7 +3,9 @@ import Tower from './Tower.js';
 import PlasmaBall from '../projectiles/PlasmaBall.js';
 import { BALANCE } from '../config/balance.js';
 import { COLORS, LIGHTING } from '../config/visual.js';
-import { makeArt, anchor } from '../world/art.js';
+import { towerPixel } from '../config/art.js';
+import { ARM_ANGLES, armFrameFor } from '../config/towerArt.js';
+import { makeArt, makeSprite, anchor } from '../world/art.js';
 
 const REST_ANGLE = -0.35;       // braço inclinado para trás, em repouso
 const WINDUP_ANGLE = -0.85;     // puxada antes do arremesso
@@ -12,26 +14,36 @@ const WINDUP_MS = 170;
 const THROW_MS = 110;
 
 // Catapulta de Plasma: lenta e cara, arremessa bolas de plasma em arco com dano em área.
+// Arte atual (SVG): o braço gira (rotation). Pixel art (TOWER_VARIANT): os tweens animam o ângulo de `armPose`
+// e o braço troca de quadro (um por ângulo, redesenhado pelo gerador); a bola acompanha a concha do quadro.
 export default class PlasmaCatapult extends Tower {
     constructor (scene, x, y) {
-        super(scene, x, y, 'plasmaCatapult', BALANCE.towers.plasmaCatapult, 'tower-catapult');
+        const px = towerPixel('plasmaCatapult');
+        super(scene, x, y, 'plasmaCatapult', BALANCE.towers.plasmaCatapult, 'tower-catapult', px);
+        this.px = px;
 
-        this.baseImg = makeArt(scene, 0, 0, 'tower-catapult-base').setLighting(true);
-        const pivot = anchor('tower-catapult-base', 'armPivot');
+        this.baseImg = makeArt(scene, 0, 0, px ? px.baseKey : 'tower-catapult-base').setLighting(true);
+        const pivot = px ? px.armPivot : anchor('tower-catapult-base', 'armPivot');
         this.pivot = pivot;
-        this.cup = anchor('tower-catapult-arm', 'cup');
-        const orb = anchor('tower-catapult-arm', 'orb');
+        this.cup = px ? px.cup : anchor('tower-catapult-arm', 'cup');
+        const orb = px ? px.orb : anchor('tower-catapult-arm', 'orb');
+        this.orbAnchor = orb;
 
         this.armRig = new Phaser.GameObjects.Container(scene, pivot.x, pivot.y);
-        this.arm = makeArt(scene, 0, 0, 'tower-catapult-arm').setLighting(true);
+        this.arm = px ? makeSprite(scene, 0, 0, px.pieceKey).setLighting(true) : makeArt(scene, 0, 0, 'tower-catapult-arm').setLighting(true);
+        // pixel art: concha menor → bola e brilho menores
+        const glowSize = px ? 30 : 56;
         this.orbGlow = scene.make.image({ x: orb.x, y: orb.y, key: 'dot' }, false)
-            .setBlendMode('ADD').setTint(COLORS.cyan).setDisplaySize(56, 56);
-        this.orb = makeArt(scene, orb.x, orb.y, 'projectile-plasma', 0.9);
+            .setBlendMode('ADD').setTint(COLORS.cyan).setDisplaySize(glowSize, glowSize);
+        this.orb = makeArt(scene, orb.x, orb.y, 'projectile-plasma', px ? 0.45 : 0.9);
         this.armRig.add([this.arm, this.orbGlow, this.orb]);
         this.rig.add([this.baseImg, this.armRig]);
         this.pieces = [this.baseImg, this.armRig];    // materialização: base, depois o braço
 
-        this.armRig.rotation = REST_ANGLE;
+        // alvo dos tweens do braço: o próprio Container (SVG) ou um ângulo virtual (pixel art, sem rotação)
+        this.armPose = px ? { rotation: REST_ANGLE } : this.armRig;
+        this.armPose.rotation = REST_ANGLE;
+        this.applyArm();
         this.facing = 1;
         this.loaded = true;
         this.firing = false;
@@ -45,9 +57,22 @@ export default class PlasmaCatapult extends Tower {
         })[0];
     }
 
+    // Pixel art: quadro do braço para o ângulo atual; a bola e o brilho ficam na concha daquele quadro.
+    applyArm () {
+        if (!this.px) { return; }
+        const f = armFrameFor(this.armPose.rotation);
+        this.arm.setFrame(f);
+        const a = ARM_ANGLES[f], o = this.orbAnchor;
+        const ox = Math.round(o.x * Math.cos(a) - o.y * Math.sin(a));
+        const oy = Math.round(o.x * Math.sin(a) + o.y * Math.cos(a));
+        this.orb.setPosition(ox, oy);
+        this.orbGlow.setPosition(ox, oy);
+    }
+
     update (dt) {
         super.update(dt);
         this.pulseT += dt;
+        this.applyArm();
         if (this.loaded) {
             const p = Math.sin(this.pulseT * 5);
             this.orbGlow.setAlpha(0.65 + 0.3 * p);
@@ -70,7 +95,7 @@ export default class PlasmaCatapult extends Tower {
 
     turn (f) {
         this.facing = f;
-        this.rig.scaleX = f;
+        this.rig.scaleX = f;      // espelho inteiro (vale também para pixel art)
         this.kick(0.8, 1.12, 380);
     }
 
@@ -81,13 +106,14 @@ export default class PlasmaCatapult extends Tower {
         this.cooldown = s.fireCooldown;
         const target = this.target;
 
-        scene.tweens.killTweensOf(this.armRig);
+        scene.tweens.killTweensOf(this.armPose);
         scene.tweens.chain({
-            targets: this.armRig,
+            targets: this.armPose,
             tweens: [
                 {
                     rotation: WINDUP_ANGLE, duration: WINDUP_MS, ease: 'Sine.easeOut',
                     onStart: () => {
+                        if (this.pixel) { return; }   // pixel art: sem squash
                         scene.tweens.killTweensOf(this);
                         scene.tweens.add({ targets: this, scaleX: 1.12, scaleY: 0.86, duration: WINDUP_MS, ease: 'Sine.easeOut' });
                     }
@@ -96,7 +122,9 @@ export default class PlasmaCatapult extends Tower {
                     rotation: THROW_ANGLE, duration: THROW_MS, ease: 'Cubic.easeIn',
                     onComplete: () => this.release(target)
                 },
-                { rotation: REST_ANGLE, duration: 750, ease: 'Elastic.easeOut', easeParams: [1.1, 0.35] }
+                this.px
+                    ? { rotation: REST_ANGLE, duration: 520, ease: 'Back.easeOut', easeParams: [1.4] }   // pixel art: retorno firme
+                    : { rotation: REST_ANGLE, duration: 750, ease: 'Elastic.easeOut', easeParams: [1.1, 0.35] }
             ],
             onComplete: () => { this.firing = false; }
         });
@@ -107,7 +135,7 @@ export default class PlasmaCatapult extends Tower {
         const scene = this.scene;
 
         // posição da concha no mundo (considera rotação do braço e o lado para onde a catapulta olha)
-        const rot = this.armRig.rotation;
+        const rot = this.px ? ARM_ANGLES[armFrameFor(this.armPose.rotation)] : this.armRig.rotation;
         const lx = -this.cup.y * Math.sin(rot);
         const ly = this.cup.y * Math.cos(rot);
         const wx = this.x + (this.pivot.x + lx) * this.facing;

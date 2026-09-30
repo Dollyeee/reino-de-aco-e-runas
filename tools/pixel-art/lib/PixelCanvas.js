@@ -18,6 +18,10 @@
 // Escala de grade (opts.scale, padrão 1): as coordenadas do desenho são multiplicadas por `scale` ANTES de
 // rasterizar — o sprite é redesenhado numa grade menor (contorno de 1 px, sem reamostrar imagem). Deslocamentos
 // da animação também são escalados e arredondados (continuam inteiros); `dot` e `rivet` mantêm 1 px de detalhe.
+//
+// Rotação de grade (opts.rotate = { angle, cx, cy }, T19): as coordenadas do desenho giram em volta de (cx, cy) ANTES
+// de rasterizar — peças que giram no jogo (cabeça da besta, braço da catapulta) são redesenhadas em cada ângulo, com
+// contorno de 1 px e luz do canto superior esquerdo aplicada depois (a luz não gira junto). Nunca se gira a imagem pronta.
 
 import { MATERIALS, OUTLINE } from '../palette.js';
 import { TEXTURES, rust, seedOf } from './textures.js';
@@ -26,11 +30,12 @@ import { TEXTURES, rust, seedOf } from './textures.js';
 
 export class Mask {
     // origin: deslocamento base de todas as formas (permite reenquadrar um sprite sem mudar coordenadas)
-    // k: escala de grade (coordenadas do desenho × k)
-    constructor (w, h, origin = [0, 0], k = 1) {
+    // k: escala de grade (coordenadas do desenho × k); rot: { angle, cx, cy } (rotação de grade, opcional)
+    constructor (w, h, origin = [0, 0], k = 1, rot = null) {
         this.w = w;
         this.h = h;
         this.k = k;
+        this.rot = rot && rot.angle ? { c: Math.cos(rot.angle), s: Math.sin(rot.angle), cx: rot.cx || 0, cy: rot.cy || 0 } : null;
         this.data = new Uint8Array(w * h);
         this.ox = origin[0];
         this.oy = origin[1];
@@ -45,6 +50,17 @@ export class Mask {
         return this;
     }
 
+    // ponto do desenho → posição contínua no canvas (rotação de grade, escala, deslocamentos)
+    tp (x, y) {
+        const r = this.rot;
+        if (r) {
+            const dx = x - r.cx, dy = y - r.cy;
+            x = r.cx + dx * r.c - dy * r.s;
+            y = r.cy + dx * r.s + dy * r.c;
+        }
+        return [x * this.k + this.dx, y * this.k + this.dy];
+    }
+
     has (x, y) {
         return x >= 0 && y >= 0 && x < this.w && y < this.h && this.data[y * this.w + x] === 1;
     }
@@ -54,17 +70,20 @@ export class Mask {
     }
 
     px (x, y) {
+        if (this.rot) { const [X, Y] = this.tp(x, y); this.set(Math.round(X), Math.round(Y)); return this; }
         this.set(Math.round(x * this.k) + this.dx, Math.round(y * this.k) + this.dy);
         return this;
     }
 
     // 1 px no ponto escalado + deslocamento em pixels FINAIS (detalhes que não podem sumir nem engordar)
     dot (x, y, fx = 0, fy = 0) {
+        if (this.rot) { const [X, Y] = this.tp(x, y); this.set(Math.round(X) + fx, Math.round(Y) + fy); return this; }
         this.set(Math.round(x * this.k) + fx + this.dx, Math.round(y * this.k) + fy + this.dy);
         return this;
     }
 
     rect (x, y, w, h) {
+        if (this.rot) { return this.poly([[x, y], [x + w, y], [x + w, y + h], [x, y + h]]); }
         const k = this.k;
         const x0 = Math.round(x * k), y0 = Math.round(y * k);
         const x1 = Math.max(x0 + 1, Math.round((x + w) * k)), y1 = Math.max(y0 + 1, Math.round((y + h) * k));
@@ -76,7 +95,7 @@ export class Mask {
 
     // polígono (coordenadas contínuas); preenche os pixels cujo centro está dentro
     poly (points) {
-        const pts = points.map(([x, y]) => [x * this.k + this.dx, y * this.k + this.dy]);
+        const pts = points.map(([x, y]) => this.tp(x, y));
         const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
         const x0 = Math.floor(Math.min(...xs)), x1 = Math.ceil(Math.max(...xs));
         const y0 = Math.floor(Math.min(...ys)), y1 = Math.ceil(Math.max(...ys));
@@ -89,6 +108,12 @@ export class Mask {
     }
 
     ellipse (cx, cy, rx, ry = rx) {
+        if (this.rot) {
+            // girada: vira polígono de 32 lados (no desenho) antes de girar
+            const pts = [];
+            for (let i = 0; i < 32; i++) { const a = (i / 32) * Math.PI * 2; pts.push([cx + Math.cos(a) * rx, cy + Math.sin(a) * ry]); }
+            return this.poly(pts);
+        }
         cx = cx * this.k + this.dx; cy = cy * this.k + this.dy;
         rx *= this.k; ry *= this.k;
         for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y++) {
@@ -104,8 +129,9 @@ export class Mask {
     line (x0, y0, x1, y1, thickness = 1) {
         const k = this.k;
         if (thickness * k <= 1) {
-            let ax = Math.round(x0 * k), ay = Math.round(y0 * k);
-            const bx = Math.round(x1 * k), by = Math.round(y1 * k);
+            const [p0x, p0y] = this.tp(x0, y0), [p1x, p1y] = this.tp(x1, y1);
+            let ax = Math.round(p0x - this.dx), ay = Math.round(p0y - this.dy);
+            const bx = Math.round(p1x - this.dx), by = Math.round(p1y - this.dy);
             const sx = ax < bx ? 1 : -1, sy = ay < by ? 1 : -1;
             const dx = Math.abs(bx - ax), dy = -Math.abs(by - ay);
             let err = dx + dy;
@@ -119,7 +145,7 @@ export class Mask {
             return this;
         }
         const r = thickness * k / 2;
-        const ax = x0 * k + this.dx, ay = y0 * k + this.dy, bx = x1 * k + this.dx, by = y1 * k + this.dy;
+        const [ax, ay] = this.tp(x0, y0), [bx, by] = this.tp(x1, y1);
         for (let y = Math.floor(Math.min(ay, by) - r); y <= Math.ceil(Math.max(ay, by) + r); y++) {
             for (let x = Math.floor(Math.min(ax, bx) - r); x <= Math.ceil(Math.max(ax, bx) + r); x++) {
                 if (distToSegment(x + 0.5, y + 0.5, ax, ay, bx, by) <= r) { this.set(x, y); }
@@ -174,10 +200,12 @@ export class PixelCanvas {
     // opts.darkRatio (padrão 0.3): fração máxima de cada parte nos tons escuros (0 e 1).
     // opts.origin [x, y]: deslocamento base de todas as formas.
     // opts.scale: escala de grade (redesenha o sprite numa grade menor; ver o topo do arquivo).
+    // opts.rotate: { angle, cx, cy } rotação de grade (peças que giram no jogo).
     constructor (w, h, opts = {}) {
         this.w = w;
         this.h = h;
         this.k = opts.scale ?? 1;
+        this.rotate = opts.rotate || null;
         this.darkRatio = opts.darkRatio ?? 0.3;
         this.origin = opts.origin || [0, 0];
         this.color = new Array(w * h).fill(null);      // '#rrggbb' ou null
@@ -191,7 +219,7 @@ export class PixelCanvas {
     }
 
     mask () {
-        return new Mask(this.w, this.h, this.origin, this.k);
+        return new Mask(this.w, this.h, this.origin, this.k, this.rotate);
     }
 
     filled (x, y) {

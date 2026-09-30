@@ -398,3 +398,36 @@ Escolha da decoração: kit A (Bosque antigo) como base do mapa 1, com transiç�
 4. O kit B (Fronteira de pinheiros) fica guardado como bioma de um mapa futuro de montanha/fronteira: registre isso no DESIGN.md (seção de mapas), junto com a ideia de "cada kit = bioma de um mapa".
 5. Remova do jogo os SVGs antigos de árvore, pedra e cristal que deixarem de ser usados (mantenha o histórico no git).
 6. Atualize a cena de referência e mostre antes × depois. npm run pixel e npm run build.
+
+---
+
+## [x] T19 — Torres em pixel art: 3 versões de cada
+
+**Concluída em 2026-09-30.** Resultado:
+- 6 torres (Besta A/B/C, Catapulta A/B/C) em `tools/pixel-art/sprites/torres/`; encaixes, ângulos e onde entram os upgrades de nível 3/4 em `src/config/towerArt.js`. Peça de cima = folha com um quadro por ângulo (cabeça 13 quadros de −90° a +90°, espelho para a esquerda; braço 12 quadros de −50° a +60°), redesenhada pelo `PixelCanvas` com a nova **rotação de grade** (nunca rotação de imagem).
+- `tools/pixel-art/escolha-torres.html` (+ `escolha-torres.client.js`): cada versão parada e animada (materialização rúnica → mira/recuo ou arremesso) na cena real do mapa 1 com orc, árvore e pedra do kit A, em 1× e 4×.
+- Jogo: `TOWER_VARIANT` em `src/config/art.js` (padrão `'atual'`) ou `?besta=a&catapulta=c`. `LaserCrossbow`/`PlasmaCatapult`/`towerPreview` com caminho pixel (quadro por ângulo, recuo de 3 px inteiros, `kick` = 1 px, sombra de pixels, orbe e brilhos menores, braço volta com `Back`); `Tower` ganhou suporte a pixel art. Padrão inalterado (simulação com as mesmas assinaturas da T18).
+- Pendências: escolher as versões; a plataforma rúnica, o orbe e os projéteis continuam SVG.
+
+Converter as 2 torres para pixel art 1×, com 3 versões TOTALMENTE diferentes de cada para eu escolher. Não substitua as torres atuais no jogo até eu decidir. Siga ART_SPEC.md e DESIGN.md.
+
+Regras para todas as versões:
+- Peças separadas (base + peça de cima que gira/dispara), para a materialização rúnica, o recuo elástico e a rotação de mira continuarem funcionando. Pontos de encaixe (headMount/armPivot, muzzle/cup) declarados como hoje.
+- Leitura instantânea no tamanho real: a torre deve se destacar do chão e da decoração mais que as árvores e menos que os efeitos. Ciano forte só nas partes de energia (cristal, arco, núcleo de plasma).
+- Pensadas para os upgrades (DESIGN.md, caminhos cruzados 3×4): deixe claro em cada versão onde entrariam as peças dos níveis 3 e 4 (ex.: cano duplo, luneta, cristal maior), mesmo sem desenhá-las agora.
+- Base com ~72–80 px de largura para a Besta e ~88–96 px para a Catapulta (ajuste se ficar desproporcional ao orc de ~80 px), respeitando o footprint de construção.
+
+Besta Laser (rápida, barata, alvo único):
+- A: torre de vigia de madeira e pedra com uma besta mecânica no topo; arco com cordas de energia ciano.
+- B: pedestal rúnico de pedra flutuando levemente, com uma besta de metal escuro e um cristal-mira ciano.
+- C: "sentinela" compacta de aço com trilho de disparo tipo arma de plasma, placas rebitadas e um visor ciano.
+
+Catapulta de Plasma (lenta, cara, dano em área):
+- A: catapulta clássica de madeira sobre rodas reforçadas com ferro, concha com orbe de plasma.
+- B: trabuco alto com contrapeso de pedra rúnica brilhando, braço longo.
+- C: morteiro-forja: base de pedra e ferro com um braço mecânico hidráulico e um reator de plasma visível.
+
+Entregáveis:
+1. tools/pixel-art/escolha-torres.html: as 3 versões de cada torre paradas, a animação de disparo (recuo + rotação) e a materialização rúnica rodando; no tamanho real sobre o chão do mapa, ao lado de orcs e árvores do kit escolhido; e ampliadas 4×.
+2. Seletores TOWER_VARIANT.laserCrossbow e TOWER_VARIANT.plasmaCatapult em src/config/art.js ('atual' | 'a' | 'b' | 'c') para eu testar no jogo; padrão 'atual'.
+3. npm run pixel e npm run build sem erros. Me diga em 2 linhas o ponto forte e o ponto fraco de cada versão.

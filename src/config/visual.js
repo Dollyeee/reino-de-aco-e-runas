@@ -6,6 +6,7 @@ export const WORLD = { width: 1280, height: 720 };
 // Resolução interna = WORLD × RENDER_SCALE. As câmeras dão zoom para caber no mundo.
 // Pixel art pede zoom INTEIRO (1, 2, 3): cada pixel da arte vira um bloco exato de pixels da tela.
 function pickRenderScale () {
+    if (typeof window === 'undefined') { return 1; }   // fora do navegador (gerador de pixel art)
     const dpr = window.devicePixelRatio || 1;
     const screenH = Math.min(window.innerHeight, window.innerWidth * WORLD.height / WORLD.width) * dpr;
     return Math.min(3, Math.max(1, Math.floor(screenH / WORLD.height + 0.15)));

@@ -255,7 +255,27 @@ entram quando a fase deles chegar.
   pele verde-acinzentada só nos ombros e no maxilar. Caminhada mecânica: pé anda em linha reta no apoio, afunda 3 px
   no pouso ("tranco") e o canhão atrasa 1 quadro.
 
-### Besta Laser — base `tower-crossbow-base` + cabeça `tower-crossbow-head`
+### Torres em pixel art (T19) — 3 versões de cada, aguardando escolha
+Fonte: `tools/pixel-art/sprites/torres/besta.js` e `catapulta.js`; encaixes em `src/config/towerArt.js`; arquivos
+`public/assets/torre-besta-<v>-base.png` + `-cabeca.png` e `torre-catapulta-<v>-base.png` + `-braco.png`; comparação
+animada em `tools/pixel-art/escolha-torres.html`; no jogo: `TOWER_VARIANT` em `src/config/art.js` ou `?besta=a&catapulta=c`.
+- **Peças**: base (imagem) + peça de cima em **folha de quadros por ângulo** — cabeça da besta de −90° a +90° de 15 em 15°
+  (13 quadros; o lado esquerdo usa o espelho), braço da catapulta de −50° a +60° de 10 em 10° (12 quadros). Cada quadro é
+  **redesenhado** pelo gerador (`PixelCanvas` com `rotate`): contorno de 1 px e luz do canto superior esquerdo em todos
+  os ângulos. É a forma permitida de "girar" em pixel art.
+- **Encaixes** como nas torres SVG: `headMount`/`armPivot` (na base), `muzzle`/`crystal` (cabeça apontando para a direita),
+  `cup`/`orb` (braço em pé); o gerador falha se algum cair fora do quadro.
+- **Tamanhos**: base da Besta 76–80 px de largura, da Catapulta 90–96 px (footprint 38 e 46 px de raio).
+- **Upgrades**: cada versão declara em `upgrades` onde entram as peças dos níveis 3 e 4 (caminhos do DESIGN.md).
+- **Ciano forte só nas partes de energia** (cordas, cristal-mira, trilho de plasma, runas do contrapeso, reator).
+
+| Versão | Besta Laser | Catapulta de Plasma |
+|---|---|---|
+| A | torre de vigia de madeira e pedra, besta com cordas de energia | catapulta de madeira sobre rodas com aro de ferro |
+| B | pedestal de pedra flutuante com runas, besta escura com cristal-mira | trabuco alto, contrapeso de pedra rúnica |
+| C | bunker de aço rebitado, trilho de plasma, visor ciano | morteiro-forja: pedra e ferro, braço hidráulico, reator |
+
+### Besta Laser — base `tower-crossbow-base` + cabeça `tower-crossbow-head` (SVG atual)
 - **Base**: 88×88 · pivot 44,88 · simétrica (não espelha).
   - `headMount` (0, −61): onde fica o eixo de giro da cabeça (centro do topo da base).
 - **Cabeça (peça que gira)**: 116×66 · pivot 58,33 = **eixo de giro** · desenhada **apontando para a direita**.
@@ -267,7 +287,7 @@ entram quando a fase deles chegar.
   da torre inteira ao atirar/construir.
 - Sombra no chão: elipse 84×30.
 
-### Catapulta de Plasma — base `tower-catapult-base` + braço `tower-catapult-arm`
+### Catapulta de Plasma — base `tower-catapult-base` + braço `tower-catapult-arm` (SVG atual)
 - **Base**: 128×104 · pivot 64,104 · desenhada **virada para a direita** (espelhada quando o alvo está à
   esquerda).
   - `armPivot` (0, −52): eixo onde o braço gira.

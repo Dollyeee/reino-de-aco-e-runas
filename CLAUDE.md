@@ -27,8 +27,9 @@ cada personagem **em partes** numa grade pequena. Não se edita PNG à mão: mud
 > Transição em andamento: o **Orc Cibernético** (com caminhada) e o **chão do mapa 1** (T12) já são pixel art 1×.
 > A **decoração** é pixel art em 3 kits = biomas (T15/T18): mapa 1 = kit A (Bosque antigo) com transição para o kit C
 > (Floresta rúnica) perto do castelo; kit B (Fronteira de pinheiros) guardado para um mapa futuro. Kit base do mapa em
-> `decorKit` (padrão `DECOR_KIT` em `src/config/art.js`), troca por item com `kit`. Torres, castelo, projéteis e ícones
-> ainda são os SVGs antigos (placeholders) e serão refeitos no mesmo gerador.
+> `decorKit` (padrão `DECOR_KIT` em `src/config/art.js`), troca por item com `kit`. As **torres** têm 3 versões em pixel
+> art aguardando escolha (T19, `TOWER_VARIANT`). Castelo, plataforma, projéteis e ícones ainda são os SVGs antigos
+> (placeholders) e serão refeitos no mesmo gerador.
 > **Guia de estilo ("bíblia") em `ART_SPEC.md`**: paleta completa, luz, contorno, densidade de detalhe, tamanhos de
 > referência e sombras. Toda arte nova segue esse guia.
 > O orc padrão é o **"Saqueador"** (`sprites/orc-b.js`, `ORC_VARIANT = 'b'` em `src/config/art.js`); o orc da T08
@@ -100,7 +101,10 @@ Personalidade vem do **peso**, não da elasticidade. Nada fica 100% parado, mas 
 - **Morte (pixel art)**: para no quadro parado, pisca e afunda em passos de pixel, e se desfaz em faíscas/destroços.
 - **Arte vetorial antiga** (enquanto existir): squash contido (máx. 5–8%), tombo ao morrer.
 - **Easing `Elastic` só em UI e explosões.** No mundo use `Quad`, `Cubic`, `Sine` e `Back` com pouco overshoot.
-- **Torres com recuo** ao disparar e retorno firme (a migrar para pixel art: hoje ainda usam `Elastic` e escala).
+- **Torres com recuo** ao disparar e retorno firme. SVG atual: `Elastic` e escala. Pixel art (T19): a peça que gira
+  (cabeça da besta, braço da catapulta) é uma **folha com um quadro por ângulo**, redesenhada pelo gerador (rotação de
+  grade, nunca rotação da imagem); lado esquerdo = quadro espelhado; recuo de 3 px inteiros na direção oposta ao tiro,
+  voltando em 2 passos; `kick` = afundar 1 px; retorno do braço com `Back` (sem `Elastic`).
 - **Construção = materialização rúnica**: círculo de runas girando + luz ciano → base revelada de baixo para cima
   em holograma (`setCrop` + linha de varredura) → peças de cima descem e encaixam (`Back.easeOut`, squash ~6%) →
   flash e faíscas. Genérico em `Tower.playBuildAnimation` a partir de `this.pieces` (base primeiro); tempos e
@@ -121,6 +125,7 @@ public/assets/            SVGs substituíveis (torres, inimigos, castelo, crista
 src/
   main.js                 configuração do Phaser.Game
   config/decor.js         kits de decoração (itens, quadros, sombras, raio de bloqueio) e decorFor (kit por item)
+  config/towerArt.js      torres em pixel art: 3 versões de cada (quadros, ângulos, encaixes, onde entram os upgrades)
   config/balance.js       TODOS os valores de balanceamento (dano, alcance, custo, vida, velocidade, ondas, economia)
   config/visual.js        cores, profundidades, luzes, bloom, escala de renderização
   data/map01.js           caminho, castelo e decoração do mapa 1 (decorações também bloqueiam construção)
@@ -170,7 +175,9 @@ explicitamente. Dentro de uma fase, o trabalho continua passando pela fila (`TAR
 Tudo em **pixel art 1×**, seguindo o guia de estilo do `ART_SPEC.md`:
 - [x] Orc Cibernético "Saqueador" (orc B) com caminhada (T05–T10)
 - [x] Chão e caminho do mapa 1 + guia de estilo (T12)
-- [ ] Torres (Besta Laser, Catapulta de Plasma) e plataforma rúnica
+- [ ] Torres (Besta Laser, Catapulta de Plasma) — 3 versões de cada em pixel art (T19), aguardando a escolha
+  (`TOWER_VARIANT` em `src/config/art.js`, padrão `'atual'`; comparação em `tools/pixel-art/escolha-torres.html`)
+- [ ] Plataforma rúnica
 - [ ] Castelo + Núcleo Arcano
 - [x] Decoração (árvores, pedras, cristais): kit A no mapa 1 com transição para o C perto do castelo (T15/T18)
 - [ ] Projéteis e efeitos

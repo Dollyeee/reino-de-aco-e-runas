@@ -43,7 +43,9 @@ export const PLATFORM_OFFSET = 10;
 //   peças de cima (Image/Container) → surgem em holograma acima do encaixe, descem e encaixam
 // Torres futuras com mais peças só precisam listar as peças na ordem.
 export default class Tower extends Phaser.GameObjects.Container {
-    constructor (scene, x, y, type, stats, shadowKey) {
+    // pixelDef: versão em pixel art (towerPixel() de src/config/art.js) ou null para a arte atual (SVG).
+    // Em pixel art não há escala nem rotação nos sprites: squash/kick viram deslocamento de pixel inteiro.
+    constructor (scene, x, y, type, stats, shadowKey, pixelDef = null) {
         super(scene, x, y + PLATFORM_OFFSET);
         scene.add.existing(this);
 
@@ -56,6 +58,7 @@ export default class Tower extends Phaser.GameObjects.Container {
         this.target = null;
         this.ready = false;
         this.pieces = [];
+        this.pixel = !!pixelDef;
 
         // capacidades de ataque (tipo de dano, camadas que acerta) = BALANCE + modificadores
         this.capabilityMods = [];
@@ -64,8 +67,8 @@ export default class Tower extends Phaser.GameObjects.Container {
         this.rig = new Phaser.GameObjects.Container(scene, 0, 0);
         this.add(this.rig);
 
-        const sh = SHADOWS[shadowKey] || [80, 28];
-        this.shadow = scene.shadows.add(this.x, this.y - 4, sh[0], sh[1]);
+        const sh = pixelDef ? pixelDef.shadow : (SHADOWS[shadowKey] || [80, 28]);
+        this.shadow = scene.shadows.add(this.x, this.y - 4, sh[0], sh[1], { pixel: this.pixel });
         this.setDepth(DEPTH.OBJECTS + this.y);
 
         // plataforma rúnica embaixo da torre
@@ -193,7 +196,8 @@ export default class Tower extends Phaser.GameObjects.Container {
 
         // sombra cresce junto com a revelação (começa pequena e fraca)
         const k = 0.3 + 0.7 * b;
-        this.shadow.setDisplaySize(this.shadow.baseW * k, this.shadow.baseH * k).setAlpha(SHADOW.alpha * b);
+        if (!this.shadow.pixel) { this.shadow.setDisplaySize(this.shadow.baseW * k, this.shadow.baseH * k); }
+        this.shadow.setAlpha(SHADOW.alpha * b);
 
         // 3) peças de cima: surgem acima do encaixe, descem com Back.easeOut e ficam sólidas no impacto
         const sp = phase(t, F.snap);
@@ -219,6 +223,7 @@ export default class Tower extends Phaser.GameObjects.Container {
         p.y = p._mountY;
         p.setAlpha(1);
         setHologram(p, false);
+        if (this.pixel) { this.kick(); return; }
         // squash de ~6% na torre inteira
         const sq = BUILD_FX.squash;
         this.scene.tweens.killTweensOf(this);
@@ -239,13 +244,20 @@ export default class Tower extends Phaser.GameObjects.Container {
         this.platform.setAlpha(1).setScale(this.platform.baseScale);
         this.platformShadow.setAlpha(0.3);
         this.platformGlow.setVisible(true);
-        this.shadow.setDisplaySize(this.shadow.baseW, this.shadow.baseH).setAlpha(SHADOW.alpha);
+        if (!this.shadow.pixel) { this.shadow.setDisplaySize(this.shadow.baseW, this.shadow.baseH); }
+        this.shadow.setAlpha(SHADOW.alpha);
         this.buildTween = null;
         this.ready = true;
     }
 
-    // Squash rápido do corpo todo (disparo).
+    // Squash rápido do corpo todo (disparo). Pixel art: afunda 1 px e volta (sem escala).
     kick (sx = 1.12, sy = 0.88, duration = 420) {
+        if (this.pixel) {
+            this.rig.y = 1;
+            if (this._kickTimer) { this._kickTimer.remove(); }
+            this._kickTimer = this.scene.time.delayedCall(90, () => { this.rig.y = 0; });
+            return;
+        }
         this.scene.tweens.killTweensOf(this);
         this.setScale(sx, sy);
         this.scene.tweens.add({ targets: this, scaleX: 1, scaleY: 1, duration, ease: 'Elastic.easeOut', easeParams: [1.1, 0.4] });

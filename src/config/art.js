@@ -21,6 +21,38 @@
 // e `pivot`, todo o encaixe continua igual.
 
 import { DECOR_ITEMS, DECOR_KITS } from './decor.js';
+import { TOWER_ART } from './towerArt.js';
+
+// ---------------------------------------------------------------------------------------------------------
+// Versão das torres (T19): 'atual' (SVGs, padrão até a escolha) | 'a' | 'b' | 'c' (pixel art, src/config/towerArt.js).
+// Para testar sem editar este arquivo: ?besta=a&catapulta=c na URL. Comparação: tools/pixel-art/escolha-torres.html.
+export const TOWER_VARIANT = {
+    laserCrossbow: 'atual',
+    plasmaCatapult: 'atual'
+};
+
+function pickTowerVariants () {
+    const out = { ...TOWER_VARIANT };
+    try {
+        const q = new URLSearchParams(globalThis.location ? globalThis.location.search : '');
+        for (const [tower, param] of [['laserCrossbow', 'besta'], ['plasmaCatapult', 'catapulta']]) {
+            const v = q.get(param);
+            if (v && (v === 'atual' || TOWER_ART[tower][v])) { out[tower] = v; }
+        }
+    } catch (e) { /* fora do navegador (gerador): usa TOWER_VARIANT */ }
+    return out;
+}
+export const TOWER_ACTIVE = pickTowerVariants();
+
+const TOWER_FILES = { laserCrossbow: ['besta', 'head', 'cabeca'], plasmaCatapult: ['catapulta', 'arm', 'braco'] };
+
+// Torre em pixel art ativa (encaixes de towerArt.js + chaves de textura) ou null se for a arte atual (SVG).
+export function towerPixel (tower) {
+    const v = TOWER_ACTIVE[tower];
+    if (!v || v === 'atual') { return null; }
+    const [file, , pieceFile] = TOWER_FILES[tower];
+    return { variant: v, ...TOWER_ART[tower][v], baseKey: `torre-${file}-${v}-base`, pieceKey: `torre-${file}-${v}-${pieceFile}` };
+}
 
 // ---------------------------------------------------------------------------------------------------------
 // Kit de decoração (T15/T18): 'a' Bosque antigo (padrão, escolhido na T18) | 'b' Fronteira de pinheiros |
@@ -105,6 +137,16 @@ export const ART = {
     'icon-core':            { file: 'icon-core.svg', size: [48, 48], pivot: [24, 24] },
     'icon-wave':            { file: 'icon-wave.svg', size: [48, 48], pivot: [24, 24] }
 };
+
+// torres em pixel art da versão ativa: base (imagem) + peça que gira (folha com um quadro por ângulo)
+for (const [tower, [file, piece, pieceFile]] of Object.entries(TOWER_FILES)) {
+    const v = TOWER_ACTIVE[tower];
+    if (v === 'atual') { continue; }
+    const d = TOWER_ART[tower][v];
+    ART[`torre-${file}-${v}-base`] = { file: `torre-${file}-${v}-base.png`, pixel: true, size: d.base.frame, pivot: d.base.pivot };
+    const P = d[piece];
+    ART[`torre-${file}-${v}-${pieceFile}`] = { file: `torre-${file}-${v}-${pieceFile}.png`, pixel: true, frame: P.frame, size: P.frame, pivot: P.pivot };
+}
 
 // decoração em pixel art: todos os itens de todos os kits (mapas misturam kits); chaves 'decor-<kit>-<item>'
 for (const [kit, K] of Object.entries(DECOR_KITS)) {
