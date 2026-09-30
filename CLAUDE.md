@@ -185,9 +185,28 @@ Tudo em **pixel art 1×**, seguindo o guia de estilo do `ART_SPEC.md`:
 - Pausar e velocidade 2×/3×
 - Vender torre (reembolso)
 - Prioridade de alvo (primeiro / último / mais forte / mais perto)
-- Estrutura de upgrades com capacidades (2 a 3 níveis por torre; upgrades trocam `damageType` ou ampliam `canHit`
-  via `Tower.addCapabilityMod`, hook pronto desde a T11)
+- Estrutura de upgrades com capacidades (design abaixo)
 - Aviso da próxima onda
+
+#### Design dos upgrades (decidido na T16 — ainda não implementado)
+- **Caminhos cruzados (estilo Bloons)**: cada torre tem **3 caminhos × 4 níveis**.
+- **Regra de cruzamento**: um caminho pode chegar ao **nível 4**; um segundo caminho, só até o **nível 2**; o terceiro
+  fica **bloqueado** depois que os outros dois forem escolhidos. (Combinações possíveis por torre: 4/2/0 em qualquer ordem
+  de caminhos, e tudo abaixo disso.)
+- **Peso visual por nível**: níveis 1–2 = melhorias menores com pequenos detalhes visuais; nível 3 = mudança visível;
+  nível 4 = mudança grande de visual **e** de comportamento.
+- **Números e capacidades**: um upgrade pode mudar números (dano, alcance, cadência, área…) **e** capacidades —
+  `damageType`, `canHit` e efeitos novos (dano contínuo, fragmentação, redução de armadura…) — pelo hook da T11
+  (`Tower.addCapabilityMod`; efeitos novos entram como novos campos de modificador).
+- **Visual por peças**: cada nível troca ou adiciona **peças** no gerador de pixel art (ex.: outra cabeça, reforço na
+  base, emissor novo), sem redesenhar a torre inteira — segue o esquema de peças da materialização (`this.pieces`).
+- **Balanceamento**: todo caminho e toda combinação passam pelo **simulador de balanceamento (Fase B)** antes de entrar no jogo.
+- **Esboço inicial dos caminhos** (nomes e ideia; números na produção):
+
+  | Torre | Caminho 1 | Caminho 2 | Caminho 3 |
+  |---|---|---|---|
+  | Besta Laser | **Perfurante** — anti-blindado | **Rajada** — cadência, tiro triplo | **Sentinela** — alcance + acerta voadores |
+  | Catapulta de Plasma | **Devastação** — área maior | **Fragmentação** — sub-bombas | **Corrosão** — derrete armadura e escudo, dano contínuo |
 
 ### Fase D — Conteúdo em pacotes completos
 Cada pacote entra **completo**: arte + animação + som + efeitos + upgrades + balanceamento validado no simulador.

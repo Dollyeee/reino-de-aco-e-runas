@@ -343,7 +343,11 @@ Entregáveis:
 
 ---
 
-## [ ] T16 — Registrar design dos upgrades
+## [x] T16 — Registrar design dos upgrades
+
+**Concluída em 2026-09-30.** Resultado:
+- CLAUDE.md, Plano de produção → Fase C: nova subseção "Design dos upgrades" com caminhos cruzados 3 × 4, regra de cruzamento (4/2/bloqueado), peso visual por nível, números + capacidades pelo hook da T11, visual por peças no gerador, validação obrigatória no simulador da Fase B e a tabela com o esboço dos caminhos da Besta Laser e da Catapulta de Plasma.
+- Só documentação: nenhum código alterado.
 
 Registrar no CLAUDE.md (plano de produção, Fase C — estrutura de upgrades) a decisão de design dos upgrades. Não implemente nada agora.
 
@@ -369,3 +373,16 @@ Conteúdo:
 5. Esboço dos caminhos de upgrade das 8 torres (3 caminhos cada, só nomes e ideia), seguindo a regra de caminhos cruzados já registrada.
 6. Ordem sugerida de introdução ao longo dos mapas (qual torre e qual inimigo aparece em qual mapa) e um escopo reduzido "versão 0.5" (4 torres, 5 inimigos, 1 chefe) como marco intermediário.
 7. Seção "Em aberto": números, custos e visuais são definidos na produção de cada item; o documento é revisado a cada fase.
+
+---
+
+## [ ] T18 — Decoração do mapa 1: kit A com transição para C
+
+Escolha da decoração: kit A (Bosque antigo) como base do mapa 1, com transição para o kit C (Floresta rúnica) perto do castelo.
+
+1. DECOR_KIT = 'a' como padrão do mapa 1.
+2. Transição narrativa: quanto mais perto do castelo/Núcleo Arcano, mais "contaminada" pela energia rúnica fica a floresta. No terço final do mapa (perto do castelo), troque algumas peças do kit A por peças do kit C: os aglomerados de cristal maiores do C, 1–2 árvores com veias ciano e o pilar em ruína como elemento temático. Na entrada do mapa, nada de ciano além dos cristais pequenos. O ciano da decoração deve ser sempre mais fraco (menos pixels emissivos, sem luz dinâmica forte) que o ciano de torres, projéteis e runas de gameplay.
+3. Permita misturar peças de kits diferentes por item em map01.js (ex.: { type: 'arvore2', kit: 'c', ... }), para cada mapa poder ter sua transição.
+4. O kit B (Fronteira de pinheiros) fica guardado como bioma de um mapa futuro de montanha/fronteira: registre isso no DESIGN.md (seção de mapas), junto com a ideia de "cada kit = bioma de um mapa".
+5. Remova do jogo os SVGs antigos de árvore, pedra e cristal que deixarem de ser usados (mantenha o histórico no git).
+6. Atualize a cena de referência e mostre antes × depois. npm run pixel e npm run build.
