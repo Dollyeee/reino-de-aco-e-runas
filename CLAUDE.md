@@ -34,7 +34,7 @@ cada personagem **em partes** numa grade pequena. Não se edita PNG à mão: mud
 > referência e sombras. Toda arte nova segue esse guia.
 > **Processo padrão desde a T22** (`ART_SPEC.md`, seção 10): conceito (3 silhuetas) → blocagem → luz e volume → materiais
 > com peças desenhadas à mão (`tools/pixel-art/lib/materiais/` + `lib/Grade.js`) → limpeza, com autocrítica e no mínimo
-> 3 rodadas salvas em `tools/pixel-art/rodadas/`. Piloto: Besta nova (`?besta=n`, aguardando aprovação).
+> 3 rodadas salvas em `tools/pixel-art/rodadas/`. Piloto: Besta nova (T22); **no jogo: Besta solo** (T26, `'s'`; `?besta=n` mostra a nova).
 > O orc padrão é o **"Saqueador"** (`sprites/orc-b.js`, `ORC_VARIANT = 'b'` em `src/config/art.js`); o orc da T08
 > continua como alternativa (`?orc=atual` na URL). `tools/pixel-art/escolha-orc.html` compara "B antes × B ajustado".
 > Arte pronta para inimigos futuros fica em `tools/pixel-art/sprites/futuros/` (ver Plano de produção, Fase D).
@@ -181,7 +181,7 @@ explicitamente. Dentro de uma fase, o trabalho continua passando pela fila (`TAR
 Tudo em **pixel art 1×**, seguindo o guia de estilo do `ART_SPEC.md`:
 - [x] Orc Cibernético "Saqueador" (orc B) com caminhada (T05–T10)
 - [x] Chão e caminho do mapa 1 + guia de estilo (T12)
-- [ ] Torres (Besta Laser, Catapulta de Plasma) — 3 versões de cada em pixel art (T19), aguardando a escolha
+- [ ] Torres (Besta Laser, Catapulta de Plasma) — 3 versões de cada em pixel art (T19); **Besta: Besta solo (`'s'`, T26) no jogo**, Catapulta aguardando a escolha
   (`TOWER_VARIANT` em `src/config/art.js`, padrão `'atual'`; comparação em `tools/pixel-art/escolha-torres.html`)
 - [ ] Plataforma rúnica
 - [ ] Castelo + Núcleo Arcano

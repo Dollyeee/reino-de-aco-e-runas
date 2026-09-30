@@ -72,7 +72,7 @@ export function escolhaTorresHtml ({ towerArt, bestaAntes, headAngles, armAngles
     // T26: Besta atual no jogo (N) × Besta solo (S)
     towers['solo-n'] = entry(towerArt.laserCrossbow.n, 'besta', `${A}torre-besta-n-base.png`, `${A}torre-besta-n-cabeca.png`, 'head');
     towers['solo-s'] = entry(towerArt.laserCrossbow.s, 'besta', `${A}torre-besta-s-base.png`, `${A}torre-besta-s-cabeca.png`, 'head');
-    const soloVs = cell('solo-n', 'Besta atual no jogo (N)', towerArt.laserCrossbow.n, 'besta') +
+    const soloVs = cell('solo-n', 'Besta nova (N, T22)', towerArt.laserCrossbow.n, 'besta') +
         cell('solo-s', 'Besta solo (T26) — sem corpo de torre, apoio baixo', towerArt.laserCrossbow.s, 'besta');
     const rodadasSolo = [
         ['besta-solo-apoios.png', '0 · conceito: 3 apoios (tripé · pedestal de pedra, escolhido · plataforma giratória)'],
@@ -128,7 +128,7 @@ export function escolhaTorresHtml ({ towerArt, bestaAntes, headAngles, armAngles
 <p>Gerado por <code>npm run pixel</code>. Cenário real do mapa 1 (chão, kit A, orc Saqueador). A animação repete a cada 9 s: materialização rúnica,
 depois combate. A peça de cima é redesenhada em cada ângulo (sem rotação de imagem) e o recuo é em pixels inteiros.
 Para testar no jogo: <code>TOWER_VARIANT</code> em <code>src/config/art.js</code> ou <code>?besta=a&amp;catapulta=c</code> na URL (padrão <code>'atual'</code> = SVGs).</p>
-<h2>Besta atual × Besta solo (T26) — não trocada no jogo; teste com <code>?besta=s</code></h2>
+<h2>Besta nova (N) × Besta solo (T26) — a solo está no jogo desde a aprovação</h2>
 <div class="cols">${soloVs}
 </div>
 <h2>Rodadas da Besta solo (autocrítica em <code>tools/pixel-art/rodadas/besta-solo-autocritica.md</code>)</h2>

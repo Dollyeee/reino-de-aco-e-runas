@@ -109,7 +109,7 @@ bloqueado. Níveis 1–2 detalhes pequenos, 3 mudança visível, 4 mudança gran
 | **Forja de Éter** | **Veio Profundo** — mais éter por onda | **Juros** — bônus sobre o éter guardado | **Tributo** — éter extra por abate perto da forja |
 | **Obelisco de Comando** | **Estandarte** — mais cadência para torres próximas | **Farol** — alcance e detecção para torres próximas | **Comando** — dano e redução de armadura para torres próximas |
 
-**Besta solo (T26, aguardando aprovação — `?besta=s`)**: sem corpo de torre, a progressão visual acontece **na própria
+**Besta solo (T26, aprovada — é a Besta do jogo)**: sem corpo de torre, a progressão visual acontece **na própria
 arma e no apoio** (pedestal baixo de pedra com runa), sem crescer para cima (a besta nunca passa de ~60 px do chão):
 - **Níveis 1–2**: detalhes pequenos — rebites e cintas extras na coronha, a runa do pedestal mais acesa.
 - **Nível 3**: a arma ganha uma peça por caminho — **Rajada**: arco duplo; **Perfurante**: trilho de plasma sob o virote;
