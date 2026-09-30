@@ -5,7 +5,7 @@ Este arquivo é mantido pelo Claude Code. O usuário manda as tarefas pela conve
 - `/proxima` — executa a próxima tarefa pendente (uma por vez) e para.
 - Se chegar uma tarefa nova pela conversa enquanto outra está em andamento, ela é adicionada aqui e a atual continua.
 
-Status: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqueada (precisa do usuário)
+Status: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqueada (precisa do usuário) · `[-]` descartada
 
 ---
 
@@ -96,7 +96,9 @@ Regras:
 
 Teste: construir várias torres seguidas (inclusive com Shift), construir durante uma onda com inimigos passando perto (não pode atirar antes de terminar) e conferir depth/iluminação. npm run build sem erros.
 
-## [ ] T04 — Processo de arte pintada
+## [-] T04 — Processo de arte pintada
+
+**Descartada em 2026-09-30.** Substituída pela direção pixel art gerada por código (T05). Reaproveitados da preparação anterior: carregamento de PNG/WebP e `ART_SPEC.md`.
 
 Configurar o processo de arte pintada. A direção de arte mudou: o jogo passa a usar arte "pintada estilizada" gerada em PNG por IA de imagem, no lugar dos SVGs desenhados em código. Depende da tarefa que preparou o carregamento de PNG/WebP e o ART_SPEC.md.
 
@@ -115,3 +117,13 @@ Configurar o processo de arte pintada. A direção de arte mudou: o jogo passa a
 3. Adicione arte-bruta/ ao .gitignore (as imagens finais em public/assets/ entram no git).
 
 4. Teste com uma imagem de exemplo gerada por você mesmo (um círculo sobre fundo magenta), confira o recorte e a ancoragem, e depois apague o exemplo. npm run build sem erros.
+
+## [x] T05 — Pixel art do Orc Cibernético com caminhada
+
+**Concluída em 2026-09-30.** Resultado:
+- Gerador `tools/pixel-art/` (`npm run pixel`, Node + pngjs): primitivas sem antialias, cel shading automático por parte, contorno interno + silhueta, paleta fixa, preview.html.
+- Orc 60×52 em partes (`sprites/orc.js`) + caminhada de 8 quadros por fase t com deslocamentos inteiros → `orc-walk.png` e `orc.png`.
+- Jogo: `pixelArt`, zoom inteiro, `PIXEL_SCALE` 2, sprite sheet + anim no manifesto, walk com frameRate pela velocidade, recuo/morte em pixels inteiros, sombra de pixels, bloom e luzes mais fracos. SVG antigo do orc removido.
+- CLAUDE.md ("Direção de arte" pixel art) e ART_SPEC.md atualizados. T04 descartada.
+
+Mudar a direção de arte para PIXEL ART desenhada em código, começando pelo Orc Cibernético com animação de caminhada. (Texto completo enviado pela conversa em 2026-09-30: gerador em tools/pixel-art/ com `npm run pixel`, paleta fixa, orc 60×52 em partes, caminhada de 8 quadros, renderização pixel-perfect no jogo, atualizar CLAUDE.md e ART_SPEC.md, mostrar o preview.html.)

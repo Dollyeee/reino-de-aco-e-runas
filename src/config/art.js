@@ -9,6 +9,10 @@
 //                  É o ponto que fica na posição do objeto (ex.: pés = borda inferior central).
 //   scale          (opcional, só PNG/WebP) densidade do arquivo: 2 = arquivo com o dobro do tamanho lógico,
 //                  4 = quádruplo... Padrão 1. SVG não precisa: é rasterizado já na resolução da tela.
+//   pixel          (pixel art gerada por `npm run pixel`) 1 pixel do arquivo = PIXEL_SCALE px do mundo,
+//                  filtro NEAREST; o código não aplica escala fracionada nem rotação nesses sprites.
+//   frame [w, h]   (sprite sheet) tamanho de UM quadro em pixels do arquivo; os quadros ficam lado a lado.
+//   anims          (sprite sheet) animações: { nome: { start, end, frameRate, repeat } }
 //   demais pontos  (headMount, muzzle, cup, eye...) são deslocamentos em pixels lógicos a partir do pivot.
 //
 // Trocar SVG por PNG: mude só `file` (e `scale`, se o arquivo for em alta resolução). Mantendo `size`
@@ -27,8 +31,12 @@ export const ART = {
     'tower-catapult-arm':   { file: 'tower-catapult-arm.svg', size: [52, 108], pivot: [26, 100],
                               cup: { x: 0, y: -88 }, orb: { x: 0, y: -94 } },
 
-    'enemy-cyber-orc':      { file: 'enemy-cyber-orc.svg', size: [88, 94], pivot: [44, 94],
-                              eye: { x: 20, y: -63 }, hit: { x: 0, y: -34 }, top: -88 },
+    // pixel art (tools/pixel-art/sprites/orc.js): quadro 60×52 → 120×104 no mundo
+    'enemy-cyber-orc':      { file: 'orc-walk.png', pixel: true, frame: [60, 52], size: [120, 104], pivot: [60, 104],
+                              anims: { walk: { start: 0, end: 7, frameRate: 10, repeat: -1 } },
+                              idle: 'enemy-cyber-orc-idle',
+                              eye: { x: 37, y: -68 }, hit: { x: 0, y: -44 }, top: -98 },
+    'enemy-cyber-orc-idle': { file: 'orc.png', pixel: true, size: [120, 104], pivot: [60, 104] },
 
     'castle':               { file: 'castle.svg', size: [260, 272], pivot: [130, 272],
                               core: { x: 0, y: -178 }, pedestal: { x: 0, y: -122 } },
@@ -56,7 +64,7 @@ export const SHADOWS = {
     'build-slot': [96, 34],
     'tower-crossbow': [84, 30],
     'tower-catapult': [124, 38],
-    'enemy-cyber-orc': [64, 22],
+    'enemy-cyber-orc': [56, 16],   // pixel art: elipse de pixels (28×8 px da arte)
     'castle': [270, 60],
     'tree': [80, 26],
     'rock': [66, 20],

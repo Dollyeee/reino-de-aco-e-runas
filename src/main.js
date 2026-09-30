@@ -31,9 +31,8 @@ function startGame () {
             autoCenter: Phaser.Scale.CENTER_BOTH
         },
         render: {
-            antialias: true,
-            // mipmaps: arte em alta resolução (PNG/WebP 2×/4×) fica nítida quando reduzida na tela
-            mipmapFilter: 'LINEAR_MIPMAP_LINEAR',
+            // pixel art: filtro NEAREST, roundPixels e canvas "crisp" (texturas suaves pedem LINEAR no BootScene)
+            pixelArt: true,
             maxLights: LIGHTING.maxLights
         },
         scene: [BootScene, GameScene, UIScene, ResultScene]

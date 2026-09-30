@@ -1,48 +1,50 @@
 # Especificação de arte — Reino de Aço e Runas
 
-Documento para quem vai produzir a arte final. Cada asset abaixo substitui um arquivo em `public/assets/`.
-Direção de arte completa: seção "Estilo visual" do `CLAUDE.md` ("cartoon sério": Warcraft III, Kingdom Rush Vengeance).
+Direção de arte: **pixel art desenhada em código** (seção "Direção de arte" do `CLAUDE.md`).
+Os sprites são módulos JS em `tools/pixel-art/sprites/`; `npm run pixel` desenha cada um **em partes** e exporta
+os PNGs para `public/assets/` + `tools/pixel-art/preview.html`. Para mudar a arte, mude o módulo — não o PNG.
 
-## Regras gerais (valem para todos os assets)
+Situação: o **Orc Cibernético** já é pixel art. Os demais assets abaixo ainda são SVGs antigos (placeholders) e
+serão refeitos no gerador seguindo as mesmas regras; as medidas deles continuam valendo como referência.
 
-- **Formato**: SVG, PNG ou WebP, **fundo transparente**.
-  - PNG/WebP: entregue em **2× ou 4×** o tamanho lógico (ex.: pedra 76×56 → PNG 304×224 em 4×).
-    O jogo reduz na tela com mipmaps, então fica nítido em qualquer resolução.
-  - SVG: use `viewBox="0 0 <largura> <altura>"` com o tamanho lógico exato.
-- **Tamanho lógico** = tamanho que o asset ocupa no mundo do jogo (mapa de 1280×720). Respeite **exatamente**
-  a proporção indicada; o quadro inteiro conta (inclusive o espaço transparente).
-- **Margem**: deixe ao menos **3 px lógicos** livres em todas as bordas do quadro. Nada (nem o contorno) pode
-  encostar na borda, senão é cortado.
-- **Ancoragem (pivot)**: o ponto do quadro que fica "no chão" / no eixo do objeto. Na maioria dos assets é a
-  **borda inferior central** (onde os pés/base tocam o chão). Os pontos de encaixe da tabela são medidos
-  **a partir do pivot**, em pixels lógicos (x → direita, y → para baixo; y negativo = acima do pivot).
-- **Câmera 3/4**: vista de cima, levemente inclinada. Objetos mostram a face de cima e a frente.
-- **Luz fixa do canto superior esquerdo**, cel shading: cor base, lado escuro embaixo/à direita, brilho pequeno
-  em cima/à esquerda.
-- **NÃO desenhe**:
-  - **sombra projetada no chão** (o jogo desenha uma elipse suave embaixo de cada objeto);
-  - **halo/brilho fora da silhueta** em partes que emitem luz (o jogo adiciona brilho, luz dinâmica e Bloom);
-  - **pose de movimento, rastro ou borrão**: movimento, recuo, giro e squash são feitos pelo código.
-    Desenhe sempre uma **pose neutra e estável**.
-- **Cores**: paleta dessaturada (musgo, pedra fria, terra, bronze); ciano `#3ff5ff`, vermelho e laranja
-  **só** em energia, runas, olhos e explosões. Contorno marrom-escuro `#1e1512`, ~3 px na silhueta e
-  ~1,5 px nos detalhes internos.
-- **Peças separadas**: algumas torres são montadas com várias imagens (base + peça que gira). Entregue cada peça
-  num arquivo próprio, com o próprio pivot.
+## Regras da pixel art (valem para todo sprite novo)
 
-## Como trocar um arquivo
+- **Grade**: 1 pixel da arte = **2×2 px do mundo** (`PIXEL_SCALE` = 2, mundo 1280×720). O quadro do sprite é
+  definido em pixels da arte (ex.: orc 60×52 → 120×104 no mundo).
+- **Fundo transparente**, **sem antialias**, só cores da paleta fixa (`tools/pixel-art/palette.js`):
+  pele `#3e5422 #688434 #92ae4e` · aço `#262a32 #424a56 #6e7886` (destaque `#aab4c0`) ·
+  couro `#342418 #543a26 #705034` · tecido `#54221a #803828 #9c4e38` · ciano `#14788c #3ff5ff #c8fdff` ·
+  vermelho `#78101c #ff3b4e #ffd0c8` · presa `#aaa082 #e8dcc0 #fffaec` · ferrugem `#7a4a2c`.
+  Ciano e vermelho só em energia, runas, olhos e brilhos.
+- **Partes**: cada sprite é desenhado em partes, de trás para frente. Cada parte recebe cel shading automático
+  (rampa de 3 tons: claro em cima/esquerda, escuro embaixo/direita e na metade inferior-direita) e contorno
+  interno onde se sobrepõe a uma parte anterior. Contorno `#1e1512` de 1 px em volta da silhueta inteira.
+- **Câmera 3/4**, luz do canto superior esquerdo, personagem **olhando para a direita** (o jogo espelha).
+- **Ancoragem**: pés/base na **borda inferior central** do quadro (linha de baixo = contorno do chão).
+- **Margem**: pelo menos 1 px livre em volta de tudo, **considerando o maior deslocamento da animação**.
+- **Animação**: gerada pelas partes a partir de uma fase `t` (0..1), só com **deslocamentos inteiros**. Exporta uma
+  folha com os quadros lado a lado (`<nome>-walk.png`) e um quadro parado (`<nome>.png`).
+- **NÃO desenhe**: sombra projetada (o jogo desenha uma elipse de pixels), halos fora da silhueta (o jogo põe brilho
+  e luz), rotação ou escala (proibidas em pixel art).
 
-1. Salve o arquivo em `public/assets/` (pode mudar a extensão, ex.: `rock.svg` → `rock.png`).
-2. Em `src/config/art.js`, mude `file` para o novo nome e, se for PNG/WebP em alta resolução, ponha `scale: 2`
-   ou `scale: 4`. Não mexa em `size`, `pivot` nem nos pontos de encaixe se a arte seguiu esta especificação.
-3. Rode `npm run dev`. Se o tamanho do arquivo não bater com o tamanho lógico × `scale`, aparece um aviso
-   `[arte]` no console do navegador.
+## Como registrar um sprite no jogo
+
+1. Crie/edite o módulo em `tools/pixel-art/sprites/`, registre-o em `tools/pixel-art/generate.js` e rode `npm run pixel`.
+2. Em `src/config/art.js`: `file`, `pixel: true`, `frame: [w, h]` (se for folha), `anims`, `size` (= quadro × 2),
+   `pivot` (em px do mundo) e os pontos de encaixe (em px do mundo, a partir do pivot).
+3. Rode `npm run dev`. Se o arquivo não bater com `size`/`frame`, aparece um aviso `[arte]` no console.
+
+## Assets ainda em SVG (placeholders)
+
+- Formato atual: SVG, PNG ou WebP com fundo transparente (o carregador aceita os três).
+- **Tamanho lógico** e **pontos de encaixe** abaixo são em pixels do mundo; ao refazer em pixel art, o quadro em
+  pixels da arte é a metade (ex.: pedra 76×56 → quadro de 38×28).
 
 ## Resumo
 
 | Arquivo | Tamanho lógico | Pivot (no quadro) | Olha para | Animação feita pelo código |
 |---|---|---|---|---|
-| `enemy-cyber-orc` | 88×94 | 44,94 (inferior central) | direita (espelhado) | passo, balanço, dano, morte |
+| `enemy-cyber-orc` (pixel art) | 120×104 (quadro 60×52) | 60,104 (inferior central) | direita (espelhado) | caminhada em 8 quadros, dano, morte |
 | `tower-crossbow-base` | 88×88 | 44,88 (inferior central) | frente (simétrica) | squash |
 | `tower-crossbow-head` | 116×66 | 58,33 (centro = eixo de giro) | direita (gira 360°) | giro, recuo, brilho |
 | `tower-catapult-base` | 128×104 | 64,104 (inferior central) | direita (espelhada) | squash, vira de lado |
@@ -59,19 +61,22 @@ Direção de arte completa: seção "Estilo visual" do `CLAUDE.md` ("cartoon sé
 
 ## Assets
 
-### Orc Cibernético — `enemy-cyber-orc`
-- **Tamanho**: 88×94 · **pivot**: 44,94 (entre os pés, no chão) · **olha para a direita** (o jogo espelha
-  quando anda para a esquerda: a arte precisa funcionar espelhada).
-- **Pontos de encaixe**:
-  - `eye` (+20, −63): centro do olho robótico. O jogo põe um brilho vermelho em cima.
-  - `hit` (0, −34): altura do peito, onde os disparos acertam.
-  - `top` −88: topo da silhueta; a barra de vida fica logo acima.
-- **Leitura**: 3 massas claras (cabeça+elmo, tronco, braço com a clava de plasma). A pele jade clara deve
-  separar do chão (grama escura) em **valor**, não só em cor. Presas e arma devem aparecer também na silhueta
-  preta.
-- **Animação procedural**: passo pesado (sobe ~3 px e balança ±2°), achatamento de até 8% ao levar dano,
-  flash branco, morte = tomba para frente girando em torno dos pés. Desenhe **uma pose em pé, parada**.
-- Sombra no chão: elipse de 64×22 desenhada pelo jogo.
+### Orc Cibernético — `enemy-cyber-orc` (pixel art) ✅
+- **Arquivos**: `orc-walk.png` (folha 480×52, **8 quadros** de 60×52) e `orc.png` (parado, 60×52).
+  Fonte: `tools/pixel-art/sprites/orc.js`.
+- **Quadro**: 60×52 px da arte → **120×104** no mundo · pivot no pé, centro inferior (30, 52 da arte) ·
+  **olha para a direita** (espelhado para a esquerda).
+- **Partes, de trás para frente**: braço de trás (pendurado, punho fechado) → perna de trás → tronco curvado em aço
+  escuro (chevron ciano no peito) → perna da frente → tanga vermelho-escura → cinto de couro com disco rúnico ciano →
+  cabeça baixa e projetada (orelha pontuda, mandíbula grande, 2 presas, sobrancelha pesada) → implante ocular
+  vermelho com aro de aço e antena → ombreira com um espinho e runa ciano → clava de ferro com núcleo ciano
+  (mão da frente, apontando para baixo/trás) → braço da frente com bracelete e punho sobre o cabo.
+- **Caminhada** (fase `t` 0..1): pernas ±3 px, pé de trás levanta 1–2 px, corpo/cabeça/ombreira sobem 1 px na
+  passagem, braços e clava ±2 px em oposição às pernas.
+- **Pontos de encaixe** (px do mundo, a partir do pivot): `eye` (+37, −68) brilho vermelho do olho ·
+  `hit` (0, −44) onde os disparos acertam · `top` −98 barra de vida.
+- **No jogo**: animação "walk" em loop com velocidade proporcional ao passo; dano = flash branco + recuo de 1 px da
+  arte; morte = quadro parado, pisca, afunda e vira faíscas. Sombra: elipse de pixels 28×8 (56×16 no mundo).
 
 ### Besta Laser — base `tower-crossbow-base` + cabeça `tower-crossbow-head`
 - **Base**: 88×88 · pivot 44,88 · simétrica (não espelha).

@@ -14,57 +14,59 @@ escudos de energia. O jogador defende o **Núcleo Arcano** (um cristal flutuando
 de inimigos que seguem um caminho fixo. Derrotar inimigos rende **éter**, gasto para construir torres em
 qualquer ponto válido do mapa (estilo Bloons TD); cada torre surge sobre uma plataforma rúnica.
 
-## Estilo visual
+## Direção de arte
 
-Direção: **"cartoon sério"** (referências: Warcraft III, Kingdom Rush Vengeance). Leitura clara e personalidade,
-mas com **peso, desgaste e ameaça**. Nada de ar infantil.
+**Pixel art desenhada em código** (substitui as direções anteriores "cartoon sério" e "pintada estilizada").
+Os sprites são gerados por `npm run pixel` a partir de módulos JS em `tools/pixel-art/sprites/`, que desenham
+cada personagem **em partes** numa grade pequena. Não se edita PNG à mão: muda-se o módulo e roda o gerador.
 
-> Transição em andamento: o piloto (paleta do mapa + Orc Cibernético + animações do inimigo) já segue esta direção.
-> Torres, castelo, decoração do cenário e UI ainda estão no estilo antigo (arredondado/saturado) e serão migrados.
+> Transição em andamento: o **Orc Cibernético** já é pixel art (com caminhada). Torres, castelo, cenário,
+> projéteis e ícones ainda são os SVGs antigos (placeholders) e serão refeitos no mesmo gerador.
 
-- **2.5D cartoon**, câmera em visão 3/4 (de cima, levemente inclinada): objetos mostram a face de cima e a frente.
-- **Formas angulares**: cunhas, trapézios e placas chanfradas em vez de círculos. Silhuetas **pesadas e
-  assimétricas** (ombros largos, massa concentrada em cima, corpo curvado para frente nos inimigos).
-- **Contorno 2–3 px, variável**, cor **marrom-escuro quente `#1e1512`**:
-  - mais grosso (~3 px) na silhueta externa;
-  - fino (~1–1.5 px) nos detalhes internos (placas, rebites, rugas, arranhões).
-- **Cel shading** em tudo: luz fixa vinda do **canto superior esquerdo**. Cada forma tem:
-  1. cor base;
-  2. versão mais escura no lado oposto à luz (baixo/direita);
-  3. um brilho pequeno e duro no lado iluminado (cima/esquerda) — em metal, uma aresta clara fina.
-- **Paleta do mundo dessaturada e mais escura**: musgo, pedra fria, terra batida, madeira velha; luz de **fim de
-  tarde** (ambiente quente e baixo).
-- **Saturação é reservada**: ciano `#3ff5ff`, vermelho e laranja são os **únicos** tons saturados, e só aparecem em
-  **energia, runas, olhos e explosões**. Todo o resto (pele, metal, madeira, tecido, pedra) fica dessaturado.
-- **Desgaste**: rebites, arranhões, ferrugem nas bordas, amassados, runas gravadas (sulcos finos, não adesivos).
-- **Sombras elípticas suaves** no chão, deslocadas para **baixo e à direita**, sob torres, inimigos e projéteis.
-  Sombras ficam numa camada própria, sempre abaixo de todos os objetos.
-- **Ordenação por profundidade**: `depth = DEPTH.OBJECTS + y` (quem está mais abaixo na tela fica na frente).
-- **Tipografia**: `FONT` = **Cinzel** (títulos, banners, nomes); `FONT_NUMBERS` = **Oxanium** (HUD, custos,
-  números de dano). Carregadas do Google Fonts em `index.html`.
-- Recursos do Phaser 4:
-  - **Iluminação dinâmica** (`setLighting(true)` + `this.lights`): chão, torres, inimigos e castelo são iluminados;
-    cristais, disparos e explosões criam luzes pontuais.
-  - **Bloom** na câmera do jogo (só brilhos intensos — cristais, lasers, plasma — "vazam" luz).
-  - **Shine** no Núcleo Arcano e nos cristais das torres.
-  - `PointLight` (game object) para halos visíveis de cristais e projéteis.
-- Arte de personagens e torres fica em **arquivos separados em `public/assets/`** (SVG, PNG ou WebP), para ser
-  trocada por arte profissional sem mexer no código. O manifesto `src/config/art.js` define para cada asset o
-  **tamanho lógico** (`size`), o **ponto de ancoragem** (`pivot`, em geral a borda inferior central), a densidade
-  de PNG/WebP (`scale`: 2×, 4×) e os pontos de encaixe (olho, acerto, montagens), todos em pixels lógicos.
-  Trocar o formato do arquivo não muda nada no jogo. A especificação para artistas está em **`ART_SPEC.md`**.
+### Gerador (`tools/pixel-art/`)
+- Primitivas rasterizadas na grade, **sem antialias**: retângulo, polígono, elipse, linha grossa, pixel avulso.
+- **Cel shading automático por parte**, rampa de 3 tons por material: claro nas bordas de cima/esquerda, escuro
+  nas bordas de baixo/direita e na metade inferior-direita da parte (luz do canto superior esquerdo).
+- **Contorno** `#1e1512` de 1 px em volta da silhueta inteira + contorno interno onde uma parte se sobrepõe a
+  outra já desenhada. Vizinhos são consultados com checagem de limites (nunca deslocamento circular de máscara).
+- **Paleta fixa** em `tools/pixel-art/palette.js` (pele, aço, couro, tecido, ciano, vermelho, presa + ferrugem).
+  Ciano `#3ff5ff` e vermelho só em energia, runas, olhos e brilhos.
+- **Animação gerada pelas partes**, parametrizada por uma fase `t` (0..1), **só com deslocamentos inteiros**.
+  Sprite sheets com os quadros lado a lado + um PNG parado; `tools/pixel-art/preview.html` mostra tudo em loop
+  (4× e tamanho real, sobre grama e terra).
+- Câmera 3/4, personagem olhando para a **direita** (o jogo espelha), pés na borda inferior do quadro.
+
+### No jogo (renderização pixel-perfect)
+- `pixelArt: true` (filtro NEAREST, `roundPixels`, canvas "pixelated"). **1 pixel da arte = `PIXEL_SCALE` (2) px do
+  mundo** 1280×720. `RENDER_SCALE` e zoom das câmeras são sempre **inteiros**.
+- Texturas que não são pixel art (SVGs antigos, brilhos, sombras suaves) continuam com filtro LINEAR.
+- Em sprites de pixel art **não há escala fracionada nem rotação**: squash, quique e inclinação viram deslocamentos
+  de pixels inteiros (ou quadros da animação). Flash branco (tint FILL) e piscar continuam. Tweens de escala só
+  na UI e em efeitos.
+- Posição dos sprites de pixel art alinhada à grade de `PIXEL_SCALE`.
+- Sombra no chão de pixel art = **elipse de pixels duros**, sem blur, deslocada para baixo/direita.
+- **Luzes pontuais e Bloom só nos brilhos** (olho, plasma, cristais), com intensidade moderada para não borrar.
+- Manifesto de arte (`src/config/art.js`): `pixel: true`, `frame` (tamanho do quadro) e `anims` (sprite sheet);
+  especificação dos assets em **`ART_SPEC.md`**.
+
+### Regras gerais que continuam
+- Iluminação dinâmica (`setLighting`), sombras numa camada própria abaixo dos objetos, `depth = DEPTH.OBJECTS + y`.
+- Tipografia: `FONT` = Cinzel (títulos), `FONT_NUMBERS` = Oxanium (HUD, custos, dano).
 
 ## Regras de animação
 
 Personalidade vem do **peso**, não da elasticidade. Nada fica 100% parado, mas nada é "borrachudo".
 
-- **Squash and stretch contido**: no máximo **5–8%** de deformação.
-- **Inimigos andam com passo pesado**: sem pulinhos. Balanço lateral curto, leve afundada a cada passo e poeira
-  ocasional no chão. Constantes em `ENEMY_ANIM` (`src/config/visual.js`).
-- **Dano**: flash branco (tint FILL) + tranco curto (≤ 8%).
-- **Morte**: tombo pesado para frente, impacto no chão e desmanche em faíscas/destroços — sem esticar.
+- **Pixel art**: movimento por **quadros** e por **deslocamentos inteiros** de pixels da arte. Sem escala fracionada
+  nem rotação no sprite.
+- **Inimigos andam com passo pesado**. Com sprite sheet, a caminhada toca em loop e o `frameRate` é proporcional à
+  velocidade (um ciclo a cada `ENEMY_ANIM.walkCycle` px); o quique procedural fica desligado. Poeira ocasional no
+  chão nos quadros de passada. Constantes em `ENEMY_ANIM` (`src/config/visual.js`).
+- **Dano**: flash branco (tint FILL) + recuo de 1 pixel da arte por um instante.
+- **Morte (pixel art)**: para no quadro parado, pisca e afunda em passos de pixel, e se desfaz em faíscas/destroços.
+- **Arte vetorial antiga** (enquanto existir): squash contido (máx. 5–8%), tombo ao morrer.
 - **Easing `Elastic` só em UI e explosões.** No mundo use `Quad`, `Cubic`, `Sine` e `Back` com pouco overshoot.
-- **Torres com recuo** ao disparar e retorno firme (a migrar para a nova direção: hoje ainda usam `Elastic`).
+- **Torres com recuo** ao disparar e retorno firme (a migrar para pixel art: hoje ainda usam `Elastic` e escala).
 - **Construção = materialização rúnica**: círculo de runas girando + luz ciano → base revelada de baixo para cima
   em holograma (`setCrop` + linha de varredura) → peças de cima descem e encaixam (`Back.easeOut`, squash ~6%) →
   flash e faíscas. Genérico em `Tower.playBuildAnimation` a partir de `this.pieces` (base primeiro); tempos e
@@ -79,6 +81,7 @@ Personalidade vem do **peso**, não da elasticidade. Nada fica 100% parado, mas 
 
 ```
 index.html
+tools/pixel-art/          gerador de pixel art (`npm run pixel`): palette.js, lib/PixelCanvas.js, sprites/*.js, preview.html
 public/assets/            SVGs substituíveis (torres, inimigos, castelo, cristais, cenário, ícones)
 src/
   main.js                 configuração do Phaser.Game
@@ -127,6 +130,7 @@ Convenções:
 
 - `npm install` — instala dependências
 - `npm run dev` — servidor de desenvolvimento (Vite) em http://localhost:5173
+- `npm run pixel` — gera os sprites de pixel art em `public/assets/` e o `tools/pixel-art/preview.html`
 - `npm run build` — build de produção em `dist/`
 - `npm run preview` — serve o build de produção
 

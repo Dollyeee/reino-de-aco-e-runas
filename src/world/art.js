@@ -1,12 +1,18 @@
 import { ART, artFormat } from '../config/art.js';
-import { FONT, FONT_NUMBERS, RENDER_SCALE, WORLD } from '../config/visual.js';
+import { FONT, FONT_NUMBERS, PIXEL_SCALE, RENDER_SCALE, WORLD } from '../config/visual.js';
 
 // Fator que converte pixels do ARQUIVO carregado em pixels LÓGICOS do mundo.
+//   pixel art: 1 px do arquivo = PIXEL_SCALE px do mundo (escala inteira).
 //   SVG: rasterizado em size × RENDER_SCALE → fator 1 / RENDER_SCALE.
 //   PNG/WebP: carregado no tamanho nativo (size × scale) → fator 1 / scale.
 export function artPixelFactor (key) {
     const def = ART[key];
+    if (def.pixel) { return PIXEL_SCALE; }
     return artFormat(key) === 'svg' ? 1 / RENDER_SCALE : 1 / (def.scale || 1);
+}
+
+export function isPixelArt (key) {
+    return !!ART[key].pixel;
 }
 
 function setupArt (img, key, scale) {
@@ -14,6 +20,8 @@ function setupArt (img, key, scale) {
     img.setOrigin(def.pivot[0] / def.size[0], def.pivot[1] / def.size[1]);
     img.baseScale = artPixelFactor(key) * scale;
     img.setScale(img.baseScale);
+    // pixel art: vértices sempre em pixels inteiros (também durante tremidas de câmera)
+    if (def.pixel) { img.vertexRoundMode = 'full'; }
     return img;
 }
 
@@ -26,6 +34,16 @@ export function addArt (scene, x, y, key, scale = 1) {
 // Mesma coisa, mas sem adicionar à cena (para colocar dentro de Containers).
 export function makeArt (scene, x, y, key, scale = 1) {
     return setupArt(scene.make.image({ x, y, key }, false), key, scale);
+}
+
+// Sprite (com animações de sprite sheet), sem adicionar à cena.
+export function makeSprite (scene, x, y, key, scale = 1) {
+    return setupArt(scene.make.sprite({ x, y, key }, false), key, scale);
+}
+
+// Chave global da animação de um asset (criada no BootScene a partir de ART[key].anims).
+export function animKey (key, name) {
+    return `${key}:${name}`;
 }
 
 // Ponto de encaixe definido no manifesto (ex.: ART['castle'].core).

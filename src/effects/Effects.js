@@ -193,6 +193,14 @@ export default class Effects {
         this.flashLight(mx, y - 10, LIGHTING.explosionLight, 280, 0.55);
     }
 
+    // Pixel art: o corpo parado se desfaz em faíscas e destroços a partir do peito.
+    enemyShatter (x, y) {
+        this.embers.explode(14, x, y);
+        this.debris.explode(8, x, y);
+        this.flash(x, y, COLORS.orange, 60, 180);
+        this.flashLight(x, y, LIGHTING.explosionLight, 260, 0.5);
+    }
+
     landingDust (x, y, count = 1) {
         this.dust.explode(count, x, y);
     }

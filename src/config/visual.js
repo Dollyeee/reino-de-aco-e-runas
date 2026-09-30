@@ -3,15 +3,17 @@
 // Tamanho lógico do mundo. Toda a lógica usa estas coordenadas.
 export const WORLD = { width: 1280, height: 720 };
 
-// Resolução interna = WORLD × RENDER_SCALE. As câmeras dão zoom para caber no mundo,
-// então sprites e textos ficam nítidos em telas grandes / alta densidade.
+// Resolução interna = WORLD × RENDER_SCALE. As câmeras dão zoom para caber no mundo.
+// Pixel art pede zoom INTEIRO (1, 2, 3): cada pixel da arte vira um bloco exato de pixels da tela.
 function pickRenderScale () {
     const dpr = window.devicePixelRatio || 1;
-    const screenH = Math.max(window.innerHeight, window.innerWidth * WORLD.height / WORLD.width) * dpr;
-    const ideal = Math.round((screenH / WORLD.height) * 2) / 2;
-    return Math.min(2, Math.max(1, ideal));
+    const screenH = Math.min(window.innerHeight, window.innerWidth * WORLD.height / WORLD.width) * dpr;
+    return Math.min(3, Math.max(1, Math.floor(screenH / WORLD.height + 0.15)));
 }
 export const RENDER_SCALE = pickRenderScale();
+
+// Pixel art: 1 pixel da arte = PIXEL_SCALE × PIXEL_SCALE pixels do mundo 1280×720.
+export const PIXEL_SCALE = 2;
 
 // Tipografia: Cinzel para títulos/nomes, Oxanium para HUD, custos e números de dano.
 export const FONT = '"Cinzel", Georgia, serif';
@@ -62,21 +64,22 @@ export const COLORS = {
 export const LIGHTING = {
     ambient: 0xc4b4a8,          // luz ambiente de fim de tarde (multiplica tudo que tem setLighting)
     maxLights: 40,              // limite de luzes visíveis ao mesmo tempo
-    coreLight: { radius: 300, color: 0x3ff5ff, intensity: 0.7 },
-    crystalLight: { radius: 150, color: 0x3ff5ff, intensity: 0.8 },
-    boltLight: { radius: 90, color: 0x3ff5ff, intensity: 1.2 },
-    plasmaLight: { radius: 130, color: 0x7afcff, intensity: 1.2 },
-    explosionLight: { radius: 220, color: 0xffb35a, intensity: 2.2 },
-    muzzleLight: { radius: 110, color: 0x3ff5ff, intensity: 1.6 }
+    // intensidades moderadas: luz só nos brilhos, sem "lavar" a pixel art
+    coreLight: { radius: 300, color: 0x3ff5ff, intensity: 0.5 },
+    crystalLight: { radius: 150, color: 0x3ff5ff, intensity: 0.55 },
+    boltLight: { radius: 90, color: 0x3ff5ff, intensity: 0.85 },
+    plasmaLight: { radius: 130, color: 0x7afcff, intensity: 0.85 },
+    explosionLight: { radius: 220, color: 0xffb35a, intensity: 1.5 },
+    muzzleLight: { radius: 110, color: 0x3ff5ff, intensity: 1.1 }
 };
 
 export const POSTFX = {
     bloom: {
-        threshold: 0.86,        // só cores muito claras brilham (por canal: ciano/branco sim, grama não)
-        blurRadius: 3,
+        threshold: 0.9,         // só os brilhos (olho, plasma, cristais) vazam luz
+        blurRadius: 2,
         blurSteps: 4,
         blurQuality: 1,
-        blendAmount: 0.7
+        blendAmount: 0.45       // fraco, para não borrar a pixel art
     },
     // Vinheta do Phaser 4: mistura cresce do centro até `radius`; strength baixo = sutil.
     vignette: { radius: 0.85, strength: 0.13, color: 0x1e1512 }
@@ -92,7 +95,12 @@ export const ENEMY_ANIM = {
     hitSquash: 0.08,        // tranco ao levar dano
     hitRecover: 7,          // velocidade de recuperação do tranco (por segundo)
     hitTilt: 0.05,          // inclinação para trás ao levar dano (rad)
-    eyeGlowSize: 16,        // halo do olho robótico
+    eyeGlowSize: 12,        // halo do olho robótico
+    // sprites de pixel art com animação (sprite sheet)
+    walkCycle: 44,          // px do mundo andados por ciclo completo da caminhada (define o frameRate)
+    knockback: 1,           // recuo ao levar dano, em pixels da ARTE (inteiro)
+    knockbackMs: 90,
+    pixelDeath: { blinks: 3, blinkMs: 70, sinkPx: 2 },  // morte em pixel art: pisca e afunda (px da arte)
     spawnMs: 300,
     death: {
         tipAngle: 1.35,     // tombo para frente (rad, ~77°)
