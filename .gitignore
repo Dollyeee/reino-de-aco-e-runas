@@ -7,3 +7,6 @@ dist
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# imagens de apoio geradas nas conversas (não fazem parte do jogo)
+Claude outputs/
