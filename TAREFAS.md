@@ -43,7 +43,14 @@ Quero trocar as plataformas fixas por posicionamento LIVRE de torres (estilo Blo
 
 5. Teste com npm run dev: construir nas duas extremidades do mapa, tentar construir em cima do caminho, de outra torre, de uma árvore e do castelo (tem que ser recusado), cancelar com ESC e com clique direito, e ficar sem éter. Sem erros no console. No fim, jogue as 5 ondas colocando torres no meio das curvas em U e me diga se ficou fácil demais; se ficou, sugira ajustes em balance.js, mas NÃO aplique sem eu aprovar.
 
-## [ ] T02 — Refazer o Orc Cibernético
+## [x] T02 — Refazer o Orc Cibernético
+
+**Concluída em 2026-09-30.** Resultado:
+- `public/assets/enemy-cyber-orc.svg` refeito: 83 → 30 formas, "massa arredondada, acento pontiagudo" (tronco/cabeça/braço arredondados; pontas só no espinho do ombro, borda do elmo, presas e visor).
+- Contraste: pele jade clara (#93bd9d) é a maior massa clara e se separa da grama em valor; armadura em bronze escurecido (#74492a); só o olho vermelho e as linhas ciano são saturados.
+- Contorno externo ~3.2 px via camada `<use>` + linhas internas 1.5 px; nada encosta nas bordas do SVG (a versão anterior era cortada na borda direita).
+- Olho robótico continua em (64,31); `eye` e `top` em art.js não precisaram mudar. Animações, balanceamento e outros SVGs intocados.
+- Teste de leitura: cabeça, clava e espinho claros na silhueta; a presa aparece como uma ponta pequena abaixo da borda do elmo (sutil no tamanho real). Pares sobrepostos se separam pelo contorno e pela ombreira de bronze.
 
 Refazer o Orc Cibernético (public/assets/enemy-cyber-orc.svg). A versão atual ficou confusa: 83 formas num sprite de 88×94, tudo angular, e a pele (#7d8450) quase igual à grama (#677444), então ele some no cenário e dois orcs juntos viram uma massa só. Mantenha a direção "cartoon sério" (não voltar ao fofo), mas corrija a leitura:
 
@@ -64,3 +71,21 @@ Refazer o Orc Cibernético (public/assets/enemy-cyber-orc.svg). A versão atual 
    - Mostre dois orcs sobrepostos, como acontece na onda, e confirme que dá para ver onde termina um e começa o outro.
 
 5. Mantenha 88×94, ancoragem no centro inferior e o olho robótico perto de (64,31); se mudar, atualize eye e top em src/config/art.js. Não mexa em animações, balanceamento nem em outros SVGs. Rode npm run build.
+
+## [ ] T03 — Animação de construção por materialização rúnica
+
+Nova animação de construção das torres: "materialização rúnica". Esta tarefa vem depois da remoção da plataforma e SUBSTITUI o efeito de construção dela (o círculo de runas continua, mas passa a fazer parte desta sequência). Consulte node_modules/phaser/skills antes de usar crop, tint e filtros do Phaser 4.
+
+Sequência (duração total em BALANCE.towers.buildTime, padrão 0.9 s; os tempos de cada fase em visual.js):
+1. Runas (0–0.25 s): o círculo de runas no chão (DEPTH.DECAL, achatado em 3/4, ciano #3ff5ff) aparece girando e acende, com uma luz pontual ciano crescendo no centro.
+2. Base em holograma (0.2–0.55 s): a base da torre aparece como holograma (tint FILL ciano, alpha ~0.6) e é revelada de BAIXO para CIMA com setCrop; uma linha de varredura clara e brilhante acompanha a borda do corte. Logo atrás da varredura, o holograma vira a arte normal (sem tint).
+3. Encaixe (0.5–0.8 s): a peça de cima (cabeça da besta / braço da catapulta) surge em holograma um pouco acima do ponto de encaixe, desce e encaixa com Back.easeOut, virando sólida no impacto + squash de ~6% na torre inteira.
+4. Final (0.8–0.9 s): flash branco rápido, 6–10 faíscas ciano, a luz ciano apaga e o círculo de runas some em fade.
+
+Regras:
+- A torre só procura alvos e atira depois que a sequência termina. O éter é descontado no início.
+- A sombra no chão cresce junto com a revelação (começa pequena e fraca).
+- Implemente de forma genérica em Tower.js (ex.: playBuildAnimation usando uma lista de "peças" de cada torre: base primeiro, depois as de cima), para torres futuras com mais peças funcionarem sem código novo.
+- Nada de números de gameplay fora de balance.js; tempos e cores do efeito em visual.js.
+
+Teste: construir várias torres seguidas (inclusive com Shift), construir durante uma onda com inimigos passando perto (não pode atirar antes de terminar) e conferir depth/iluminação. npm run build sem erros.
