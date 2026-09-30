@@ -298,3 +298,38 @@ Ajustes da etapa 1 do pixel art (chão) + escala dos personagens:
 2. Variação sutil de tom da grama por região (manchas grandes e suaves de ±1 tom, quase imperceptíveis) para o gramado não parecer um tapete uniforme.
 3. Escala: reduza o Orc Saqueador para ~80 px de altura no mundo (redesenhe na grade menor se necessário para manter pixel 1× — não escale o sprite com fator fracionado) e registre no ART_SPEC.md a nova referência de tamanho (inimigo comum ~80 px). Confira que 20 orcs em fila no caminho não viram uma massa contínua.
 4. Regere a cena de referência e mostre antes × depois. npm run pixel e npm run build.
+
+---
+
+## [x] T14 — Corrigir brilho do olho fora do orc
+
+**Concluída em 2026-09-30.** Resultado:
+- **Causa**: na T13, `eyeAt(pose, k = SCALE)` ganhou o parâmetro de escala, mas `orc-b.js` gerava o JSON com `walkPoses.map(eyeAt)` — o `map` passa o **índice do quadro** como segundo argumento, então o quadro n usava escala n (quadro 0 → (0,0), quadro 7 → (661,5; 164,5)). **Correção**: `walkPoses.map((p) => eyeAt(p))`; os 8 olhos agora ficam entre (70,9; 16,6) e (72,9; 17,6), idleEye (70,9; 17,6). Orc 'atual', Brutamontes e Ciborgue conferidos: já estavam certos (o `eyeAt` deles não tem segundo parâmetro).
+- **Segundo defeito encontrado no teste (existia desde a T05)**: ao virar para a esquerda, o Phaser espelha a textura dentro do quadro mas mantém a origem; como o pivot não fica no centro do quadro, o orc se deslocava 10 px para o lado e o brilho do olho ficava ~10 px à frente. **Correção**: `Enemy.faceTo()` espelha também a origem (sprite gira em volta dos pés).
+- **Validação**: `npm run pixel` falha com erro claro (antes de gravar arquivos) se um ponto de ancoragem cair fora do quadro — dados por quadro dos JSONs e `eye`/`hit`/`top`/pivot de `ORC_VARIANTS`; testado reintroduzindo o bug (erro em `orc-b-walk.json eye[2]`). `Enemy.js` confere o JSON uma vez por asset e, se houver ponto fora, avisa no console (modo dev) e usa o olho fixo de `art.js` (testado).
+- Teste no jogo com zoom de câmera: brilho sobre o olho andando para a direita e virado para a esquerda (prints em `Claude outputs/olho-direita-t14.jpg` e `olho-esquerda-t14.jpg`). `npm run build` OK.
+
+BUG: bolinhas vermelhas "atirando" à frente dos orcs. Causa encontrada: public/assets/orc-b-walk.json tem as posições do olho por quadro erradas desde a T13 — eye[0] = (0,0) e os demais crescem a cada quadro até (661.5, 164.5), enquanto o correto (idleEye) é ~(70.9, 17.6) dentro do quadro 102×83. O Enemy.js posiciona o eyeGlow com esses valores, então o brilho vermelho aparece até ~660 px à frente/abaixo do orc a cada quadro.
+
+1. Corrija o gerador (tools/pixel-art/generate.js ou onde o JSON é escrito): as coordenadas do olho de cada quadro devem ser relativas ao próprio quadro (0..largura, 0..altura), não à folha de sprites, e já na escala final após o ajuste de tamanho. Regere com npm run pixel e confira que os 8 valores ficam próximos de idleEye (variando só alguns pixels com o sobe-desce da caminhada).
+2. Validação para isso não voltar a acontecer: o gerador falha com erro claro se algum ponto de ancoragem (olho, hit, etc.) cair fora do quadro; e o Enemy.js, em modo dev, avisa no console e usa o olho padrão do art.js se receber um ponto fora do quadro.
+3. Confira o mesmo cálculo para a variante 'atual' e para os sprites futuros (brutamontes, ciborgue).
+4. Teste no jogo: orcs andando para a direita e para a esquerda, o brilho vermelho fica exatamente sobre o olho em todos os quadros. npm run build sem erros. Registre no resultado da tarefa a causa e a correção.
+
+---
+
+## [ ] T15 — Kits de decoração em pixel art
+
+Converter a decoração do mapa (árvores, pedras, cristais) para pixel art 1×, gerando 3 KITS completos para eu escolher — não 3 versões soltas de cada item. Siga o ART_SPEC.md (paleta, luz do canto superior esquerdo, contorno seletivo, densidade de detalhe) e mantenha a decoração um pouco menos saturada e contrastada que orcs e torres, para não competir com o que importa no jogo. Nada infantil (sem frutinhas, sem formas de pirulito).
+
+Cada kit tem: 3 árvores de formas e tamanhos diferentes, 2 arbustos, 3 pedras (pequena, média, grande), 1 aglomerado de cristal ciano (com pixels emissivos) e 1 elemento temático.
+
+- Kit A — "Bosque antigo": carvalhos largos e retorcidos, copas densas em tons de verde-musgo, pedras cobertas de musgo; elemento temático: toco de árvore cortado.
+- Kit B — "Fronteira de pinheiros": pinheiros e abetos altos e escuros, arbustos espinhosos, pedras angulosas cinza-frias; elemento temático: marco de pedra com runa ciano gravada.
+- Kit C — "Floresta rúnica": árvores com casca escura e veias finas de ciano brilhando, cristais maiores brotando do chão, pedras com fissuras rúnicas; elemento temático: ruína de pilar medieval com um circuito rúnico exposto.
+
+Entregáveis:
+1. tools/pixel-art/escolha-decoracao.html: cada kit com os itens soltos (tamanho real e ampliados 4×) e, principalmente, cada kit aplicado no MAPA INTEIRO (mesmas posições de decoração de map01.js, sobre o chão novo, com orcs no caminho), lado a lado, para eu comparar o conjunto.
+2. Um seletor DECOR_KIT em src/config/art.js ('a' | 'b' | 'c'), para eu testar no jogo; padrão = arte atual até eu escolher.
+3. Sombras no chão seguindo as regras do ART_SPEC; a área de bloqueio de construção de cada item (PlacementRules) ajustada ao tamanho real da nova arte.
+4. npm run pixel e npm run build sem erros. Me diga em 2 linhas o ponto forte e o ponto fraco de cada kit no conjunto do mapa.

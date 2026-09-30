@@ -140,7 +140,8 @@ export function drawOrcB (pose = IDLE_POSE, k = SCALE) {
     return cv.finish();
 }
 
-// posição do olho em pixels do quadro (escala do jogo)
+// posição do olho em pixels do quadro (escala do jogo).
+// Atenção: não use `poses.map(eyeAt)` — o map passaria o índice do quadro como `k` (bug da T13, corrigido na T14).
 export function eyeAt (pose, k = SCALE) {
     return { x: EYE.x * k + Math.round(pose.lunge * k), y: EYE.y * k + Math.round(pose.bob * k) };
 }
@@ -151,7 +152,7 @@ export default {
     name: 'orc-b',
     frame: FRAME,
     sheets: [
-        { file: 'orc-b-walk.png', frames: walkPoses.map((p) => drawOrcB(p)), meta: { eye: walkPoses.map(eyeAt), idleEye: eyeAt(IDLE_POSE) } },
+        { file: 'orc-b-walk.png', frames: walkPoses.map((p) => drawOrcB(p)), meta: { eye: walkPoses.map((p) => eyeAt(p)), idleEye: eyeAt(IDLE_POSE) } },
         { file: 'orc-b.png', frames: [drawOrcB(IDLE_POSE)] }
     ]
 };

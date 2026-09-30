@@ -7,6 +7,23 @@ import ShadowLayer from '../effects/Shadow.js';
 import { animKey, anchor, makeArt, makeSprite } from '../world/art.js';
 
 const HP_BAR_W = 40;
+
+// Dados por quadro do gerador (ex.: olho) conferidos uma vez por asset: um ponto fora do quadro é bug do gerador
+// (T13/T14); nesse caso o jogo avisa (modo dev) e usa o olho fixo do manifesto (src/config/art.js).
+const metaOk = new Map();
+function validMeta (meta, key, def) {
+    if (!meta) { return null; }
+    if (!metaOk.has(key)) {
+        const [fw, fh] = def.frame;
+        const bad = (meta.eye || []).findIndex((e) => !(e && e.x >= 0 && e.y >= 0 && e.x <= fw && e.y <= fh));
+        if (bad >= 0 && import.meta.env.DEV) {
+            console.warn(`[arte] ${def.meta}: olho do quadro ${bad} ${JSON.stringify(meta.eye[bad])} fora do quadro ${fw}×${fh}; ` +
+                'usando o olho padrão de src/config/art.js. Rode `npm run pixel`.');
+        }
+        metaOk.set(key, bad < 0);
+    }
+    return metaOk.get(key) ? meta : null;
+}
 const A = ENEMY_ANIM;
 const PS = PIXEL_SCALE;
 
@@ -60,7 +77,7 @@ export default class Enemy extends Phaser.GameObjects.Container {
             this.sprite.play({ key: this.walkAnim, startFrame: Phaser.Math.Between(0, this.walkFrames - 1) });
             this.lastFrame = -1;
             // dados por quadro do gerador (posição do olho acompanha o sobe-desce da cabeça)
-            this.meta = this.def.meta ? scene.cache.json.get(`${artKey}:meta`) : null;
+            this.meta = this.def.meta ? validMeta(scene.cache.json.get(`${artKey}:meta`), artKey, this.def) : null;
         }
 
         // brilho do olho robótico (aditivo e sem iluminação → pega Bloom)
@@ -90,6 +107,16 @@ export default class Enemy extends Phaser.GameObjects.Container {
             this.setScale(0.94);
             scene.tweens.add({ targets: this, alpha: 1, scale: 1, duration: A.spawnMs, ease: 'Quad.easeOut' });
         }
+    }
+
+    // Vira para a direita (1) ou esquerda (-1). O Phaser espelha a textura dentro do quadro mas mantém a origem;
+    // como o pivot (pés) não fica no centro do quadro, a origem também é espelhada: assim o sprite gira em volta
+    // dos pés (não "pula" para o lado) e os pontos de encaixe (olho) continuam valendo com x × facing.
+    faceTo (f) {
+        this.facing = f;
+        this.sprite.setFlipX(f < 0);
+        const ox = this.def.pivot[0] / this.def.size[0];
+        this.sprite.setOrigin(f < 0 ? 1 - ox : ox, this.sprite.originY);
     }
 
     // Posição prevista daqui a `ms` milissegundos (para a catapulta mirar).
@@ -128,8 +155,7 @@ export default class Enemy extends Phaser.GameObjects.Container {
         if (Math.abs(p.dx) > 0.3) {
             const f = p.dx < 0 ? -1 : 1;
             if (f !== this.facing) {
-                this.facing = f;
-                this.sprite.setFlipX(f < 0);
+                this.faceTo(f);
                 if (!this.walkAnim) { this.hitSquash = Math.max(this.hitSquash, 0.5); }
             }
         }

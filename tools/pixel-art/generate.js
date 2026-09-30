@@ -238,6 +238,29 @@ Promise.all(Object.values(images).map((i) => i.decode())).then(() => {
 `;
 }
 
+// Pontos de ancoragem precisam cair DENTRO do quadro (0..largura, 0..altura). Um ponto fora é bug do gerador
+// (ex.: T13, olho por quadro calculado com a escala errada) e faz o jogo desenhar brilhos longe do sprite.
+function checkPoint (where, p, fw, fh) {
+    if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y) || p.x < 0 || p.y < 0 || p.x > fw || p.y > fh) {
+        throw new Error(`[pixel] ponto de ancoragem fora do quadro ${fw}×${fh}: ${where} = ${JSON.stringify(p)}`);
+    }
+}
+for (const sprite of SPRITES) {
+    for (const sheet of sprite.sheets) {
+        for (const [key, val] of Object.entries(sheet.meta || {})) {
+            const list = Array.isArray(val) ? val : [val];
+            list.forEach((p, i) => checkPoint(`${sheet.file.replace(/\.png$/, '.json')} ${key}${Array.isArray(val) ? `[${i}]` : ''}`, p, sprite.frame.w, sprite.frame.h));
+        }
+    }
+}
+// encaixes do manifesto do jogo (px a partir do pivot) também precisam cair dentro do quadro
+for (const [id, V] of Object.entries(ORC_VARIANTS)) {
+    const [fw, fh] = V.frame, [px, py] = V.pivot;
+    checkPoint(`ORC_VARIANTS.${id}.pivot`, { x: px, y: py }, fw, fh);
+    for (const name of ['eye', 'hit']) { checkPoint(`ORC_VARIANTS.${id}.${name}`, { x: px + V[name].x, y: py + V[name].y }, fw, fh); }
+    checkPoint(`ORC_VARIANTS.${id}.top`, { x: px, y: py + V.top }, fw, fh);
+}
+
 const entries = [];
 for (const sprite of SPRITES) {
     for (const sheet of sprite.sheets) {

@@ -164,6 +164,9 @@ e texturas de material com semente fixa.
 2. Em `src/config/art.js`: `file`, `pixel: true`, `frame: [w, h]` (se for folha), `anims`, `meta`, `size` (= quadro),
    `pivot` (em px do mundo) e os pontos de encaixe (em px do mundo, a partir do pivot).
 3. Rode `npm run dev`. Se o arquivo não bater com `size`/`frame`, aparece um aviso `[arte]` no console.
+4. Pontos de ancoragem (olho por quadro no JSON, `eye`/`hit`/`top` do manifesto) precisam cair **dentro do quadro**:
+   `npm run pixel` falha com erro se algum cair fora, e o jogo (modo dev) avisa e usa o olho fixo do manifesto.
+   Ao gerar dados por quadro, use `poses.map((p) => eyeAt(p))` — nunca `poses.map(eyeAt)` (o índice viraria argumento).
 
 ## Assets ainda em SVG (placeholders)
 
