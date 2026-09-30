@@ -169,6 +169,8 @@ O que o jogo já tem. A produção daqui em diante segue o **Plano de produção
 - Recurso **éter**: ganho ao derrotar inimigos, gasto para construir torres
 - Vida do Núcleo Arcano, telas de vitória e derrota
 - Interface: éter, vida do Núcleo, onda atual, botão para iniciar a próxima onda
+- Zoom provisório da câmera do mundo (T25, `src/world/CameraZoom.js`): roda do mouse (1×–4×, passos inteiros, centrado
+  no cursor), `+`/`−`, `0` volta ao mapa inteiro, setas ou botão do meio movem; o HUD não muda
 
 ## Plano de produção (NÃO implementar antes da hora)
 

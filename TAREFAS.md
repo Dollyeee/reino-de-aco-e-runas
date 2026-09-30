@@ -552,6 +552,10 @@ a base da torre eu achei muito estranha, faça 3 design completamente diferentes
 
 ---
 
-## [ ] T25 — Zoom in/out dentro do jogo
+## [x] T25 — Zoom in/out dentro do jogo
+
+**Concluída em 2026-09-30.** Resultado:
+- `src/world/CameraZoom.js` (ligado na GameScene): roda do mouse aproxima/afasta em passos inteiros 1×–4× (pixel art nítida) mantendo o ponto sob o cursor; `+`/`−` no centro; `0` volta ao mapa inteiro; setas e arrastar com o botão do meio movem a câmera; câmera presa ao mundo 1280×720. HUD (UIScene) não muda; posicionar torres continua certo com zoom (o TowerPlacer já convertia pela câmera). Dica de controles atualizada.
+- Testado: 2 cliques de roda → 3× com o ponto sob o cursor fixo (384, 288); `−` → 2×; `0` → 1× e centralizado; construção e onda rodando com zoom.
 
 quer poder da zoom in e zoom out dentro do jogo por enquanto

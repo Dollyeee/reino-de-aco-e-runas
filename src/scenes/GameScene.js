@@ -13,6 +13,7 @@ import { TOWER_TYPES } from '../towers/index.js';
 import TowerPlacer from '../towers/TowerPlacer.js';
 import PlacementRules from '../world/PlacementRules.js';
 import { setupWorldCamera } from '../world/art.js';
+import CameraZoom from '../world/CameraZoom.js';
 
 // Cena principal: mundo, torres, inimigos, projéteis e regras da partida.
 export default class GameScene extends Phaser.Scene {
@@ -52,6 +53,7 @@ export default class GameScene extends Phaser.Scene {
         this.waves = new WaveManager(this, BALANCE.waves);
 
         this.rangeGfx = this.add.graphics().setDepth(DEPTH.RANGE);
+        this.zoom = new CameraZoom(this);   // T25: zoom provisório (roda do mouse, + − 0, setas)
         this.placer = new TowerPlacer(this, new PlacementRules(this.map, this.track));
 
         // botão direito cancela o posicionamento (sem abrir o menu do navegador)
@@ -268,5 +270,6 @@ export default class GameScene extends Phaser.Scene {
 
         this.castle.update(dt);
         this.placer.update();
+        this.zoom.update(dt);
     }
 }

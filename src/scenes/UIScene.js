@@ -42,7 +42,7 @@ export default class UIScene extends Phaser.Scene {
         });
 
         this.hint = this.add.text(WORLD.width / 2, towerBarRect().y - 16,
-            '1/2 escolhe a torre  •  clique constrói  •  Shift constrói várias  •  Esc cancela  •  Espaço inicia a onda',
+            '1/2 escolhe a torre  •  clique constrói  •  Shift constrói várias  •  Esc cancela  •  Espaço inicia a onda  •  roda do mouse: zoom (0 volta)',
             textStyle(14, '#fff6e6', { strokeThickness: 4 })).setOrigin(0.5).setAlpha(0.95);
         this.tweens.add({ targets: this.hint, y: this.hint.y - 4, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
 
