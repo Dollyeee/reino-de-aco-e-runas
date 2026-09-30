@@ -4,7 +4,7 @@
 // Ao desenhar uma parte:
 //   1. contorno interno: pixels de partes JÁ desenhadas que encostam na parte nova viram contorno;
 //   2. sombreamento automático (cel shading, luz do canto superior esquerdo):
-//        borda de baixo/direita e metade inferior-direita → tom escuro;
+//        tom escuro nos pixels mais de baixo/direita (bordas primeiro), no máximo ~30% da parte;
 //        borda de cima/esquerda → tom claro; resto → tom médio.
 // No fim, contorno de 1 px em volta da silhueta inteira.
 //
@@ -139,9 +139,14 @@ function distToSegment (px, py, ax, ay, bx, by) {
 // ------------------------------------------------------------------ tela
 
 export class PixelCanvas {
-    constructor (w, h) {
+    // opts.darkRatio (padrão 0.3): fração máxima de cada parte em tom escuro — os pixels mais de
+    //   baixo/direita (bordas primeiro). opts.darkSplit: modo antigo por limiar diagonal (desliga darkRatio).
+    constructor (w, h, opts = {}) {
         this.w = w;
         this.h = h;
+        this.darkSplit = opts.darkSplit ?? 1.1;
+        this.darkRatio = opts.darkSplit !== undefined ? null : (opts.darkRatio ?? 0.3);
+        this.stats = [];            // { name, total, dark } por parte, para conferir o sombreamento
         this.color = new Array(w * h).fill(null);      // '#rrggbb' ou null (transparente)
         this.owner = new Int32Array(w * h).fill(-1);   // índice da parte dona do pixel
         this.parts = 0;
@@ -166,6 +171,8 @@ export class PixelCanvas {
         const id = this.parts++;
         const shade = opts.shade !== false;
         const tone = opts.tone ?? MID;
+        const split = opts.darkSplit ?? this.darkSplit;
+        let total = 0, dark = 0;
 
         // 1) contorno interno sobre as partes de trás que encostam na parte nova
         if (opts.outline !== false) {
@@ -182,22 +189,51 @@ export class PixelCanvas {
         // 2) preenchimento com sombreamento
         const b = m.bounds();
         const bw = Math.max(1, b.x1 - b.x0 + 1), bh = Math.max(1, b.y1 - b.y0 + 1);
+        const diag = (x, y) => (x + 0.5 - b.x0) / bw + (y + 0.5 - b.y0) / bh;   // 0 = canto sup-esq, 2 = inf-dir
+        const edgeDR = (x, y) => !m.has(x, y + 1) || !m.has(x + 1, y);           // borda de baixo/direita
+        const edgeUL = (x, y) => !m.has(x, y - 1) || !m.has(x - 1, y);           // borda de cima/esquerda
+
+        // Modo por fração (padrão): só os pixels mais "de baixo/direita" ficam escuros, até darkRatio da parte.
+        let darkSet = null;
+        const ratio = opts.darkRatio ?? this.darkRatio;
+        if (shade && ratio !== null) {
+            const px = [];
+            for (let y = 0; y < this.h; y++) {
+                for (let x = 0; x < this.w; x++) {
+                    if (!m.has(x, y)) { continue; }
+                    const d = diag(x, y);
+                    if (edgeDR(x, y) || d > 1) { px.push({ i: y * this.w + x, score: d + (edgeDR(x, y) ? 0.6 : 0) }); }
+                }
+            }
+            let count = 0;
+            for (let y = 0; y < this.h; y++) { for (let x = 0; x < this.w; x++) { if (m.has(x, y)) { count++; } } }
+            px.sort((p, q) => q.score - p.score);
+            darkSet = new Set(px.slice(0, Math.floor(count * ratio)).map((p) => p.i));
+        }
+
         for (let y = 0; y < this.h; y++) {
             for (let x = 0; x < this.w; x++) {
                 if (!m.has(x, y)) { continue; }
                 let t = tone;
-                if (shade) {
-                    const lowerRight = (x + 0.5 - b.x0) / bw + (y + 0.5 - b.y0) / bh > 1.1;
-                    if (!m.has(x, y + 1) || !m.has(x + 1, y)) { t = DARK; }
-                    else if (!m.has(x, y - 1) || !m.has(x - 1, y)) { t = LIGHT; }
-                    else if (lowerRight) { t = DARK; }
+                if (shade && darkSet) {
+                    if (darkSet.has(y * this.w + x)) { t = DARK; }
+                    else if (edgeUL(x, y)) { t = LIGHT; }
+                    else { t = MID; }
+                } else if (shade) {
+                    // modo antigo (limiar diagonal): mantido para a versão congelada do "antes"
+                    if (edgeDR(x, y)) { t = DARK; }
+                    else if (edgeUL(x, y)) { t = LIGHT; }
+                    else if (diag(x, y) > split) { t = DARK; }
                     else { t = MID; }
                 }
                 const i = y * this.w + x;
                 this.color[i] = ramp[t];
                 this.owner[i] = id;
+                total++;
+                if (t === DARK) { dark++; }
             }
         }
+        if (shade) { this.stats.push({ name: opts.name || `${material}#${id}`, total, dark }); }
         return this;
     }
 

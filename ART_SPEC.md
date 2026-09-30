@@ -62,19 +62,22 @@ serão refeitos no gerador seguindo as mesmas regras; as medidas deles continuam
 ## Assets
 
 ### Orc Cibernético — `enemy-cyber-orc` (pixel art) ✅
-- **Arquivos**: `orc-walk.png` (folha 480×52, **8 quadros** de 60×52) e `orc.png` (parado, 60×52).
-  Fonte: `tools/pixel-art/sprites/orc.js`.
-- **Quadro**: 60×52 px da arte → **120×104** no mundo · pivot no pé, centro inferior (30, 52 da arte) ·
-  **olha para a direita** (espelhado para a esquerda).
-- **Partes, de trás para frente**: braço de trás (pendurado, punho fechado) → perna de trás → tronco curvado em aço
-  escuro (chevron ciano no peito) → perna da frente → tanga vermelho-escura → cinto de couro com disco rúnico ciano →
-  cabeça baixa e projetada (orelha pontuda, mandíbula grande, 2 presas, sobrancelha pesada) → implante ocular
-  vermelho com aro de aço e antena → ombreira com um espinho e runa ciano → clava de ferro com núcleo ciano
-  (mão da frente, apontando para baixo/trás) → braço da frente com bracelete e punho sobre o cabo.
-- **Caminhada** (fase `t` 0..1): pernas ±3 px, pé de trás levanta 1–2 px, corpo/cabeça/ombreira sobem 1 px na
-  passagem, braços e clava ±2 px em oposição às pernas.
-- **Pontos de encaixe** (px do mundo, a partir do pivot): `eye` (+37, −68) brilho vermelho do olho ·
-  `hit` (0, −44) onde os disparos acertam · `top` −98 barra de vida.
+- **Arquivos**: `orc-walk.png` (folha 480×52, **8 quadros** de 60×52), `orc-walk.json` (posição do olho por quadro)
+  e `orc.png` (parado, 60×52). Fonte: `tools/pixel-art/sprites/orc.js` (versão anterior congelada em `orc-v1.js`,
+  usada só no "antes × depois" do preview).
+- **Quadro**: 60×52 px da arte → **120×104** no mundo; o personagem tem **49 px da arte (98 px no mundo)** de altura ·
+  pivot no pé, centro inferior (30, 52 da arte) · **olha para a direita** (espelhado para a esquerda).
+- **Proporções**: pernas ~1/3 da altura (coxas de pele, grevas de aço claro, botas grandes), tronco ~40% curvado
+  para frente, cabeça grande e projetada (mandíbula saliente, 2 presas, orelha para fora, sobrancelha de 2 px).
+- **Partes, de trás para frente**: braço de trás grosso (punho à direita) → perna de trás → barriga (malha de aço
+  escuro) + peitoral (aço claro, chevron ciano) → perna da frente → tanga curta → cinto com disco rúnico → cabeça →
+  implante ocular vermelho com aro e antena → ombreira de aço escuro com um espinho, runa ciano e ferrugem →
+  clava grande com núcleo ciano → braço da frente grosso em diagonal, com bracelete e punho no cabo.
+- **Caminhada** (poses-chave): contato com pernas ±5 px e tronco 1 px à frente (quadros 0 e 4); passagem com pernas
+  juntas, corpo 1 px acima e pé de trás a 3 px do chão (quadros 2 e 6); braço de trás e clava ±3 px em oposição.
+  Cabeça, olho, ombreira e antena acompanham o sobe-desce.
+- **Pontos de encaixe** (px do mundo, a partir do pivot): `eye` (+37, −67) na pose parada (na caminhada vem do
+  JSON) · `hit` (0, −54) · `top` −96.
 - **No jogo**: animação "walk" em loop com velocidade proporcional ao passo; dano = flash branco + recuo de 1 px da
   arte; morte = quadro parado, pisca, afunda e vira faíscas. Sombra: elipse de pixels 28×8 (56×16 no mundo).
 

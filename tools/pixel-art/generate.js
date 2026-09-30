@@ -7,6 +7,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PNG } from 'pngjs';
 import orc from './sprites/orc.js';
+import { V1_WALK } from './sprites/orc-v1.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..');
@@ -19,10 +20,15 @@ const DIRT = '#96795a';
 
 const SPRITES = [orc];
 
-function writeSheet (sheet, frame) {
-    const n = sheet.frames.length;
+// "Antes × depois" no preview (versões antigas congeladas; não vão para o jogo)
+const COMPARE = [
+    { title: 'Orc — antes × depois', before: V1_WALK, after: orc.sheets[0].frames, frame: orc.frame }
+];
+
+function encodeSheet (frames, frame) {
+    const n = frames.length;
     const png = new PNG({ width: frame.w * n, height: frame.h });
-    sheet.frames.forEach((cv, f) => {
+    frames.forEach((cv, f) => {
         const rgba = cv.toRGBA();
         for (let y = 0; y < frame.h; y++) {
             for (let x = 0; x < frame.w; x++) {
@@ -32,12 +38,64 @@ function writeSheet (sheet, frame) {
             }
         }
     });
-    const buf = PNG.sync.write(png);
-    fs.writeFileSync(path.join(ASSETS, sheet.file), buf);
-    return { file: sheet.file, frames: n, width: png.width, height: png.height, base64: buf.toString('base64') };
+    return PNG.sync.write(png);
 }
 
-function previewHtml (entries) {
+// Confere o sombreamento: o tom escuro não deve passar de ~1/3 de cada parte (partes com 20+ px).
+function checkShading (name, frames) {
+    const worst = new Map();
+    for (const cv of frames) {
+        for (const st of cv.stats) {
+            if (st.total < 20) { continue; }
+            const ratio = st.dark / st.total;
+            if (!worst.has(st.name) || ratio > worst.get(st.name)) { worst.set(st.name, ratio); }
+        }
+    }
+    const over = [...worst].filter(([, r]) => r > 0.34);
+    const max = Math.max(...worst.values());
+    console.log(`  sombreamento de "${name}": maior fração escura por parte = ${(max * 100).toFixed(0)}%` +
+        (over.length ? ` ⚠️ acima de 34%: ${over.map(([n, r]) => `${n} ${(r * 100).toFixed(0)}%`).join(', ')}` : ' ✓'));
+}
+
+// Teste da caminhada: nas linhas das pernas (terço de baixo do quadro), quantos pixels mudam entre quadros.
+function checkLegs (file, frames, frame) {
+    const y0 = Math.floor(frame.h * 0.68);
+    const legs = frames.map((cv) => cv.color.slice(y0 * frame.w));
+    let min = Infinity, pair = null;
+    for (let i = 0; i < legs.length; i++) {
+        for (let j = i + 1; j < legs.length; j++) {
+            let d = 0;
+            for (let k = 0; k < legs[i].length; k++) { if (legs[i][k] !== legs[j][k]) { d++; } }
+            if (d < min) { min = d; pair = [i, j]; }
+        }
+    }
+    console.log(`  pernas em ${file}: menor diferença entre dois quadros = ${min} px (quadros ${pair[0]} e ${pair[1]})` + (min >= 20 ? ' ✓' : ' ⚠️ pouco distintos'));
+}
+
+function writeSheet (sheet, frame) {
+    const buf = encodeSheet(sheet.frames, frame);
+    fs.writeFileSync(path.join(ASSETS, sheet.file), buf);
+    if (sheet.meta) {
+        // dados por quadro (ex.: posição do olho) para o jogo acompanhar a animação
+        const json = { frame: [frame.w, frame.h], frames: sheet.frames.length, ...sheet.meta };
+        fs.writeFileSync(path.join(ASSETS, sheet.file.replace(/\.png$/, '.json')), JSON.stringify(json, null, 2) + '\n');
+    }
+    return { file: sheet.file, frames: sheet.frames.length, width: frame.w * sheet.frames.length, height: frame.h, base64: buf.toString('base64') };
+}
+
+function previewHtml (entries, compares) {
+    const compareBlocks = compares.map((c) => `
+    <section>
+      <h2>${c.title}</h2>
+      <div class="row">
+        <figure><canvas data-src="${c.beforeId}" data-scale="4" data-bg="${GRASS}"></canvas><figcaption>ANTES · 4× · grama</figcaption></figure>
+        <figure><canvas data-src="${c.afterId}" data-scale="4" data-bg="${GRASS}"></canvas><figcaption>DEPOIS · 4× · grama</figcaption></figure>
+        <figure><canvas data-src="${c.beforeId}" data-scale="${PIXEL_SCALE}" data-bg="${DIRT}"></canvas><figcaption>ANTES · tamanho real · terra</figcaption></figure>
+        <figure><canvas data-src="${c.afterId}" data-scale="${PIXEL_SCALE}" data-bg="${DIRT}"></canvas><figcaption>DEPOIS · tamanho real · terra</figcaption></figure>
+      </div>
+      <figure class="strip"><canvas data-src="${c.beforeId}" data-scale="4" data-bg="${GRASS}" data-strip="1"></canvas><figcaption>ANTES — 8 quadros (4×)</figcaption></figure>
+      <figure class="strip"><canvas data-src="${c.afterId}" data-scale="4" data-bg="${GRASS}" data-strip="1"></canvas><figcaption>DEPOIS — 8 quadros (4×)</figcaption></figure>
+    </section>`).join('\n');
     const blocks = entries.map((e) => `
     <section>
       <h2>${e.name} — ${e.file} (${e.frames} quadro${e.frames > 1 ? 's' : ''}, ${e.fw}×${e.fh} px)</h2>
@@ -50,7 +108,8 @@ function previewHtml (entries) {
       ${e.frames > 1 ? `<figure class="strip"><canvas data-src="${e.id}" data-scale="4" data-bg="${GRASS}" data-strip="1"></canvas><figcaption>todos os quadros (4×)</figcaption></figure>` : ''}
     </section>`).join('\n');
 
-    const data = Object.fromEntries(entries.map((e) => [e.id, { src: `data:image/png;base64,${e.base64}`, frames: e.frames, fw: e.fw, fh: e.fh }]));
+    const all = [...entries, ...compares.flatMap((c) => [c.beforeData, c.afterData])];
+    const data = Object.fromEntries(all.map((e) => [e.id, { src: `data:image/png;base64,${e.base64}`, frames: e.frames, fw: e.fw, fh: e.fh }]));
 
     return `<!doctype html>
 <html lang="pt-BR">
@@ -69,6 +128,7 @@ function previewHtml (entries) {
 <body>
 <h1>Pixel art — preview</h1>
 <p>Gerado por <code>npm run pixel</code>. Animações em loop a 10 quadros/s. "Tamanho real" = ${PIXEL_SCALE} px de tela por pixel da arte (como no mundo 1280×720 do jogo).</p>
+${compareBlocks}
 ${blocks}
 <script>
 const DATA = ${JSON.stringify(data)};
@@ -119,5 +179,14 @@ for (const sprite of SPRITES) {
         console.log(`✓ public/assets/${out.file}  (${out.width}×${out.height}, ${out.frames} quadro${out.frames > 1 ? 's' : ''})`);
     }
 }
-fs.writeFileSync(path.join(HERE, 'preview.html'), previewHtml(entries));
+for (const sprite of SPRITES) {
+    checkShading(sprite.name, sprite.sheets.flatMap((sh) => sh.frames));
+    for (const sh of sprite.sheets) { if (sh.frames.length > 1) { checkLegs(sh.file, sh.frames, sprite.frame); } }
+}
+const compares = COMPARE.map((c, i) => {
+    const mk = (frames, tag) => ({ id: `cmp${i}_${tag}`, base64: encodeSheet(frames, c.frame).toString('base64'), frames: frames.length, fw: c.frame.w, fh: c.frame.h });
+    const beforeData = mk(c.before, 'antes'), afterData = mk(c.after, 'depois');
+    return { title: c.title, beforeId: beforeData.id, afterId: afterData.id, beforeData, afterData };
+});
+fs.writeFileSync(path.join(HERE, 'preview.html'), previewHtml(entries, compares));
 console.log('✓ tools/pixel-art/preview.html');

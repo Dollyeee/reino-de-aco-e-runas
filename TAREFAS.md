@@ -127,3 +127,17 @@ Configurar o processo de arte pintada. A direção de arte mudou: o jogo passa a
 - CLAUDE.md ("Direção de arte" pixel art) e ART_SPEC.md atualizados. T04 descartada.
 
 Mudar a direção de arte para PIXEL ART desenhada em código, começando pelo Orc Cibernético com animação de caminhada. (Texto completo enviado pela conversa em 2026-09-30: gerador em tools/pixel-art/ com `npm run pixel`, paleta fixa, orc 60×52 em partes, caminhada de 8 quadros, renderização pixel-perfect no jogo, atualizar CLAUDE.md e ART_SPEC.md, mostrar o preview.html.)
+
+## [x] T06 — Ajustes no pixel art do Orc
+
+**Concluída em 2026-09-30.** Resultado:
+- Orc redesenhado: pernas ~1/3 com coxas/grevas/botas, tronco em placas (peitoral claro × barriga de malha escura), ombreira de aço escuro com ferrugem, cabeça maior, braços grossos, clava ~30% maior com núcleo ciano.
+- Caminhada com poses-chave (contato ±5 px, passagem +1 px, pé a 3 px do chão, inclinação no contato); brilho do olho acompanha via `orc-walk.json`.
+- Gerador: sombra escura limitada a 30% por parte (antes chegava a 73%); teste de pernas entre quadros (antes: 0 px de diferença em alguns pares; agora ≥ 98 px); preview com "antes × depois".
+- Altura 49 px da arte = 98 px no mundo (PIXEL_SCALE 2 e canvas 60×52 mantidos).
+
+Ajustes no pixel art do Orc (tools/pixel-art/sprites/orc.js): proporções (pernas ~30%, tronco ~40% curvado, cabeça maior), braços grossos e clava 30% maior, placas de aço legíveis (sombra escura ≤ ~1/3 por parte), caminhada com poses-chave (contato ±5 px, passagem, pé levantando 2–3 px, olho acompanhando), orc com ~100 px de altura, preview "antes × depois". (Texto completo enviado pela conversa em 2026-09-30.)
+
+## [ ] T07 — Aplicar balanceamento da sugestão da T01
+
+Sobre a sugestão de balanceamento da T01: aplique a Catapulta custo 135 e a onda 5 healthMult 3.5, mas ajuste a onda 4 para que a estratégia mista vença ~15/20 e "só Catapultas" ~13/20 na mesma simulação. Me mostre os números antes de commitar.

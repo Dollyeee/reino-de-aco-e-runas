@@ -28,6 +28,7 @@ export default class BootScene extends Phaser.Scene {
                 this.load.svg(key, url, { width: def.size[0] * RENDER_SCALE, height: def.size[1] * RENDER_SCALE });
             } else if ((format === 'png' || format === 'webp') && def.frame) {
                 this.load.spritesheet(key, url, { frameWidth: def.frame[0], frameHeight: def.frame[1] });
+                if (def.meta) { this.load.json(`${key}:meta`, `assets/${def.meta}`); }
             } else if (format === 'png' || format === 'webp') {
                 this.load.image(key, url);
             } else {

@@ -6,6 +6,7 @@ export const OUTLINE = '#1e1512';
 export const MATERIALS = {
     pele: ['#3e5422', '#688434', '#92ae4e'],
     aco: ['#262a32', '#424a56', '#6e7886'],
+    acoClaro: ['#424a56', '#6e7886', '#aab4c0'],   // mesmas cores do aço, um degrau acima (placas em destaque)
     couro: ['#342418', '#543a26', '#705034'],
     tecido: ['#54221a', '#803828', '#9c4e38'],
     ciano: ['#14788c', '#3ff5ff', '#c8fdff'],

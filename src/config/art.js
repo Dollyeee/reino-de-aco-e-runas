@@ -13,6 +13,7 @@
 //                  filtro NEAREST; o código não aplica escala fracionada nem rotação nesses sprites.
 //   frame [w, h]   (sprite sheet) tamanho de UM quadro em pixels do arquivo; os quadros ficam lado a lado.
 //   anims          (sprite sheet) animações: { nome: { start, end, frameRate, repeat } }
+//   meta           (sprite sheet) JSON gerado por `npm run pixel` com dados por quadro (ex.: posição do olho)
 //   demais pontos  (headMount, muzzle, cup, eye...) são deslocamentos em pixels lógicos a partir do pivot.
 //
 // Trocar SVG por PNG: mude só `file` (e `scale`, se o arquivo for em alta resolução). Mantendo `size`
@@ -34,8 +35,8 @@ export const ART = {
     // pixel art (tools/pixel-art/sprites/orc.js): quadro 60×52 → 120×104 no mundo
     'enemy-cyber-orc':      { file: 'orc-walk.png', pixel: true, frame: [60, 52], size: [120, 104], pivot: [60, 104],
                               anims: { walk: { start: 0, end: 7, frameRate: 10, repeat: -1 } },
-                              idle: 'enemy-cyber-orc-idle',
-                              eye: { x: 37, y: -68 }, hit: { x: 0, y: -44 }, top: -98 },
+                              meta: 'orc-walk.json', idle: 'enemy-cyber-orc-idle',
+                              eye: { x: 37, y: -67 }, hit: { x: 0, y: -54 }, top: -96 },
     'enemy-cyber-orc-idle': { file: 'orc.png', pixel: true, size: [120, 104], pivot: [60, 104] },
 
     'castle':               { file: 'castle.svg', size: [260, 272], pivot: [130, 272],

@@ -48,6 +48,8 @@ export default class Enemy extends Phaser.GameObjects.Container {
             this.walkBaseRate = walk.frameRate;
             this.sprite.play({ key: this.walkAnim, startFrame: Phaser.Math.Between(0, this.walkFrames - 1) });
             this.lastFrame = -1;
+            // dados por quadro do gerador (posição do olho acompanha o sobe-desce da cabeça)
+            this.meta = this.def.meta ? scene.cache.json.get(`${artKey}:meta`) : null;
         }
 
         // brilho do olho robótico (aditivo e sem iluminação → pega Bloom)
@@ -138,16 +140,23 @@ export default class Enemy extends Phaser.GameObjects.Container {
         this.sprite.x = this.knockMs > 0 ? -this.facing * A.knockback * PS : 0;
         this.sprite.y = 0;
 
+        const frame = this.sprite.anims.currentFrame ? this.sprite.anims.currentFrame.index - 1 : 0;
         if (this.eyeGlow) {
-            this.eyeGlow.x = this.eyeOffset.x * this.facing + this.sprite.x;
-            this.eyeGlow.y = this.eyeOffset.y;
+            let ex = this.eyeOffset.x, ey = this.eyeOffset.y;
+            const e = this.meta && this.meta.eye && this.meta.eye[frame];
+            if (e) {
+                // pixels da arte → pixels do mundo, a partir do pivot
+                ex = (e.x - this.def.pivot[0] / PS) * PS;
+                ey = (e.y - this.def.pivot[1] / PS) * PS;
+            }
+            this.eyeGlow.x = ex * this.facing + this.sprite.x;
+            this.eyeGlow.y = ey;
             this.eyeGlow.alpha = 0.6 + 0.2 * Math.sin(this.scene.time.now / 140);
         }
 
-        // poeira quando um pé toca o chão (quadros de passada máxima)
-        const frame = this.sprite.anims.currentFrame ? this.sprite.anims.currentFrame.index - 1 : 0;
+        // poeira quando um pé toca o chão (quadros de contato)
         if (frame !== this.lastFrame) {
-            if ((frame === 2 || frame === 6) && Math.random() < A.dustChance) {
+            if ((frame === 0 || frame === 4) && Math.random() < A.dustChance) {
                 this.scene.effects.landingDust(this.x + this.facing * 8, this.y + 2, 1);
             }
             this.lastFrame = frame;

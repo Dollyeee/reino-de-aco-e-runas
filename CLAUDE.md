@@ -25,15 +25,17 @@ cada personagem **em partes** numa grade pequena. Não se edita PNG à mão: mud
 
 ### Gerador (`tools/pixel-art/`)
 - Primitivas rasterizadas na grade, **sem antialias**: retângulo, polígono, elipse, linha grossa, pixel avulso.
-- **Cel shading automático por parte**, rampa de 3 tons por material: claro nas bordas de cima/esquerda, escuro
-  nas bordas de baixo/direita e na metade inferior-direita da parte (luz do canto superior esquerdo).
+- **Cel shading automático por parte**, rampa de 3 tons por material: claro nas bordas de cima/esquerda, escuro nos
+  pixels mais de baixo/direita (bordas primeiro), **no máximo ~30% de cada parte** (o gerador mede e avisa).
+  Luz do canto superior esquerdo.
 - **Contorno** `#1e1512` de 1 px em volta da silhueta inteira + contorno interno onde uma parte se sobrepõe a
   outra já desenhada. Vizinhos são consultados com checagem de limites (nunca deslocamento circular de máscara).
 - **Paleta fixa** em `tools/pixel-art/palette.js` (pele, aço, couro, tecido, ciano, vermelho, presa + ferrugem).
   Ciano `#3ff5ff` e vermelho só em energia, runas, olhos e brilhos.
 - **Animação gerada pelas partes**, parametrizada por uma fase `t` (0..1), **só com deslocamentos inteiros**.
-  Sprite sheets com os quadros lado a lado + um PNG parado; `tools/pixel-art/preview.html` mostra tudo em loop
-  (4× e tamanho real, sobre grama e terra).
+  Sprite sheets com os quadros lado a lado + um PNG parado + um JSON com dados por quadro (ex.: posição do olho);
+  `tools/pixel-art/preview.html` mostra tudo em loop (4× e tamanho real, sobre grama e terra) e o "antes × depois".
+  O gerador também confere se as pernas mudam de verdade entre os quadros da caminhada.
 - Câmera 3/4, personagem olhando para a **direita** (o jogo espelha), pés na borda inferior do quadro.
 
 ### No jogo (renderização pixel-perfect)
