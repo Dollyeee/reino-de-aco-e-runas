@@ -103,6 +103,27 @@ export const ENEMY_ANIM = {
     }
 };
 
+// Materialização rúnica (construção de torre). As fases são frações da duração total
+// (BALANCE.towers.buildTime); entre parênteses, os tempos com a duração padrão de 0,9 s.
+export const BUILD_FX = {
+    runes: [0.00, 0.28],        // (0–0,25 s) círculo de runas surge girando + luz no centro
+    base: [0.22, 0.61],         // (0,2–0,55 s) base revelada de baixo para cima em holograma
+    snap: [0.56, 0.89],         // (0,5–0,8 s) peças de cima descem e encaixam
+    finale: [0.89, 1.00],       // (0,8–0,9 s) flash, faíscas, luz apaga, runas somem
+    color: 0x3ff5ff,
+    hologramAlpha: 0.6,
+    runeRadius: 64,             // raio do círculo de runas (px lógicos)
+    runeFlatten: 0.42,          // achatamento 3/4 do círculo no chão
+    runeSpin: 3.2,              // voltas (rad) que o círculo gira durante a construção
+    light: { radius: 170, intensity: 1.6 },
+    scanLag: 18,                // px de holograma entre a linha de varredura e a arte já sólida
+    scanWidth: 1.15,            // largura da linha de varredura (× largura da base)
+    snapLift: 26,               // px acima do encaixe onde a peça de cima surge
+    squash: 0.06,               // squash da torre inteira no encaixe
+    sparks: 8,
+    flashSize: 120
+};
+
 // Deslocamento da sombra projetada (luz vem do canto superior esquerdo).
 export const SHADOW = { offsetX: 7, offsetY: 4, alpha: 0.28 };
 

@@ -23,6 +23,7 @@ export default class LaserCrossbow extends Tower {
             .setBlendMode('ADD').setTint(COLORS.cyan).setDisplaySize(34, 34);
         this.headRig.add([this.head, this.crystalGlow]);
         this.rig.add([this.baseImg, this.headRig]);
+        this.pieces = [this.baseImg, this.headRig];   // materialização: base, depois a cabeça
 
         this.aim = -0.4 + Math.random() * 0.8;
         this.pulseT = Math.random() * 10;

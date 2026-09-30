@@ -102,6 +102,37 @@ export function createProceduralTextures (scene) {
         }
     });
 
+    // Círculo de runas (materialização das torres): anéis + glifos, branco (a cor vem do tint)
+    canvasTexture(scene, 'rune-circle', 256, 256, (ctx, w) => {
+        const c = w / 2;
+        ctx.strokeStyle = '#ffffff';
+        ctx.fillStyle = '#ffffff';
+        ctx.lineCap = 'round';
+        ctx.lineWidth = 6;
+        ctx.beginPath(); ctx.arc(c, c, c - 8, 0, Math.PI * 2); ctx.stroke();
+        ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(c, c, c - 36, 0, Math.PI * 2); ctx.stroke();
+        ctx.globalAlpha = 0.55;
+        ctx.setLineDash([10, 8]);
+        ctx.beginPath(); ctx.arc(c, c, c - 58, 0, Math.PI * 2); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.globalAlpha = 1;
+        // glifos entre os anéis
+        ctx.lineWidth = 4;
+        for (let i = 0; i < 12; i++) {
+            const a = (Math.PI * 2 / 12) * i;
+            ctx.save();
+            ctx.translate(c + Math.cos(a) * (c - 22), c + Math.sin(a) * (c - 22));
+            ctx.rotate(a + Math.PI / 2);
+            ctx.beginPath();
+            if (i % 3 === 0) { ctx.moveTo(-7, 6); ctx.lineTo(0, -8); ctx.lineTo(7, 6); }
+            else if (i % 3 === 1) { ctx.moveTo(0, -8); ctx.lineTo(0, 8); ctx.moveTo(-6, -2); ctx.lineTo(6, 2); }
+            else { ctx.moveTo(-6, -6); ctx.lineTo(6, 6); ctx.moveTo(6, -6); ctx.lineTo(-6, 6); }
+            ctx.stroke();
+            ctx.restore();
+        }
+    });
+
     // Marca de queimado no chão
     canvasTexture(scene, 'scorch', 128, 64, (ctx, w, h) => {
         ctx.save();

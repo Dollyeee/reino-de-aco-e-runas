@@ -72,7 +72,13 @@ Refazer o Orc Cibernético (public/assets/enemy-cyber-orc.svg). A versão atual 
 
 5. Mantenha 88×94, ancoragem no centro inferior e o olho robótico perto de (64,31); se mudar, atualize eye e top em src/config/art.js. Não mexa em animações, balanceamento nem em outros SVGs. Rode npm run build.
 
-## [ ] T03 — Animação de construção por materialização rúnica
+## [x] T03 — Animação de construção por materialização rúnica
+
+**Concluída em 2026-09-30.** Resultado:
+- `Tower.playBuildAnimation` refeito de forma genérica a partir de `this.pieces` (base + peças de cima); Besta e Catapulta só declaram as peças. Substitui a queda do céu e o "pop" da plataforma.
+- Fases: runas giram/acendem + luz ciano; base revelada de baixo para cima com `setCrop`, faixa de holograma (tint FILL ciano, sem iluminação) e linha de varredura, arte sólida logo atrás; cabeça/braço descem em holograma e encaixam com Back.easeOut + squash 6%; flash, 8 faíscas, luz e runas apagam. Sombra cresce com a revelação.
+- Duração em `BALANCE.towers.buildTime` (0,9 s); fases, cores e medidas em `BUILD_FX` (visual.js); textura procedural `rune-circle`.
+- Testado: orc no alcance desde 16 ms, torre pronta em 928 ms, 1º disparo em 992 ms; construção seguida com Shift; depth, iluminação e luzes temporárias restauradas ao final. `buildPuff` (efeito antigo) removido.
 
 Nova animação de construção das torres: "materialização rúnica". Esta tarefa vem depois da remoção da plataforma e SUBSTITUI o efeito de construção dela (o círculo de runas continua, mas passa a fazer parte desta sequência). Consulte node_modules/phaser/skills antes de usar crop, tint e filtros do Phaser 4.
 

@@ -193,13 +193,6 @@ export default class Effects {
         this.flashLight(mx, y - 10, LIGHTING.explosionLight, 280, 0.55);
     }
 
-    buildPuff (x, y) {
-        this.dust.explode(16, x, y);
-        this.sparks.explode(8, x, y - 20);
-        this.shockwave(x, y, 55, COLORS.cyan, 380);
-        this.flashLight(x, y - 30, LIGHTING.muzzleLight, 350);
-    }
-
     landingDust (x, y, count = 1) {
         this.dust.explode(count, x, y);
     }

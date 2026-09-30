@@ -1,7 +1,31 @@
 import Phaser from 'phaser';
-import { COLORS, DEPTH } from '../config/visual.js';
+import { BALANCE } from '../config/balance.js';
+import { BUILD_FX, COLORS, DEPTH, SHADOW } from '../config/visual.js';
 import { SHADOWS } from '../config/art.js';
-import { addArt } from '../world/art.js';
+import { addArt, makeArt } from '../world/art.js';
+
+const ADD_BLEND = Phaser.BlendModes.ADD;
+
+// fração de progresso dentro de uma fase [início, fim]
+function phase (t, range) {
+    return Phaser.Math.Clamp((t - range[0]) / (range[1] - range[0]), 0, 1);
+}
+
+// Liga/desliga o visual de holograma (tint FILL ciano, sem iluminação) numa imagem ou Container.
+// Imagens aditivas (brilhos) ficam como estão.
+function setHologram (obj, on) {
+    if (obj.list) { obj.list.forEach((c) => setHologram(c, on)); return; }
+    if (!obj.setTintMode || obj.blendMode === ADD_BLEND) { return; }
+    if (on) {
+        if (obj._holoLit === undefined) { obj._holoLit = !!obj.lighting; }
+        obj.setTint(BUILD_FX.color).setTintMode(Phaser.TintModes.FILL);
+        if (obj.setLighting) { obj.setLighting(false); }
+    } else {
+        obj.clearTint();
+        if (obj._holoLit !== undefined && obj.setLighting) { obj.setLighting(obj._holoLit); }
+        delete obj._holoLit;
+    }
+}
 
 // Distância entre o centro da face de cima da plataforma e a base da torre.
 export const PLATFORM_OFFSET = 10;
@@ -12,6 +36,11 @@ export const PLATFORM_OFFSET = 10;
 //     └─ rig (Container)       → scaleX = ±1 para virar de lado; filhos = arte da torre
 //   platform / platformGlow    → plataforma rúnica no chão (faz parte da torre, mas fica na camada do chão)
 //   hitZone                    → área de clique para abrir o painel de informações
+//
+// Materialização (playBuildAnimation) usa this.pieces = [base, ...peças de cima], definido por cada torre:
+//   base (Image)                    → revelada de baixo para cima em holograma (setCrop) com linha de varredura
+//   peças de cima (Image/Container) → surgem em holograma acima do encaixe, descem e encaixam
+// Torres futuras com mais peças só precisam listar as peças na ordem.
 export default class Tower extends Phaser.GameObjects.Container {
     constructor (scene, x, y, type, stats, shadowKey) {
         super(scene, x, y + PLATFORM_OFFSET);
@@ -25,6 +54,7 @@ export default class Tower extends Phaser.GameObjects.Container {
         this.cooldown = 0;
         this.target = null;
         this.ready = false;
+        this.pieces = [];
 
         this.rig = new Phaser.GameObjects.Container(scene, 0, 0);
         this.add(this.rig);
@@ -53,42 +83,160 @@ export default class Tower extends Phaser.GameObjects.Container {
         this.hitZone.on('pointerdown', () => scene.onTowerClicked(this));
     }
 
-    // A plataforma surge do chão; em seguida a torre cai do céu, achata ao tocar a plataforma e volta com elasticidade.
+    // ------------------------------------------------ materialização rúnica
+    // 1) runas giram e acendem + luz ciano  2) base em holograma revelada de baixo para cima
+    // 3) peças de cima descem e encaixam (squash)  4) flash, faíscas, luz e runas apagam.
+    // A torre só procura alvos quando termina (this.ready).
     playBuildAnimation () {
         const scene = this.scene;
-        const groundY = this.y;
-        const PLATFORM_MS = 220;
+        const F = BUILD_FX;
+        const [base, ...tops] = this.pieces;
+        this.ready = false;
+        this.snapped = tops.map(() => false);
+        this.flashed = false;
 
-        const pbs = this.platform.baseScale;
-        this.platform.setScale(pbs * 0.2, pbs * 0.1).setAlpha(0);
+        // plataforma e sombra começam apagadas
+        this.platform.setAlpha(0);
         this.platformShadow.setAlpha(0);
-        scene.tweens.add({ targets: this.platform, scaleX: pbs, scaleY: pbs, alpha: 1, duration: PLATFORM_MS, ease: 'Back.easeOut' });
-        scene.tweens.add({ targets: this.platformShadow, alpha: 0.3, duration: PLATFORM_MS });
-        scene.effects.flash(this.placeX, this.placeY, COLORS.cyan, 90, 260, DEPTH.DECAL + 3);
-        scene.effects.dust.explode(8, this.placeX, this.placeY + 4);
+        this.platformGlow.setVisible(false);
+        this.shadow.setAlpha(0);
 
-        this.y = groundY - 140;
-        this.setScale(0.75, 1.35);
-        this.setAlpha(0);
-        this.shadow.setScale(0.2);
+        // círculo de runas no chão (Container achatado → a imagem gira "deitada" no plano do chão)
+        this.runes = scene.add.container(this.placeX, this.placeY).setDepth(DEPTH.DECAL).setScale(1, F.runeFlatten);
+        this.runeImg = scene.add.image(0, 0, 'rune-circle').setBlendMode('ADD').setTint(F.color)
+            .setDisplaySize(F.runeRadius * 2, F.runeRadius * 2).setAlpha(0);
+        this.runes.add(this.runeImg);
+        this.buildLight = scene.effects.acquireLight(this.placeX, this.placeY - 24,
+            { radius: F.light.radius, color: F.color, intensity: 0 });
 
-        scene.tweens.add({ targets: this.shadow, scaleX: this.shadow.scaleX * 5, scaleY: this.shadow.scaleY * 5, delay: PLATFORM_MS, duration: 260, ease: 'Quad.easeIn' });
-        scene.tweens.chain({
-            targets: this,
-            delay: PLATFORM_MS,
-            tweens: [
-                { y: groundY, alpha: 1, duration: 260, ease: 'Quad.easeIn' },
-                {
-                    scaleX: 1.3, scaleY: 0.68, duration: 80, ease: 'Quad.easeOut',
-                    onStart: () => scene.effects.buildPuff(this.x, groundY)
-                },
-                { scaleX: 1, scaleY: 1, duration: 650, ease: 'Elastic.easeOut', easeParams: [1.2, 0.35] }
-            ],
-            onComplete: () => { this.ready = true; }
+        // base: arte sólida + cópia em holograma por cima, as duas recortadas de baixo para cima
+        const parent = base.parentContainer;
+        this.holoBase = makeArt(scene, base.x, base.y, base.texture.key).setScale(base.scaleX, base.scaleY);
+        setHologram(this.holoBase, true);
+        this.scanLine = scene.make.image({ x: 0, y: 0, key: 'dot' }, false).setBlendMode('ADD').setTint(0xe8feff);
+        parent.addAt(this.holoBase, parent.getIndex(base) + 1);
+        parent.addAt(this.scanLine, parent.getIndex(this.holoBase) + 1);
+        this.revealTo(base, 0);
+        this.revealTo(this.holoBase, 0);
+
+        // peças de cima: invisíveis e em holograma até a fase de encaixe
+        for (const p of tops) {
+            p._mountY = p.y;
+            p.setAlpha(0);
+            setHologram(p, true);
+        }
+
+        this.buildTween = scene.tweens.addCounter({
+            from: 0,
+            to: 1,
+            duration: BALANCE.towers.buildTime * 1000,
+            ease: 'Linear',
+            onUpdate: (tw) => this.buildStep(tw.getValue()),
+            onComplete: () => this.finishBuild()
         });
-        // corrige a sombra ao tamanho final
-        const sh = this.shadow;
-        scene.time.delayedCall(PLATFORM_MS + 270, () => sh.setDisplaySize(sh.baseW, sh.baseH));
+    }
+
+    // Mostra só uma faixa horizontal da imagem, medida de BAIXO para CIMA em frações da altura
+    // (from = 0 é a base da imagem, to = 1 é o topo). Usa setCrop em pixels da textura.
+    revealBand (img, from, to) {
+        const fw = img.frame.width, fh = img.frame.height;
+        const lo = Math.round(fh * Phaser.Math.Clamp(from, 0, 1));
+        const hi = Math.round(fh * Phaser.Math.Clamp(to, 0, 1));
+        if (hi - lo <= 0) { img.setVisible(false); return; }
+        img.setVisible(true);
+        if (lo === 0 && hi === fh) { img.setCrop(); return; }
+        img.setCrop(0, fh - hi, fw, hi - lo);
+    }
+
+    revealTo (img, fraction) {
+        this.revealBand(img, 0, fraction);
+    }
+
+    buildStep (t) {
+        const scene = this.scene;
+        const F = BUILD_FX;
+        const [base, ...tops] = this.pieces;
+
+        // 1) runas + luz + plataforma (tudo apaga durante o final)
+        const r = phase(t, F.runes);
+        const fade = 1 - phase(t, F.finale);
+        this.runeImg.rotation = t * F.runeSpin;
+        this.runeImg.setAlpha(Phaser.Math.Easing.Quadratic.Out(r) * fade * (0.85 + 0.15 * Math.sin(t * 40)));
+        const rs = 0.6 + 0.4 * Phaser.Math.Easing.Back.Out(r);
+        this.runes.setScale(rs, rs * F.runeFlatten);
+        if (this.buildLight) { this.buildLight.intensity = F.light.intensity * r * fade; }
+        const pbs = this.platform.baseScale;
+        this.platform.setAlpha(r).setScale(pbs * (0.7 + 0.3 * r));
+        this.platformShadow.setAlpha(0.3 * r);
+
+        // 2) base em holograma revelada de baixo para cima; a arte sólida vem logo atrás da varredura
+        const b = phase(t, F.base);
+        const h = base.displayHeight;
+        const lag = F.scanLag / h;
+        const solid = b <= 0 ? 0 : (b >= 1 ? 1 : Math.max(0, b - lag));
+        this.revealTo(base, solid);
+        // o holograma é só a faixa entre a arte já sólida e a linha de varredura
+        this.revealBand(this.holoBase, solid, b >= 1 ? 0 : b);
+        this.holoBase.setAlpha(F.hologramAlpha * (0.8 + 0.2 * Math.sin(t * 50)));
+        const scanning = b > 0 && b < 1;
+        this.scanLine.setVisible(scanning);
+        if (scanning) {
+            const top = base.y - h * base.originY;
+            this.scanLine.setPosition(base.x, top + h * (1 - b));
+            this.scanLine.setDisplaySize(base.displayWidth * F.scanWidth, 7).setAlpha(0.9);
+        }
+
+        // sombra cresce junto com a revelação (começa pequena e fraca)
+        const k = 0.3 + 0.7 * b;
+        this.shadow.setDisplaySize(this.shadow.baseW * k, this.shadow.baseH * k).setAlpha(SHADOW.alpha * b);
+
+        // 3) peças de cima: surgem acima do encaixe, descem com Back.easeOut e ficam sólidas no impacto
+        const sp = phase(t, F.snap);
+        tops.forEach((p, i) => {
+            if (this.snapped[i]) { return; }
+            const q = Phaser.Math.Clamp(sp * tops.length - i, 0, 1);
+            p.y = p._mountY - F.snapLift * (1 - Phaser.Math.Easing.Back.Out(q));
+            p.setAlpha(Math.min(1, q * 4) * F.hologramAlpha);
+            if (q >= 1) { this.snapPiece(p, i); }
+        });
+
+        // 4) final: flash branco rápido e faíscas ciano (runas e luz já apagam acima)
+        if (!this.flashed && t >= F.finale[0]) {
+            this.flashed = true;
+            const cy = this.y - h * 0.6;
+            scene.effects.flash(this.x, cy, 0xffffff, F.flashSize, 140);
+            scene.effects.sparks.explode(F.sparks, this.x, cy);
+        }
+    }
+
+    snapPiece (p, i) {
+        this.snapped[i] = true;
+        p.y = p._mountY;
+        p.setAlpha(1);
+        setHologram(p, false);
+        // squash de ~6% na torre inteira
+        const sq = BUILD_FX.squash;
+        this.scene.tweens.killTweensOf(this);
+        this.setScale(1 + sq, 1 - sq);
+        this.scene.tweens.add({ targets: this, scaleX: 1, scaleY: 1, duration: 260, ease: 'Back.easeOut' });
+    }
+
+    finishBuild () {
+        const [base, ...tops] = this.pieces;
+        tops.forEach((p, i) => { if (!this.snapped[i]) { this.snapPiece(p, i); } });
+        base.setCrop();
+        base.setVisible(true);
+        if (this.holoBase) { this.holoBase.destroy(); this.holoBase = null; }
+        if (this.scanLine) { this.scanLine.destroy(); this.scanLine = null; }
+        if (this.runes) { this.runes.destroy(); this.runes = null; }
+        this.scene.effects.releaseLight(this.buildLight);
+        this.buildLight = null;
+        this.platform.setAlpha(1).setScale(this.platform.baseScale);
+        this.platformShadow.setAlpha(0.3);
+        this.platformGlow.setVisible(true);
+        this.shadow.setDisplaySize(this.shadow.baseW, this.shadow.baseH).setAlpha(SHADOW.alpha);
+        this.buildTween = null;
+        this.ready = true;
     }
 
     // Squash rápido do corpo todo (disparo).
@@ -120,6 +268,9 @@ export default class Tower extends Phaser.GameObjects.Container {
     }
 
     destroyAll () {
+        if (this.buildTween) { this.buildTween.remove(); }
+        if (this.runes) { this.runes.destroy(); }
+        if (this.buildLight) { this.scene.effects.releaseLight(this.buildLight); }
         this.shadow.destroy();
         this.platformShadow.destroy();
         this.platform.destroy();

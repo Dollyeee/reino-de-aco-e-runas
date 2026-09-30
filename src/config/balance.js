@@ -21,6 +21,7 @@ export const BALANCE = {
 
     // ------------------------------------------------------------------ torres
     towers: {
+        buildTime: 0.9,              // duração da materialização (s): a torre só atira depois disso
         laserCrossbow: {
             name: 'Besta Laser',
             description: 'Rápida e barata.\nDisparo laser em linha reta.',

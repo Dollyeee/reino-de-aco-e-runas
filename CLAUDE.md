@@ -65,6 +65,10 @@ Personalidade vem do **peso**, não da elasticidade. Nada fica 100% parado, mas 
 - **Morte**: tombo pesado para frente, impacto no chão e desmanche em faíscas/destroços — sem esticar.
 - **Easing `Elastic` só em UI e explosões.** No mundo use `Quad`, `Cubic`, `Sine` e `Back` com pouco overshoot.
 - **Torres com recuo** ao disparar e retorno firme (a migrar para a nova direção: hoje ainda usam `Elastic`).
+- **Construção = materialização rúnica**: círculo de runas girando + luz ciano → base revelada de baixo para cima
+  em holograma (`setCrop` + linha de varredura) → peças de cima descem e encaixam (`Back.easeOut`, squash ~6%) →
+  flash e faíscas. Genérico em `Tower.playBuildAnimation` a partir de `this.pieces` (base primeiro); tempos e
+  cores em `BUILD_FX` (visual.js), duração em `BALANCE.towers.buildTime`. A torre só atira depois de terminar.
 - **Cristais flutuam e pulsam** devagar (subida/descida senoidal + intensidade da luz).
 - **Explosões** com partículas (ciano, laranja, faíscas metálicas) + luz temporária.
 - **Números de dano** sobem e somem rápido (fonte `FONT_NUMBERS`).

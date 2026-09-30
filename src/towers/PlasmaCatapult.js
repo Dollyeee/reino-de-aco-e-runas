@@ -29,6 +29,7 @@ export default class PlasmaCatapult extends Tower {
         this.orb = makeArt(scene, orb.x, orb.y, 'projectile-plasma', 0.9);
         this.armRig.add([this.arm, this.orbGlow, this.orb]);
         this.rig.add([this.baseImg, this.armRig]);
+        this.pieces = [this.baseImg, this.armRig];    // materialização: base, depois o braço
 
         this.armRig.rotation = REST_ANGLE;
         this.facing = 1;
