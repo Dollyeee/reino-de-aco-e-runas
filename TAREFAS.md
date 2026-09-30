@@ -454,3 +454,25 @@ Passada de acabamento na Besta Laser versão A (piloto). As torres estão com ap
 8. Mantenha pontos de encaixe, ângulos de mira, recuo e materialização funcionando; atualize towerArt.js se as medidas mudarem.
 
 Entregável: no escolha-torres.html, "Besta A antes × depois" no tamanho real sobre o chão (ao lado do orc e de uma árvore do kit A) e ampliado 4×, com o idle e o disparo rodando. npm run pixel e npm run build. Descreva o que mudou.
+
+---
+
+## [!] T21 — Piloto SpriteCook da Besta Laser
+
+**Bloqueada (2026-09-30):** as ferramentas do SpriteCook (generate_game_art, upload, check_job_status) não estão nesta sessão. O usuário precisa rodar `npx spritecook-mcp setup` no próprio terminal, fazer o login e reiniciar a sessão do Claude Code. Preparado: `arte-bruta/spritecook/referencias/chao-256.png` (recorte 256×256 do chão com caminho), `arte-bruta/spritecook/paleta-besta.json` (61 cores do ART_SPEC), `arte-bruta/spritecook/manifesto.json` (esqueleto) e `.mcp.json` no `.gitignore`.
+
+Quero usar o SpriteCook (plugin de geração de pixel art) para fazer um piloto da Besta Laser que combine com a arte atual do jogo.
+
+0. Confira se as ferramentas do SpriteCook (generate_game_art, upload de assets, check_job_status) estão disponíveis aqui. Se não estiverem, rode `npx spritecook-mcp setup` e me guie no login; NÃO grave chaves ou tokens em arquivos versionados.
+
+1. Referências de estilo: faça upload para o SpriteCook de public/assets/orc-b.png, uma árvore e uma pedra do kit A (decor-a-*), e um recorte 256×256 do chão com caminho (public/assets/chao-map01.png). Use esses asset IDs como style_asset_ids em todas as gerações — a meta é a torre parecer do MESMO jogo.
+
+2. Antes de gerar, rode list_generation_models, me diga o custo em créditos e use qualidade "medium". Gere no máximo 4 variações por pedido.
+
+3. Gere a BASE da Besta Laser (sem a arma no topo — só um suporte giratório de madeira e ferro com um anel rúnico ciano), pixel art, fundo transparente, ~112×128 px:
+   "Medieval wooden watchtower on a stone base for a tower defense game, sturdy and chunky, empty rotating turret mount on top with a faint glowing cyan rune ring. 3/4 top-down FRONT view (same camera as the reference characters — NOT isometric/diagonal), light from the top-left, muted earthy palette, cyan used only for small rune details, readable silhouette at small size."
+   Use a paleta do ART_SPEC.md no parâmetro colors (até 64 cores).
+
+4. Com a base escolhida por mim, gere a ARMA (besta mecânica de madeira e ferro com cordas de energia ciano) vista DE CIMA, apontando para a direita, ~64×64, usando a base como reference_asset_id. Ela será girada no jogo para mirar.
+
+5. Baixe os resultados para arte-bruta/spritecook/ e mantenha um manifesto (asset IDs, prompts, custo) em arte-bruta/spritecook/manifesto.json. Mostre no escolha-torres.html as variações da base no tamanho real sobre o chão, ao lado do orc e das árvores, junto com a Besta A atual para comparar. NÃO integre no jogo ainda — primeiro eu escolho.

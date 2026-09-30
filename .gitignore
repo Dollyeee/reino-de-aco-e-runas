@@ -10,3 +10,6 @@ desktop.ini
 
 # imagens de apoio geradas nas conversas (não fazem parte do jogo)
 Claude outputs/
+
+# configuração local de MCP (pode conter chaves de API: nunca versionar)
+.mcp.json

@@ -1,0 +1,28 @@
+{
+  "tarefa": "T21 — piloto SpriteCook da Besta Laser",
+  "referencias": {
+    "estilo": [
+      {
+        "arquivo": "public/assets/orc-b.png",
+        "asset_id": null
+      },
+      {
+        "arquivo": "public/assets/decor-a-arvore2.png",
+        "asset_id": null
+      },
+      {
+        "arquivo": "public/assets/decor-a-pedraM.png",
+        "asset_id": null
+      },
+      {
+        "arquivo": "arte-bruta/spritecook/referencias/chao-256.png",
+        "asset_id": null
+      }
+    ]
+  },
+  "paleta": "arte-bruta/spritecook/paleta-besta.json",
+  "modelo": null,
+  "qualidade": "medium",
+  "custo_creditos": null,
+  "geracoes": []
+}
