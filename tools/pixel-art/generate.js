@@ -10,10 +10,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PNG } from 'pngjs';
 import orc from './sprites/orc.js';
-import orcB from './sprites/orc-b.js';
+import orcB, { drawOrcB, walkPose, IDLE_POSE, WALK_FRAMES, DESIGN } from './sprites/orc-b.js';
 import brutamontes from './sprites/futuros/brutamontes.js';
 import ciborgue from './sprites/futuros/ciborgue.js';
-import { B1_WALK, B1_IDLE, B1_FRAME } from './legacy/orc-b-v1.js';
 import { escolhaHtml } from './escolha.js';
 import { ORC_VARIANTS } from '../../src/config/art.js';
 import { BALANCE } from '../../src/config/balance.js';
@@ -35,13 +34,17 @@ const DIRT = MATERIALS.terra[2];
 // orc do jogo (atual da T08 e Saqueador padrão) + arte pronta para inimigos futuros (sprites/futuros/)
 const SPRITES = [orc, orcB, brutamontes, ciborgue];
 
-// Página escolha-orc.html: Saqueador como estava na T09 × ajustado na T10 (mesmos pivot, sombra e walkCycle)
-const B_BEFORE = { frame: B1_FRAME, sheets: [{ frames: B1_WALK }, { frames: [B1_IDLE] }] };
+// Página escolha-orc.html: Saqueador na escala da T10 (grade 1, ~107 px) × escala da T13 (grade 0,75, ~80 px).
+// A versão T10 é o mesmo desenho com escala 1, com os encaixes que ela usava no jogo.
+const B_T10 = {
+    frame: DESIGN,
+    sheets: [{ frames: Array.from({ length: WALK_FRAMES }, (_, i) => drawOrcB(walkPose(i / WALK_FRAMES), 1)) }, { frames: [drawOrcB(IDLE_POSE, 1)] }]
+};
 const ORC_CHOICE = [
-    { id: 'b', key: 'antes', label: 'B antes (T09)', sprite: B_BEFORE,
-      note: 'Como foi escolhido: magro, lâmina fina, braço mecânico estreito.' },
-    { id: 'b', key: 'ajustado', label: 'B ajustado (T10) — padrão', sprite: orcB,
-      note: 'Ombros e peito ~15% mais largos, braço mecânico mais grosso com 2 linhas ciano, botas maiores, lâmina ~30% maior com brilho, placa na cabeça.' }
+    { id: 'b', key: 't10', label: 'B na T10 (~107 px)', sprite: B_T10, pivot: [61, 110], shadow: [56, 15], walkCycle: 44,
+      note: 'Escala anterior: grade 136×110.' },
+    { id: 'b', key: 't13', label: 'B na T13 (~80 px) — padrão', sprite: orcB,
+      note: 'Mesmo desenho redesenhado na grade 0,75 (quadro 102×83): contorno e detalhes continuam com 1 px.' }
 ];
 
 // "Antes × depois" no preview (versões antigas congeladas; não vão para o jogo)
@@ -307,13 +310,13 @@ const choice = ORC_CHOICE.map((c) => {
     const [walk, idle] = c.sprite.sheets;
     return {
         id: c.key, label: c.label, note: c.note, fw: c.sprite.frame.w, fh: c.sprite.frame.h,
-        pivot: V.pivot, walkCycle: V.walkCycle, shadow: V.shadow,
+        pivot: c.pivot || V.pivot, walkCycle: c.walkCycle || V.walkCycle, shadow: c.shadow || V.shadow,
         walk: { base64: encodeSheet(walk.frames, c.sprite.frame).toString('base64'), frames: walk.frames.length },
         idle: { base64: encodeSheet(idle.frames, c.sprite.frame).toString('base64') }
     };
 });
 fs.writeFileSync(path.join(HERE, 'escolha-orc.html'), escolhaHtml({
-    title: 'Orc Cibernético — B antes × B ajustado', variants: choice,
+    title: 'Orc Cibernético — escala T10 × T13', variants: choice,
     intro: 'O Saqueador (versão B) é o Orc Cibernético padrão do jogo (<code>ORC_VARIANT = \'b\'</code> em <code>src/config/art.js</code>; ' +
         '<code>?orc=atual</code> na URL mostra o orc da T08). A e C viraram arte para inimigos futuros em <code>sprites/futuros/</code>.',
     speed: BALANCE.enemies.cyberOrc.speed, grass: GRASS, dirt: DIRT

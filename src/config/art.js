@@ -30,8 +30,9 @@ export const ORC_VARIANT = 'b';
 export const ORC_VARIANTS = {
     atual: { label: 'Atual (T08)', prefix: 'orc', frame: [116, 104], pivot: [58, 104],
              eye: { x: 39, y: -66 }, hit: { x: 0, y: -54 }, top: -96, shadow: [56, 16], walkCycle: 44 },
-    b:     { label: 'Saqueador', prefix: 'orc-b', frame: [136, 110], pivot: [61, 110],
-             eye: { x: 33, y: -86 }, hit: { x: 0, y: -60 }, top: -106, shadow: [56, 15], walkCycle: 44 }
+    // T13: redesenhado na grade 0,75 → ~80 px de altura (antes: quadro 136×110, ~107 px)
+    b:     { label: 'Saqueador', prefix: 'orc-b', frame: [102, 83], pivot: [46, 83],
+             eye: { x: 25, y: -65 }, hit: { x: 0, y: -45 }, top: -80, shadow: [42, 11], walkCycle: 33 }
 };
 
 function pickOrcVariant () {

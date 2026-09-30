@@ -27,12 +27,13 @@ cada personagem **em partes** numa grade pequena. Não se edita PNG à mão: mud
 > referência e sombras. Toda arte nova segue esse guia.
 > O orc padrão é o **"Saqueador"** (`sprites/orc-b.js`, `ORC_VARIANT = 'b'` em `src/config/art.js`); o orc da T08
 > continua como alternativa (`?orc=atual` na URL). `tools/pixel-art/escolha-orc.html` compara "B antes × B ajustado".
-> Arte pronta para inimigos futuros fica em `tools/pixel-art/sprites/futuros/` (ver Roadmap).
+> Arte pronta para inimigos futuros fica em `tools/pixel-art/sprites/futuros/` (ver Plano de produção, Fase D).
 
 ### Resolução
 - **Pixel art 1×**: 1 pixel da arte = **1 pixel do mundo** 1280×720 (`PIXEL_SCALE` = 1). Vale para TODA a arte nova.
-- **Inimigos comuns com ~100 px de altura** (orc Saqueador: quadro 136×110, ~107 px com o moicano). Nada de ampliar sprite antigo:
-  as partes são redesenhadas na grade 1×.
+- **Inimigos comuns com ~80 px de altura** (T13; orc Saqueador: quadro 102×83, ~81 px com o moicano). Nada de ampliar
+  ou reduzir imagem: para mudar o tamanho, as partes são redesenhadas numa grade menor (`PixelCanvas` com `scale`,
+  ex.: o Saqueador é desenhado em coordenadas 136×110 e rasterizado na grade 0,75).
 
 ### Gerador (`tools/pixel-art/`)
 - Primitivas rasterizadas na grade, **sem antialias**: retângulo, polígono, elipse, linha grossa, pixel avulso.

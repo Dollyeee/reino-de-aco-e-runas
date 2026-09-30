@@ -4,11 +4,16 @@
 // lâmina de plasma ciano saindo do antebraço. Caminhada rápida e agressiva, passos longos.
 // T10: ombros e peito ~15% mais largos, braço mecânico mais grosso com 2 linhas ciano, botas maiores,
 // lâmina ~30% maior (núcleo de 4 px + brilho de 2 px no vazio) e placa de metal na cabeça.
-// Quadro 136×110, olhando para a DIREITA, pés na borda inferior.
+// T13: redesenhado na grade 0,75 (SCALE) → ~80 px de altura no mundo. As coordenadas abaixo continuam sendo as do
+// desenho original (grade 136×110); o PixelCanvas multiplica por SCALE antes de rasterizar (sem reamostrar imagem).
+// Quadro 102×83, olhando para a DIREITA, pés na borda inferior.
 
 import { PixelCanvas } from '../lib/PixelCanvas.js';
 
-export const FRAME = { w: 136, h: 110 };
+export const DESIGN = { w: 136, h: 110 };        // grade em que as coordenadas foram escritas
+export const SCALE = 0.75;                         // grade do jogo (T13: ~80 px de altura)
+export function frameFor (k) { return { w: Math.ceil(DESIGN.w * k), h: Math.round(DESIGN.h * k) }; }
+export const FRAME = frameFor(SCALE);
 export const WALK_FRAMES = 8;
 export const EYE = { x: 94.5, y: 23.5 };
 
@@ -54,8 +59,9 @@ function leg (cv, hipX, hipY, pose, name) {
     cv.part('acoClaro', (m) => m.poly([[fx + 8, g - 6], [fx + 16, g - 4], [fx + 17, g], [fx + 8, g]]), { name: `${name}: biqueira`, specular: 1 });
 }
 
-export function drawOrcB (pose = IDLE_POSE) {
-    const cv = new PixelCanvas(FRAME.w, FRAME.h);
+export function drawOrcB (pose = IDLE_POSE, k = SCALE) {
+    const F = frameFor(k);
+    const cv = new PixelCanvas(F.w, F.h, { scale: k });
     const b = pose.bob;
     const up = pose.lunge;
     const hipY = 60 + b;
@@ -134,8 +140,9 @@ export function drawOrcB (pose = IDLE_POSE) {
     return cv.finish();
 }
 
-export function eyeAt (pose) {
-    return { x: EYE.x + pose.lunge, y: EYE.y + pose.bob };
+// posição do olho em pixels do quadro (escala do jogo)
+export function eyeAt (pose, k = SCALE) {
+    return { x: EYE.x * k + Math.round(pose.lunge * k), y: EYE.y * k + Math.round(pose.bob * k) };
 }
 
 const walkPoses = Array.from({ length: WALK_FRAMES }, (_, i) => walkPose(i / WALK_FRAMES));

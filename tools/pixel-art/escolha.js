@@ -1,4 +1,4 @@
-// Página de comparação entre versões de um sprite (hoje: Orc Cibernético, "B antes × B ajustado") — gerada por `npm run pixel`.
+// Página de comparação entre versões de um sprite (hoje: Orc Cibernético, escala T10 × T13) — gerada por `npm run pixel`.
 // Mostra cada versão parada e andando em loop, no tamanho real do jogo (grama e terra) e ampliada 4×,
 // e 2 inimigos de cada versão andando juntos sobre o caminho, como numa onda.
 

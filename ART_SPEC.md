@@ -20,6 +20,10 @@ Referências vivas: `tools/pixel-art/preview.html` (paleta completa, tiles, reco
 
 - **1×**: 1 pixel da arte = **1 pixel do mundo** 1280×720 (`PIXEL_SCALE` = 1). Nada é ampliado nem reduzido.
 - Sem antialias, sem rotação e sem escala fracionada nos sprites (o jogo só desloca em pixels inteiros).
+- **Mudar o tamanho = redesenhar na grade**: um sprite pode ser escrito numa grade de desenho maior e rasterizado
+  com `new PixelCanvas(w, h, { scale })` — as formas são multiplicadas por `scale` antes de virar pixels, o contorno
+  continua com 1 px e rebites/pontos (`dot`, `rivet`) continuam com 1 px. **Nunca** se reduz ou amplia a imagem pronta.
+  Ex.: o Saqueador é escrito em 136×110 e desenhado na grade 0,75 (quadro 102×83).
 - **Fundo transparente**; só cores da paleta (`tools/pixel-art/palette.js`).
 
 ## 2. Paleta
@@ -42,6 +46,9 @@ Cada material é uma **rampa de 5 tons com hue shift**: 0 = mais escuro … 4 = 
 | `madeira` | catapulta, portões, cabos de ferramenta | `#26161e` | `#472a26` | `#6e442c` | `#946236` | `#bf8e4c` |
 | `pedra` | castelo, pedras, pedrinhas, sulcos rúnicos | `#23222c` | `#3d3c46` | `#5b5a5f` | `#7c7a76` | `#a5a18f` |
 | `grama` | chão (grama, tufos) | `#232d2c` | `#35432f` | `#4b5a36` | `#627040` | `#858b52` |
+| `gramaSol` | regiões levemente mais claras do gramado | `#242f2b` | `#384630` | `#4f5e38` | `#667443` | `#898f55` |
+| `gramaSombra` | regiões levemente mais escuras do gramado | `#222b2c` | `#33412f` | `#475634` | `#5e6c3e` | `#81884f` |
+| `musgo` | manchas de musgo (entre os tons 1 e 2 da grama) | `#1f292a` | `#2e3b2d` | `#404f31` | `#55643a` | `#74804a` |
 | `terra` | chão (caminho) | `#35272a` | `#58443a` | `#7a6049` | `#977b5b` | `#b59c76` |
 | `ciano` ⚡ | energia rúnica, plasma, runas | `#0c3252` | `#14788c` | `#3ff5ff` | `#a8fcf0` | `#f2fff0` |
 | `vermelho` ⚡ | olhos, perigo, núcleo ferido | `#3a0a26` | `#78101c` | `#ff3b4e` | `#ff9a78` | `#fff0d8` |
@@ -104,14 +111,14 @@ e texturas de material com semente fixa.
 
 | Objeto | Tamanho | Observação |
 |---|---|---|
-| Inimigo comum (orc Saqueador) | ~100–107 px de altura (quadro 136×110) | régua de tudo |
-| Inimigo pesado / elite | 100–115 px (Brutamontes 128×110, Ciborgue 128×106) | mais largo, não muito mais alto |
-| Inimigo voador (futuro) | 60–90 px | voa ~40 px acima da sombra |
+| **Inimigo comum (orc Saqueador)** | **~80 px de altura** (quadro 102×83) | **régua de tudo** (T13; antes ~107 px) |
+| Inimigo pesado / elite | ~85–95 px, bem mais largo | Brutamontes e Ciborgue ainda estão na escala antiga (~106–110 px): serão redesenhados na grade menor no pacote deles (Fase D) |
+| Inimigo voador (futuro) | 50–70 px | voa ~40 px acima da sombra |
 | Torre (base + peça de cima) | 100–150 px de altura, base 80–130 px | Besta ~100 px, Catapulta ~150 px com o braço |
 | Plataforma rúnica | 100×60 px | centro da face de cima = ponto da torre |
-| Castelo | ~260×272 px (≈ 2,5× o orc) | maior objeto do mapa |
+| Castelo | ~260×272 px (≈ 3,4× o orc) | maior objeto do mapa |
 | Núcleo Arcano | 76×124 px | |
-| Árvore | 100–130 px de altura (≈ 1–1,3× o orc), copa 70–100 px | |
+| Árvore | 100–130 px de altura (≈ 1,3–1,6× o orc), copa 70–100 px | |
 | Pedra decorativa | 30–76 px de largura | |
 | Aglomerado de cristais | ~84×86 px | |
 | Largura do caminho | 66 px (`MAP01.pathWidth`) | cabe um orc de lado com folga |
@@ -122,7 +129,7 @@ e texturas de material com semente fixa.
 - **Nunca desenhada no sprite.** O jogo desenha uma **elipse de pixels duros** (sem blur) na camada de sombras,
   cor `rgb(30, 14, 40)` com opacidade 0,28 (`SHADOW.alpha`), **deslocada +7, +4 px** (para baixo/direita).
 - Tamanho (`SHADOWS` em `src/config/art.js`): personagens ≈ 40–60% da largura do quadro × altura de ¼ da largura
-  (orc 56×15); torres e castelo ≈ a largura da base (Besta 84×30, Catapulta 124×38, castelo 270×60).
+  (orc 42×11); torres e castelo ≈ a largura da base (Besta 84×30, Catapulta 124×38, castelo 270×60).
 - O chão (tiles, tufos, pedrinhas) não tem sombra projetada: só a sombra de contato de 1 px embutida no desenho.
 - Sprites de pixel art não escalam a sombra; objetos no ar (projéteis) usam a sombra suave que encolhe com a altura.
 
@@ -143,8 +150,10 @@ e texturas de material com semente fixa.
 
 - O chão de cada mapa é **uma imagem do tamanho do mundo** (1280×720), gerada por `npm run pixel` a partir dos dados
   do mapa (`src/data/map01.js`) e do mesmo `PathTrack` do jogo → o traçado desenhado é o que os inimigos seguem.
-- Grama em **tiles de 32×32** (6 variações com o **mesmo tom de base**, para não aparecer emenda) + manchas de musgo
-  (um tom abaixo, borda recortada) + tufos, flores e pedrinhas espalhados por semente fixa.
+- Grama em **tiles de 32×32** (6 variações com o **mesmo tom de base**, para não aparecer emenda) + **variação por
+  região** (rampas `gramaSol`/`gramaSombra`, manchas grandes e suaves, quase imperceptíveis) + **manchas pequenas de
+  musgo** (rampa `musgo`, borda quebrada em degraus de pixel, folhinhas por dentro; nunca perto das curvas do caminho
+  nem sob o castelo) + tufos, flores e pedrinhas espalhados por semente fixa.
 - Caminho de terra com **borda irregular** (nunca linha reta), barranco escuro em cima/esquerda e claro embaixo/direita,
   capim avançando sobre a terra, sulcos, pegadas e pedrinhas.
 - Mudou o caminho do mapa? Rode `npm run pixel`; o jogo avisa no console se o chão estiver desatualizado.
@@ -167,7 +176,7 @@ e texturas de material com semente fixa.
 | Arquivo | Tamanho lógico | Pivot (no quadro) | Olha para | Animação feita pelo código |
 |---|---|---|---|---|
 | `ground-map01` (pixel art 1×, chão) | 1280×720 | 0,0 (canto superior esquerdo) | — | nenhuma |
-| `enemy-cyber-orc` (pixel art 1×, Saqueador) | 136×110 | 61,110 (entre os pés) | direita (espelhado) | caminhada em 8 quadros, dano, morte |
+| `enemy-cyber-orc` (pixel art 1×, Saqueador) | 102×83 | 46,83 (entre os pés) | direita (espelhado) | caminhada em 8 quadros, dano, morte |
 | `tower-crossbow-base` | 88×88 | 44,88 (inferior central) | frente (simétrica) | squash |
 | `tower-crossbow-head` | 116×66 | 58,33 (centro = eixo de giro) | direita (gira 360°) | giro, recuo, brilho |
 | `tower-catapult-base` | 128×104 | 64,104 (inferior central) | direita (espelhada) | squash, vira de lado |
@@ -192,22 +201,24 @@ e texturas de material com semente fixa.
 - Cena de conferência: `tools/pixel-art/cena-referencia.png` (`tools/pixel-art/cenario/cena.js`).
 
 ### Orc Cibernético — `enemy-cyber-orc` (pixel art 1×, "Saqueador") ✅
-Versão padrão do jogo (`ORC_VARIANT = 'b'` em `src/config/art.js`), escolhida na T09 e ajustada na T10.
-- **Arquivos**: `orc-b-walk.png` (folha 1088×110, **8 quadros** de 136×110), `orc-b-walk.json` (olho por quadro) e
-  `orc-b.png` (parado). Fonte: `tools/pixel-art/sprites/orc-b.js`. A versão da T09 (antes do ajuste) está congelada
-  em `tools/pixel-art/legacy/orc-b-v1.js`, só para o comparativo "B antes × B ajustado" de `escolha-orc.html`.
-- **Quadro**: 136×110 = tamanho no mundo (a lâmina e seu brilho ocupam a direita) · pivot entre os pés (61, 110) ·
-  **olha para a direita** (espelhado para a esquerda).
+Versão padrão do jogo (`ORC_VARIANT = 'b'` em `src/config/art.js`), escolhida na T09, ajustada na T10 e reduzida
+para ~80 px na T13.
+- **Arquivos**: `orc-b-walk.png` (folha 816×83, **8 quadros** de 102×83), `orc-b-walk.json` (olho por quadro) e
+  `orc-b.png` (parado). Fonte: `tools/pixel-art/sprites/orc-b.js`, escrito em coordenadas da grade 136×110 e
+  desenhado na grade **0,75** (`SCALE`). `escolha-orc.html` compara a escala da T10 (grade 1, ~107 px) com a atual.
+- **Quadro**: 102×83 = tamanho no mundo (a lâmina e seu brilho ocupam a direita) · pivot entre os pés (46, 83) ·
+  figura com ~81 px de altura · **olha para a direita** (espelhado para a esquerda).
 - **Corpo**: alto e magro, inclinado para frente como quem vai atacar; pernas longas (coxa de pele, canela enfaixada,
   bota de couro com sola e biqueira de aço); colete de couro, alça, cinto com bolsa, faixas; ombreira pequena;
   cabeça projetada com orelha longa, mandíbula comprida, presa, moicano, monóculo vermelho e placa de metal rebitada.
 - **Braço da frente inteiro mecânico**: braço de aço com pistão, cotovelo, antebraço blindado, garra, cabos e 2 linhas
   ciano; **lâmina de plasma** saindo do antebraço (núcleo claro de 4 px + brilho ciano de 2 px que se espalha no vazio,
   sem contorno). Lâmina e olho vermelho são os dois pontos focais.
-- **Caminhada**: passos longos (pernas ±14 px, pé sobe 8 px) com joelhos dobrados; corpo sobe 2 px na passagem e dá um
-  bote de 2 px à frente no contato; braço de carne balança ±8 px; lâmina firme.
-- **Pontos de encaixe** (px do mundo, a partir do pivot): `eye` (+33, −86) na pose parada (na caminhada vem do
-  JSON) · `hit` (0, −60) · `top` −106. Sombra: elipse de pixels 56×15. `walkCycle` 44.
+- **Caminhada** (valores na grade do desenho; no jogo × 0,75, arredondados): passos longos (pernas ±14 px, pé sobe
+  8 px) com joelhos dobrados; corpo sobe 2 px na passagem e dá um bote de 2 px à frente no contato; braço de carne
+  balança ±8 px; lâmina firme.
+- **Pontos de encaixe** (px do mundo, a partir do pivot): `eye` (+25, −65) na pose parada (na caminhada vem do
+  JSON) · `hit` (0, −45) · `top` −80. Sombra: elipse de pixels 42×11. `walkCycle` 33.
 - **No jogo**: animação "walk" em loop com velocidade proporcional ao passo; dano = flash branco + recuo de 2 px;
   morte = quadro parado, pisca, afunda e vira faíscas.
 

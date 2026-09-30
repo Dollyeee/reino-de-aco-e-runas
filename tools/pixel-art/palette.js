@@ -24,6 +24,11 @@ export const MATERIALS = {
 
     // cenário (T12): mais escuro e dessaturado que os personagens, para eles se destacarem
     grama: ['#232d2c', '#35432f', '#4b5a36', '#627040', '#858b52'],
+    // variação por região (T13): quase imperceptível, ± um passo pequeno em volta da grama base
+    gramaSol: ['#242f2b', '#384630', '#4f5e38', '#667443', '#898f55'],
+    gramaSombra: ['#222b2c', '#33412f', '#475634', '#5e6c3e', '#81884f'],
+    // musgo (T13): entre os tons 1 e 2 da grama, mais oliva; manchas pequenas com folhinhas
+    musgo: ['#1f292a', '#2e3b2d', '#404f31', '#55643a', '#74804a'],
     terra: ['#35272a', '#58443a', '#7a6049', '#977b5b', '#b59c76'],
     pedra: ['#23222c', '#3d3c46', '#5b5a5f', '#7c7a76', '#a5a18f'],
     madeira: ['#26161e', '#472a26', '#6e442c', '#946236', '#bf8e4c']

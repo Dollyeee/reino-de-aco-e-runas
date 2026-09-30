@@ -3,7 +3,9 @@
 //
 // Camadas (de baixo para cima):
 //   1. grama: tiles 32×32 (6 variações, todas com o mesmo tom de base → sem emenda visível), escolhidos por
-//      semente fixa; manchas de musgo mais escuro com borda recortada (ruído de 2 oitavas);
+//      semente fixa; variação de tom por região (rampas gramaSol/gramaSombra, manchas grandes e suaves) e
+//      manchas pequenas de musgo (rampa própria, borda quebrada em blocos de pixel, folhinhas por dentro),
+//      longe das curvas do caminho e do castelo;
 //   2. caminho de terra: borda irregular (ruído ao longo do caminho + pixels soltos), caminho "afundado"
 //      com a luz do canto superior esquerdo → borda de cima/esquerda na sombra do barranco (tons 0–1) e borda
 //      de baixo/direita iluminada (tom 3); sulcos, pegadas, manchas de terra batida e pedrinhas;
@@ -19,7 +21,8 @@ import { fbm, valueNoise, valueNoise1 } from '../lib/noise.js';
 import PathTrack from '../../../src/world/PathTrack.js';
 
 export const TILE = 32;
-const G = MATERIALS.grama, T = MATERIALS.terra, P = MATERIALS.pedra, C = MATERIALS.ciano;
+const G = MATERIALS.grama, T = MATERIALS.terra, P = MATERIALS.pedra, C = MATERIALS.ciano, M = MATERIALS.musgo;
+const G_INDEX = Object.fromEntries(G.map((c, i) => [c, i]));
 
 // ---------------------------------------------------------------------------------------- raster
 // Imagem simples: uma cor '#rrggbb' (ou null = transparente) por pixel.
@@ -207,7 +210,15 @@ export function drawGround (map, w = 1280, h = 720) {
         for (let v = 0; v < WEIGHTS.length; v++) { r -= WEIGHTS[v]; if (r < 0) { return v; } }
         return 0;
     };
-    const DOWN = { [G[4]]: G[3], [G[3]]: G[2], [G[2]]: G[1], [G[1]]: G[1], [G[0]]: G[0] };
+    // onde o musgo NÃO pode aparecer: perto das curvas do caminho e embaixo/em volta do castelo
+    const corners = map.path.slice(1, -1);
+    const c0 = map.castle;
+    const mossAllowed = (x, y) => {
+        if (corners.some((p) => Math.hypot(p.x - x, p.y - y) < 120)) { return false; }
+        if (c0 && x > c0.x - 170 && x < c0.x + 170 && y > c0.y - 290 && y < c0.y + 50) { return false; }
+        return inset[y * w + x] === -99;   // nem colado na borda do caminho
+    };
+    const isMoss = new Uint8Array(w * h);
     for (let ty = 0; ty * TILE < h; ty++) {
         for (let tx = 0; tx * TILE < w; tx++) {
             const tile = tiles[pickTile(tx, ty)];
@@ -215,13 +226,34 @@ export function drawGround (map, w = 1280, h = 720) {
                 for (let i = 0; i < TILE; i++) {
                     const x = tx * TILE + i, y = ty * TILE + j;
                     if (x >= w || y >= h) { continue; }
-                    let c = tile.px[j * TILE + i];
-                    // musgo: manchas grandes um tom abaixo, borda recortada pixel a pixel
-                    const m = fbm(x, y, 90, seed + 21) + (hash(x, y, seed + 22) - 0.5) * 0.035;
-                    if (m > 0.71 && hash(x, y, seed + 23) < 0.88) { c = DOWN[c]; }
-                    img.set(x, y, c);
+                    const t = G_INDEX[tile.px[j * TILE + i]];
+                    // região: manchas grandes e suaves, ± um passo pequeno de tom (quase imperceptível)
+                    const r = fbm(x, y, 260, seed + 25) + (hash(x, y, seed + 26) - 0.5) * 0.02;
+                    const ramp = r > 0.58 ? MATERIALS.gramaSol : (r < 0.42 ? MATERIALS.gramaSombra : G);
+                    // musgo: manchas pequenas; o ruído é lido em blocos de 2×2 px → borda quebrada em degraus,
+                    // e cada bloco da borda ainda ganha um "dente" pixel a pixel
+                    const bx = x >> 1, by = y >> 1;
+                    const m = fbm(bx * 2, by * 2, 54, seed + 21) + (hash(bx, by, seed + 22) - 0.5) * 0.06 +
+                        (hash(x, y, seed + 23) - 0.5) * 0.02;
+                    if (m > 0.72 && mossAllowed(x, y)) {
+                        isMoss[y * w + x] = 1;
+                        img.set(x, y, M[Math.min(t, 3)]);
+                    } else {
+                        img.set(x, y, ramp[t]);
+                    }
                 }
             }
+        }
+    }
+    // folhinhas dentro do musgo (2 px claros + 1 px de sombra embaixo/à direita)
+    const LEAVES = [['33', '.1'], ['3.', '31'], ['.3', '31']];
+    for (let y = 0; y < h - 2; y += 3) {
+        for (let x = 0; x < w - 2; x += 3) {
+            if (hash(x, y, seed + 27) > 0.3) { continue; }
+            const lx = x + Math.floor(hash(x, y, seed + 28) * 3), ly = y + Math.floor(hash(x, y, seed + 29) * 3);
+            const leaf = LEAVES[Math.floor(hash(x, y, seed + 30) * LEAVES.length)];
+            const inside = leaf.every((row, j) => [...row].every((ch, i) => ch === '.' || isMoss[(ly + j) * w + lx + i]));
+            if (inside) { img.stamp(lx, ly, leaf, { 1: M[1], 3: M[3] }); }
         }
     }
 

@@ -283,7 +283,14 @@ Início da conversão do jogo inteiro para pixel art 1×. Etapa 1: guia de estil
 
 ---
 
-## [ ] T13 — Ajustes do chão e escala do orc
+## [x] T13 — Ajustes do chão e escala do orc
+
+**Concluída em 2026-09-30.** Resultado:
+- **Musgo**: rampa própria `musgo` (entre os tons 1 e 2 da grama, mais clara que antes), manchas ~40% menores (ruído 90 → 54 px), borda quebrada em degraus de 2 px com dentes de 1 px, folhinhas por dentro; nenhuma mancha a menos de 120 px das curvas do caminho, sob/em volta do castelo nem colada no caminho.
+- **Variação por região**: rampas `gramaSol` / `gramaSombra` (≈ ±4 níveis de cor) em manchas grandes e suaves (ruído de 260 px).
+- **Orc Saqueador ~80 px**: `PixelCanvas` ganhou escala de grade (`scale`: formas multiplicadas antes de rasterizar; contorno, rebites e pontos continuam com 1 px); `orc-b.js` desenhado na grade 0,75 → quadro 102×83, figura de 81 px. Encaixes em `ORC_VARIANTS.b`: pivot (46,83), olho (+25,−65), hit (0,−45), top −80, sombra 42×11, walkCycle 33. Outros sprites idênticos (escala 1). `escolha-orc.html` agora compara T10 (~107 px) × T13; `legacy/orc-b-v1.js` removido.
+- **ART_SPEC.md / CLAUDE.md**: inimigo comum ~80 px como régua, regra "mudar tamanho = redesenhar na grade", paleta com as rampas novas; Brutamontes e Ciborgue anotados como ainda na escala antiga (redesenho no pacote da Fase D).
+- **20 orcs em fila** (imagens em `Claude outputs/fila-20-orcs-onda1.png` e `-onda5.png`): na onda 1 (71 px entre orcs) todos separados; na onda 5 (44 px) se sobrepõem nos trechos verticais, mas cabeça, olho e lâmina de cada um continuam distintos. `npm run pixel` e `npm run build` OK.
 
 Ajustes da etapa 1 do pixel art (chão) + escala dos personagens:
 
