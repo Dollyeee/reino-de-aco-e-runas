@@ -333,3 +333,17 @@ Entregáveis:
 2. Um seletor DECOR_KIT em src/config/art.js ('a' | 'b' | 'c'), para eu testar no jogo; padrão = arte atual até eu escolher.
 3. Sombras no chão seguindo as regras do ART_SPEC; a área de bloqueio de construção de cada item (PlacementRules) ajustada ao tamanho real da nova arte.
 4. npm run pixel e npm run build sem erros. Me diga em 2 linhas o ponto forte e o ponto fraco de cada kit no conjunto do mapa.
+
+---
+
+## [ ] T16 — Registrar design dos upgrades
+
+Registrar no CLAUDE.md (plano de produção, Fase C — estrutura de upgrades) a decisão de design dos upgrades. Não implemente nada agora.
+
+- Sistema de caminhos cruzados estilo Bloons: cada torre tem 3 caminhos × 4 níveis.
+- Regra de cruzamento: um caminho pode chegar ao nível 4, um segundo caminho até o nível 2, o terceiro fica bloqueado depois que os outros dois forem escolhidos.
+- Níveis 1–2: melhorias menores com pequenos detalhes visuais; nível 3: mudança visível; nível 4: mudança grande de visual e comportamento.
+- Upgrades podem alterar números E capacidades (damageType, canHit, efeitos como dano contínuo, fragmentação, redução de armadura), usando o hook preparado na T11.
+- Visual por peças: cada nível troca ou adiciona peças no gerador de pixel art, sem redesenhar a torre inteira.
+- Todo caminho e combinação precisa passar pelo simulador de balanceamento (Fase B) antes de entrar no jogo.
+- Esboço inicial dos caminhos: Besta Laser = Perfurante (anti-blindado) / Rajada (cadência, tiro triplo) / Sentinela (alcance + acerta voadores). Catapulta de Plasma = Devastação (área) / Fragmentação (sub-bombas) / Corrosão (derrete armadura e escudo, dano contínuo).
