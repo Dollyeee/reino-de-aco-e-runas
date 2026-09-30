@@ -89,3 +89,23 @@ Regras:
 - Nada de números de gameplay fora de balance.js; tempos e cores do efeito em visual.js.
 
 Teste: construir várias torres seguidas (inclusive com Shift), construir durante uma onda com inimigos passando perto (não pode atirar antes de terminar) e conferir depth/iluminação. npm run build sem erros.
+
+## [ ] T04 — Processo de arte pintada
+
+Configurar o processo de arte pintada. A direção de arte mudou: o jogo passa a usar arte "pintada estilizada" gerada em PNG por IA de imagem, no lugar dos SVGs desenhados em código. Depende da tarefa que preparou o carregamento de PNG/WebP e o ART_SPEC.md.
+
+1. CLAUDE.md: substitua a seção "Estilo visual" por "Direção de arte" com:
+   - Estilo: arte pintada à mão estilizada, pinceladas suaves visíveis, formas grandes e legíveis, proporções pesadas (não fofas), paleta terrosa e dessaturada, ciano #3ff5ff e vermelho só em energia/olhos/magia, contorno escuro fino e irregular só na silhueta, câmera 3/4, luz quente do canto superior esquerdo + rim light.
+   - A arte é produzida FORA do código. O Claude Code não desenha nem redesenha arte de personagens/torres/cenário em SVG ou código; só integra os arquivos. Os SVGs atuais são placeholders até serem substituídos.
+   - Mantenha as regras de iluminação dinâmica, sombras projetadas, depth e animações procedurais (ajustando a intensidade do squash para combinar com arte pintada: máx. ~6%).
+
+2. Crie a pasta arte-bruta/ (fora de public/) para eu jogar as imagens geradas, e o script `npm run arte` (Node + sharp) que, para cada arquivo em arte-bruta/ cujo nome bate com um asset do ART_SPEC.md:
+   - remove o fundo magenta #FF00FF com tolerância ajustável e borda suave (antialias), e remove o "vazamento" rosado nas bordas (despill);
+   - recorta o espaço vazio, posiciona com a ancoragem do ART_SPEC.md (borda inferior central, com a margem certa);
+   - redimensiona para 2× o tamanho lógico do asset e salva como WebP com transparência em public/assets/;
+   - atualiza o art.js (arquivo, escala e, se preciso, pontos de encaixe proporcionais) e gera arte-bruta/preview.html mostrando cada asset processado sobre a grama e sobre a terra do caminho, no tamanho real do jogo.
+   - Arquivos que não batem com nenhum asset: liste no final como "ignorados", sem apagar.
+
+3. Adicione arte-bruta/ ao .gitignore (as imagens finais em public/assets/ entram no git).
+
+4. Teste com uma imagem de exemplo gerada por você mesmo (um círculo sobre fundo magenta), confira o recorte e a ancoragem, e depois apague o exemplo. npm run build sem erros.
