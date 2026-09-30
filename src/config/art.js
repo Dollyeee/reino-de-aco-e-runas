@@ -27,7 +27,7 @@ import { TOWER_ART } from './towerArt.js';
 // Versão das torres (T19): 'atual' (SVGs, padrão até a escolha) | 'a' | 'b' | 'c' (pixel art, src/config/towerArt.js).
 // Para testar sem editar este arquivo: ?besta=a&catapulta=c na URL. Comparação: tools/pixel-art/escolha-torres.html.
 export const TOWER_VARIANT = {
-    laserCrossbow: 'atual',
+    laserCrossbow: 'n',          // Besta nova (T22) no jogo para teste do usuário; 'atual' volta ao SVG
     plasmaCatapult: 'atual'
 };
 
