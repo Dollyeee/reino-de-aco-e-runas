@@ -120,3 +120,22 @@ Convenções:
 - `npm run dev` — servidor de desenvolvimento (Vite) em http://localhost:5173
 - `npm run build` — build de produção em `dist/`
 - `npm run preview` — serve o build de produção
+
+## Fluxo de trabalho
+
+Versionamento com **git** (branch `main`, sem remoto por enquanto). Identidade configurada só neste repositório.
+
+- **Fila de tarefas** em `TAREFAS.md`:
+  - `/fila <tarefa>` adiciona ao final da fila, **sem executar**.
+  - `/proxima` executa a próxima tarefa pendente, **uma por vez**, e **para** para o usuário testar.
+- **Tarefa nova no meio de outra**: se o usuário mandar uma tarefa nova pela conversa enquanto outra está em
+  andamento, **NÃO** comece a nova. Adicione-a ao final de `TAREFAS.md` (mesmo formato do `/fila`), confirme em
+  uma linha e continue a tarefa atual.
+- **Um commit ao fim de cada tarefa concluída**, mensagem em português `<ID>: <título>` e um resumo curto no corpo.
+  **Nunca** commitar com `npm run build` quebrado.
+- **Pedidos soltos** fora da fila (ajustes rápidos) também terminam em commit, com mensagem clara.
+- **Proibido sem autorização explícita do usuário**: `git reset --hard`, `git push --force`, `git clean`, rebase,
+  reescrever histórico, apagar branches.
+- **Desfazer uma tarefa**: use `git revert` do commit dela (mantém o histórico) e mostre ao usuário o que vai ser
+  revertido (`git show --stat <commit>`) **antes** de reverter.
+- **"O que mudou?"**: responda com base em `git log` / `git diff`.
